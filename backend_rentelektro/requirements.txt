@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+gunicorn
+python-jose
+bcrypt
+passlib
+prometheus-fastapi-instrumentator
+asyncpg
+environ
+pytest
+pydantic[email]
+pydantic-settings
+django-environ
+psycopg2-binary

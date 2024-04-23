@@ -1,0 +1,33 @@
+@startuml
+!theme plain
+
+class "ChatMessages" {
+    -senderId: ObjectId
+    -receiverId: ObjectId
+    -message: String
+    -timestamp: Date
+    -attachments: Array<String>
+    -metadata: Object
+}
+
+class "Feedback_Tickets" {
+    -userId: ObjectId
+    -type: String ["feedback" | "service_ticket"]
+    -content: String
+    -submittedAt: Date
+    -status: String
+    -details: Object
+    -attachments: Array<String>
+}
+
+class "AnalyticsEvents" {
+    -eventType: String
+    -userId: ObjectId
+    -timestamp: Date
+    -eventDetails: Object
+    -metadata: Object
+}
+
+
+
+@enduml

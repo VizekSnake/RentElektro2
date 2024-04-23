@@ -1,0 +1,103 @@
+@startuml Enhanced User Management API Diagram
+
+skinparam backgroundColor orange
+skinparam rectangle {
+    BackgroundColor black
+    BorderColor black
+    FontColor white
+    FontName Arial
+    FontSize 10
+}
+skinparam note {
+    BackgroundColor azure
+    BorderColor black
+    FontName Arial
+    FontSize 10
+}
+
+package "RentElektro API DOC scheme Alpha"{
+
+rectangle "User Management Scheme" {
+    note "**Register User**\n\n----\n**POST**\n /api/users/register\n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- username (string)\n- firstname(string)\n- lastname (string)\n- phone (string)\n- company (boolean)\n- email (string)\n- password (string)\n\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as Register
+    note "**Login User**\n\n----\n**POST**\n /api/users/login\n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- email (string)\n- password (string)\n\n**Responses:**\n- 200 OK: User ID, login welcome\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as Login
+    note "**Get User Profile**\n\n----\n**GET**\n /api/users/{userId} \n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- username (string)\n- email (string)\n- password (string)\n\n**Responses:**\n- 200 OK: User ID\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as GetProfile
+    note "**Update User Profile**\n\n----\n**PATCH**\n /api/users/{userId} \n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- username (optional,string)\n- email (optional,string)\n- firstname(optional,string)\n- lastname (optional,string)\n- phone (optional,string)\n- company (optional,boolean)\n- recovery_phone (optional,string)\n- recovery_email (optional,string)\n- profile_img (optional,string)\n\n**Responses:**\n- 200 OK: User ID\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as UpdateProfile
+    note "**Delete User Profile**\n\n----\n**DELETE**\n /api/users/{userId} \n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- userId (integer)\n- email (string)\n- password (string)\n\n**Responses:**\n- 200 OK: User ID, confirmation of delete\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as DeleteProfile
+    note "**Hibernate User Profile**\n\n----\n**PATCH**\n /api/users/{userId}/hibernate \n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- username (string)\n- email (string)\n- password (string)\n\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as HibernateProfile
+}
+rectangle "Tool listings Scheme" {
+    note "**List all tools**\n\n----\n**GET**\n /api/tools\n\n**Headers**:\nAuthorization: Bearer token\n\n**Query Parameters**\n- category (optional, string)\n- availability (optional, boolean)\n\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as ListTools
+    note "**Add a tool**\n\n----\n**POST**\n /api/tool/add\n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- name (string)\n- brand(string)\n- description (string)\n- category (string)\n- availability (boolean)\n- rate (number, price per day)\n\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as AddTool
+    note "**Tool profile**\n\n----\n**GET**\n/api/tool\n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- name (string)\n- brand(string)\n- description (string)\n- category (string)\n- availability (boolean)\n- rate (number, price per day)\n- rating\n- number of rents\n\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as ToolProfile
+    note "**User tools**\n\n----\n**GET**\n/api/tool\n\n**Headers**:\nAuthorization: Bearer token\n\n**Query Parameters**\n- status (optional, string)\n- availability (optional, boolean)\n\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as UserTools
+    note "**Update Tool Availability**\n\n----\n**POST**\n /api/tools/{toolId}/availability \n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- availability (boolean)\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as ToolAvaibility
+    note "**Update Tool**\n\n----\n**PATCH** /api/tool/{toolId}\n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:** (JSON with fields to update)\n- name (string): The new name of the tool\n- description (string): Updated description\n- availability (boolean): Whether the tool is available for use\n\n**Responses:**\n- 200 OK: Tool updated successfully, possibly return updated tool details\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized: Authentication required or failed\n- 404 Not Found: Tool not found\n- 409 Conflict: Update conflict,trying to update to an already used name" as UpdateTool
+   note "**Delete Tool**\n\n----\n**DELETE** /api/tool/{toolId}\n\n**Headers**:\nAuthorization: Bearer token\n\n**Responses:**\n- 204 No Content: Tool successfully deleted\n- 400 Bad Request: Invalid tool ID\n- 401 Unauthorized: Authentication required\n- 404 Not Found: Tool not found\n- 409 Conflict: Cannot delete tool due to a conflict (e.g., tool is in use)" as DeleteTool
+  note "**Tool Categories**\n\n----\n**GET** /api/tool/categories\n\n**Headers**:\nAuthorization: Bearer token (if required)\n\n**Responses:**\n- 200 OK: Returns a list of tool categories\n- 400 Bad Request: Invalid request parameters\n- 401 Unauthorized: Authentication required or failed \n- 404 Not Found: Categories not found\n- 409 Conflict: Generic conflict" as ToolCategories
+
+}
+rectangle "Rental Scheme" {
+    note "**Rent Tool**\n\n----\n**GET**\n /api/rentals\n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- toolId(string)\n- startDate(date)\n- endDate(date)\n\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as RentTool
+    note "**Rent Offer**\n\n----\n**GET**\n /api/rentals/{rentalId}\n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- toolId(string)\n- startDate(date)\n- endDate(date)\n- brand(string)\n\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as RentOffer
+    note "**Return a Tool**\n\n----\n**PATCH**\n /api/rentals/{rentalId}/return \n\n**Headers**:\nAuthorization: Bearer token\n\n**Responses:**\n- 200 OK: Confirmation of return\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as ReturnTool
+    note "**RentalDetails**\n\n----\n**POST**\n /api/rentals/detail\n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- username (string)\n- email (string)\n- password (string)\n\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as RentalDetails
+    note "**Extend Rental**\n\n----\n**PATCH**\n /api/rentals/{rentalId}/extend \n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- endDate (date, new end date)\n\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as ExtendRental
+    note "**ToolCalendar**\n\n----\n**PATCH**\n /api/tools/{toolId}/calendar \n\n**Headers**:\nAuthorization: Bearer token\n\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as ToolCalendar
+    note "**Delete Rental Offer**\n\n----\n**DELETE**\n /api/rentals/{rentalId}/delete \n\n**Headers**:\nAuthorization: Bearer token\n\n**Body:**\n- username (string)\n- email (string)\n- password (string)\n\n**Responses:**\n- 200 OK: User ID, confirmation of registration\n- 400 Bad Request: Invalid input data\n- 401 Unauthorized\n- 409 Conflict" as DeleteRentalOffer
+    note "**Rate and Review a Tool**\n\n----\n**POST** /api/tools/{toolId}/reviews\n\n**Headers**:\n- Authorization: Bearer token\n\n**Body:**\n- rating (integer, 1-5)\n- review (optional, string)\n\n**Responses:**\n- 200 OK: Review ID, confirmation of submission." as RateAndReview
+
+}
+rectangle "Admin Features" {
+    note "**Get All Rentals**\n\n----\n**GET** /api/admin/rentals\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Response:**\n- 200 OK: List of all rentals with details." as GetAllRentals
+    note "**Manage Tool Categories**\n\n----\n**Endpoint:** /api/admin/categories\n**Method:** POST/GET/DELETE\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Body/Query Parameters:** Depends on operation: Add, List, Remove category\n\n**Response:**\n- 200 OK: Confirmation of action, updated list of categories.\n- 400 Bad Request: Invalid request parameters.\n- 401 Unauthorized: Admin token required." as ManageCategories
+    note "**View All Users**\n\n----\n**GET** /api/admin/users\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Response:**\n- 200 OK: List of all users with details.\n- 401 Unauthorized: Admin token required." as ViewAllUsers
+    note "**Add User**\n\n----\n**POST** /api/admin/users\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Body:**\n- username (string)\n- email (string)\n- password (string)\n- role (string): 'user' or 'privileged'\n\n**Response:**\n- 201 Created: User ID, confirmation of user creation.\n- 400 Bad Request: Missing/invalid fields.\n- 401 Unauthorized: Admin token required." as AddUser
+    note "**Add Privileged User**\n\n----\n**POST** /api/admin/users/privileged\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Body:**\n- username (string)\n- email (string)\n- password (string)\n\n**Response:**\n- 201 Created: Privileged User ID, confirmation of privileged user creation.\n- 400 Bad Request: Missing/invalid fields.\n- 401 Unauthorized: Admin token required." as AddPrivilegedUser
+    note "**Update User Status**\n\n----\n**PATCH** /api/admin/users/{userId}/status\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Body:**\n- status (string): New status of the user (e.g., 'active', 'suspended')\n\n**Response:**\n- 200 OK: Confirmation of user status update.\n- 400 Bad Request: Missing/invalid status.\n- 401 Unauthorized: Admin token required.\n- 404 Not Found: User ID does not exist." as UpdateUserStatus
+    note "**Delete User**\n\n----\n**DELETE** /api/admin/users/{userId}\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Response:**\n- 200 OK: Confirmation of user deletion.\n- 401 Unauthorized: Admin token required.\n- 404 Not Found: User ID does not exist." as DeleteUser
+    note "**Manage Rules and Permissions**\n\n----\n**PATCH** /api/admin/rules\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Body:**\n- ruleId (string)\n- action (string): 'add', 'remove', or 'update'\n- permissions (array of strings): Specific permissions to apply\n\n**Response:**\n- 200 OK: Confirmation of rule/permission update.\n- 400 Bad Request: Missing/invalid fields or actions.\n- 401 Unauthorized: Admin token required." as ManageRules
+}
+rectangle "Maintenance and Service Tracking" {
+    note "**Report Tool Issue**\n\n----\n**POST** /api/tools/{toolId}/issues/report\n\n**Headers**:\n- Authorization: Bearer token\n\n**Body:**\n- description (string)\n\n**Response:**\n- 201 Created: Issue report confirmation, tracking ID.\n- 400 Bad Request: Missing/invalid fields.\n- 401 Unauthorized: User token required." as ReportToolIssue
+    note "**Schedule Maintenance**\n\n----\n**POST** /api/tools/{toolId}/maintenance/schedule\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Body:**\n- date (date)\n- description (string)\n\n**Response:**\n- 201 Created: Maintenance schedule confirmation.\n- 400 Bad Request: Missing/invalid fields or date.\n- 401 Unauthorized: Admin token required." as ScheduleMaintenance
+    note "**View Scheduled Maintenance**\n\n----\n**GET** /api/tools/{toolId}/maintenance\n\n**Headers**:\n- Authorization: Bearer token\n\n**Response:**\n- 200 OK: List of scheduled maintenance events.\n- 404 Not Found: Tool ID does not exist." as ViewScheduledMaintenance
+    note "**Cancel Scheduled Maintenance**\n\n----\n**DELETE** /api/tools/{toolId}/maintenance/{maintenanceId}/cancel\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Response:**\n- 200 OK: Confirmation of cancellation.\n- 404 Not Found: Maintenance ID does not exist." as CancelScheduledMaintenance
+    note "**Update Scheduled Maintenance**\n\n----\n**PATCH** /api/tools/{toolId}/maintenance/{maintenanceId}/update\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Body:**\n- date (date)\n- description (string)\n\n**Response:**\n- 200 OK: Confirmation of update.\n- 400 Bad Request: Missing/invalid fields.\n- 404 Not Found: Maintenance ID does not exist." as UpdateScheduledMaintenance
+    note "**View Tool Issues**\n\n----\n**GET** /api/tools/{toolId}/issues\n\n**Headers**:\n- Authorization: Bearer token\n\n**Response:**\n- 200 OK: List of issues.\n- 404 Not Found: Tool ID does not exist." as ViewToolIssues
+    note "**Update Tool Issue Status**\n\n----\n**PATCH** /api/tools/{toolId}/issues/{issueId}/status\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Body:**\n- status (string)\n\n**Response:**\n- 200 OK: Confirmation of status update.\n- 404 Not Found: Issue ID does not exist." as UpdateToolIssueStatus
+    note "**Maintenance History**\n\n----\n**GET** /api/tools/{toolId}/maintenance/history\n\n**Headers**:\n- Authorization: Bearer token\n\n**Response:**\n- 200 OK: List of maintenance events.\n- 404 Not Found: Tool ID does not exist." as MaintenanceHistory
+     note "**Assign Maintenance Task**\n\n----\n**POST** /api/tools/{toolId}/maintenance/assign\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Body:**\n- staffId/provider (string)\n- maintenanceId (string)\n- notes (optional, string)\n\n**Response:**\n- 201 Created: Assignment details.\n- 400 Bad Request: Missing/invalid fields.\n- 404 Not Found: Maintenance ID does not exist." as AssignMaintenanceTask
+    note "**Report Tool Issue by User**\n\n----\n**POST** /api/tools/{toolId}/issues/report\n\n**Headers**:\n- Authorization: Bearer token\n\n**Body:**\n- description (string): Detailed description of the issue.\n- category (string): The category of the issue (e.g., 'mechanical', 'electrical', 'software').\n- urgency (string): Indicates the urgency of the issue (e.g., 'low', 'medium', 'high').\n- images (optional, array of strings): URLs or identifiers for uploaded images evidencing the issue.\n\n**Response:**\n- 201 Created: Issue report confirmation, tracking ID.\n- 400 Bad Request: Missing/invalid fields.\n- 401 Unauthorized: User token required.\n- 413 Payload Too Large: Too many or too large images uploaded." as ReportToolIssueByUser
+}
+rectangle "User Feedback and Queries" {
+    note "**Submit Feedback**\n\n----\n**POST** /api/feedback/submit\n\n**Headers**:\n- Authorization: Bearer token\n\n**Body:**\n- feedbackType (string): Type of feedback (e.g., 'service', 'app').\n- comments (string): User comments.\n\n**Responses:**\n- 201 Created: Feedback submission confirmation.\n- 400 Bad Request: Invalid input data.\n- 401 Unauthorized" as SubmitFeedback
+    note "**Submit Query**\n\n----\n**POST** /api/queries/submit\n\n**Headers**:\n- Authorization: Bearer token\n\n**Body:**\n- querySubject (string)\n- queryDetails (string)\n\n**Responses:**\n- 201 Created: Query submission confirmation.\n- 400 Bad Request: Invalid input data.\n- 401 Unauthorized" as SubmitQuery
+}
+
+rectangle "Chat System (to consider TODO)" {
+    note "**WebSocket Chat Connection**\n\n----\n**WebSocket** /ws/chat\n\nAllows for real-time messaging between users. Once a user opens a WebSocket connection to this endpoint, they can send and receive messages in real-time.\n\n**Headers**:\n- Authorization: Bearer token\n\n**Usage**:\n- To send a message, users submit a text message through the WebSocket connection.\n- Incoming messages from other users are received in real-time through the same connection.\n\n**Responses:**\n- Connection established: User joins the chat.\n- Message received: Real-time messages broadcasted to all connected users." as WSChatConnection
+}
+
+rectangle "Dynamic Pricing and Offers(TODO)" {
+    note "**Get Pricing**\n\n----\n**GET** /api/pricing\n\n**Query Parameters:**\n- toolId (string)\n- rentalDuration (integer)\n\n**Responses:**\n- 200 OK: Pricing details.\n- 400 Bad Request: Invalid input data" as GetPricing
+    note "**Special Offers**\n\n----\n**GET** /api/offers\n\n**Responses:**\n- 200 OK: List of current special offers." as SpecialOffers
+}
+rectangle "Integration with External Services(TODO)" {
+    note "**Payment Gateway Integration**\n\n----\nDetails about integrating with a payment gateway for processing payments." as PaymentIntegration
+    note "**SMS/Email Notification Service**\n\n----\nDetails about integrating with SMS and email services for sending notifications to users." as NotificationService
+}
+rectangle "Security Enhancements" {
+    note "**Enable Two-Factor Authentication**\n\n----\n**PATCH** /api/users/{userId}/security/2fa/enable\n\n**Headers**:\n- Authorization: Bearer token\n\n**Responses:**\n- 200 OK: 2FA enabled.\n- 400 Bad Request: Invalid request.\n- 401 Unauthorized" as Enable2FA
+    note "**Audit Logs**\n\n----\n**GET** /api/admin/audit/logs\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Responses:**\n- 200 OK: List of audit logs.\n- 401 Unauthorized" as AuditLogs
+}
+
+rectangle "Advanced Analytics(TODO)" {
+    note "**Tool Usage Analytics**\n\n----\n**GET** /api/analytics/tools/usage\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Query Parameters:**\n- startDate (date, optional)\n- endDate (date, optional)\n\n**Responses:**\n- 200 OK: Detailed tool usage statistics.\n- 400 Bad Request: Invalid date format.\n- 401 Unauthorized: Admin token required" as ToolUsageAnalytics
+    note "**Rental Patterns Analytics**\n\n----\n**GET** /api/analytics/rentals/patterns\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Query Parameters:**\n- timeFrame (string, optional): 'daily', 'weekly', 'monthly'.\n\n**Responses:**\n- 200 OK: Rental pattern statistics over the specified time frame.\n- 400 Bad Request: Invalid time frame.\n- 401 Unauthorized: Admin token required" as RentalPatternsAnalytics
+    note "**User Engagement Analytics**\n\n----\n**GET** /api/analytics/users/engagement\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Query Parameters:**\n- metrics (string, optional): Specific metrics to retrieve (e.g., 'login_frequency', 'rental_activity').\n\n**Responses:**\n- 200 OK: User engagement statistics based on specified metrics.\n- 400 Bad Request: Invalid metrics specified.\n- 401 Unauthorized: Admin token required" as UserEngagementAnalytics
+    note "**Revenue Analytics**\n\n----\n**GET** /api/analytics/revenue\n\n**Headers**:\n- Authorization: Bearer token (admin)\n\n**Query Parameters:**\n- startDate (date, optional)\n- endDate (date, optional)\n\n**Responses:**\n- 200 OK: Revenue data between specified dates.\n- 400 Bad Request: Invalid date format.\n- 401 Unauthorized: Admin token required" as RevenueAnalytics
+}
+
+
+
+@enduml

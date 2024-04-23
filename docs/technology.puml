@@ -1,0 +1,92 @@
+@startuml
+
+skinparam backgroundColor #EEF2F7
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #7B8AB8
+    ArrowColor #554B8F
+    FontName "Arial"
+}
+
+rectangle Frontend <<Angular>> {
+    [Angular App]
+}
+
+rectangle Backend <<FastAPI>> {
+    [FastAPI Server]
+}
+
+rectangle Databases {
+    database "PostgreSQL" as PG
+    database "MongoDB" as Mongo
+}
+
+rectangle Cache <<Redis>> {
+    [Redis Cache]
+}
+
+rectangle ReverseProxy <<NGINX>> {
+    [NGINX Server]
+}
+
+rectangle Testing  {
+    [Cypress]
+    [Unittest]
+}
+
+rectangle MessageQueue <<RabbitMQ/Kafka>> {
+    [Message Queue]
+}
+rectangle CMS <<Directus>> {
+    [Content management system]
+}
+
+rectangle Observability {
+    [Prometheus & Grafana]
+    [Elastic Stack]
+}
+
+rectangle DevOps {
+    [Docker]
+    [Kubernetes]
+    [CI/CD]
+}
+
+rectangle Security {
+    [OAuth2 & OpenID Connect]
+}
+
+rectangle Search {
+    [Elasticsearch]
+    [Algolia]
+}
+
+rectangle Analytics {
+    [Apache Spark]
+}
+
+rectangle UserExperience {
+    [User Interaction Analysis\n **Hotjar or FullStory**]
+}
+
+[Angular App] ... [NGINX Server] : Serves Static Files
+[NGINX Server] -->  [Content management system]
+[Content management system] --> [FastAPI Server] : Reverse Proxy/API Requests
+[FastAPI Server] --> [Redis Cache] : Sessions & Cache
+[FastAPI Server] --> PG : Structured Data
+[FastAPI Server] --> Mongo : Unstructured Data
+[FastAPI Server] --> [Message Queue]
+[FastAPI Server] ..> [Cypress] : E2E Tests
+[FastAPI Server] ..> [Selenium] : Browser Compatibility Tests
+[FastAPI Server] ..> [GraphQL] : Alternative/Complement to REST
+[FastAPI Server] --> [Observability] : Monitoring & Logging
+[FastAPI Server] --> [Security] : Auth & Authorization
+[Angular App] --> [PWA Technologies] : Offline Capabilities
+[Angular App] --> [State Management] : Manage Application State
+[FastAPI Server] --> [Search] : Search Features
+[Backend] --> [Analytics] : Data Processing
+[Angular App] --> [UserExperience] : UX Analysis
+[NGINX Server] --> [Web Application Firewall] : Security Layer
+[Backend] --> [DevOps] : Deployment & Orchestration
+
+@enduml

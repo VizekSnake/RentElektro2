@@ -1,0 +1,112 @@
+@startuml
+
+!theme plain
+
+entity "User" as User {
+    +UserID: SERIAL [PK]
+    +Username: VARCHAR
+    +FirstName: VARCHAR
+    +LastName: VARCHAR
+    +Phone: VARCHAR
+    +Company: BOOLEAN
+    +Email: VARCHAR
+    +PasswordHash: TEXT
+    +Role: VARCHAR
+    +IsActive: BOOLEAN
+    +ProfileImage: TEXT
+}
+
+entity "Category" as Category {
+    +CategoryID: SERIAL [PK]
+    +Name: VARCHAR
+    +Description: TEXT
+}
+
+entity "Tool" as Tool {
+    +ToolID: SERIAL [PK]
+    +Type: TypeEnum
+    +PowerSource: PowerSourceEnum
+    +Brand: VARCHAR
+    +Description: TEXT
+    +CategoryID: INTEGER [FK]
+    +Availability: BOOLEAN
+    +Insurance: BOOLEAN
+    +Power: INTEGER
+    +Age: NUMERIC
+    +RatePerDay: NUMERIC
+    +ImageURLs: TEXT[]
+
+}
+
+enum TypeEnum {
+    hammer
+    saw
+    drill
+    // Add more types as needed
+}
+
+enum PowerSourceEnum {
+    electric
+    gas
+}
+
+entity "Rental" as Rental {
+    +RentalID: SERIAL [PK]
+    +ToolID: INTEGER [FK]
+    +UserID: INTEGER [FK]
+    +StartDate: DATE
+    +EndDate: DATE
+    +Status: VARCHAR
+    +RateApplied: NUMERIC
+    +TotalCost: NUMERIC
+}
+
+entity "Feedback" as Feedback {
+    +FeedbackID: SERIAL [PK]
+    +UserID: INTEGER [FK]
+    +FeedbackType: VARCHAR
+    +Comments: TEXT
+    +CreatedAt: TIMESTAMP
+}
+
+entity "Review" as Review {
+    +ReviewID: SERIAL [PK]
+    +ToolID: INTEGER [FK]
+    +UserID: INTEGER [FK]
+    +Rating: INTEGER
+    +ReviewText: TEXT
+    +CreatedAt: TIMESTAMP
+}
+
+entity "Maintenance" as Maintenance {
+    +MaintenanceID: SERIAL [PK]
+    +ToolID: INTEGER [FK]
+    +ScheduledDate: DATE
+    +Description: TEXT
+    +Status: VARCHAR
+}
+
+entity "Issue" as Issue {
+    +IssueID: SERIAL [PK]
+    +ToolID: INTEGER [FK]
+    +ReportedByUserID: INTEGER [FK]
+    +Description: TEXT
+    +Category: VARCHAR
+    +Urgency: VARCHAR
+    +Status: VARCHAR
+    +CreatedAt: TIMESTAMP
+}
+
+User ||--o{ Rental : ""
+User ||--o{ Feedback : ""
+User ||--o{ Review : ""
+User ||--o{ Issue : "Reports"
+
+Tool ||--o{ Rental : ""
+Tool ||--o{ Review : ""
+Tool ||--o{ Maintenance : ""
+Tool ||--o{ Issue : ""
+
+Category ||--o{ Tool : ""
+
+@enduml
