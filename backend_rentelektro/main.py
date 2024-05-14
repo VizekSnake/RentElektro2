@@ -4,20 +4,27 @@ from api.api_v1.endpoints import users, tools
 from api.api_v1.endpoints import maintance
 from core import models
 from core.database import engine
-# from api.routers import auth
-from starlette.staticfiles import StaticFiles
-from starlette.responses import Response
 from prometheus_fastapi_instrumentator import Instrumentator
-from starlette.requests import Request
-from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
-from starlette.responses import JSONResponse
-app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI(tags="Main")
 instrumentator = Instrumentator()
-# Instrument the FastAPI app
 instrumentator.instrument(app)
 
 models.Base.metadata.create_all(bind=engine)
 
+origins = [
+    "http://localhost",
+    "http://localhost:8081",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():

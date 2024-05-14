@@ -52,3 +52,19 @@ def delete_tool(db: Session, tool_id: int):
     except SQLAlchemyError as e:
         db.rollback()
         raise e
+
+
+def update_tool(db: Session, tool_id: int, tool: ToolUpdate):
+    db_tool = get_tool(db, tool_id)
+    if not db_tool:
+        return None
+    for var, value in vars(tool).items():
+        setattr(db_tool, var, value) if value else None
+    db.add(db_tool)
+    try:
+        db.commit()
+        db.refresh(db_tool)
+        return db_tool
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise e

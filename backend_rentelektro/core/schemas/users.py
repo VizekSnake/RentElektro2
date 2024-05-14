@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
+from typing import List, Union, Optional
 
 
 class UserBase(BaseModel):
@@ -38,5 +38,15 @@ class User(UserBase):
 
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    username: str
     password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: Union[str, None] = None
+    scopes: List[str] = []

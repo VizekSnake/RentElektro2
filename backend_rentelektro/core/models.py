@@ -1,5 +1,6 @@
-from sqlalchemy import Boolean, Column, Integer, String, Text, Float, Enum
+from sqlalchemy import Boolean, Column, Integer, String, Text, Float, Enum, ForeignKey
 from core.database import Base
+from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -33,6 +34,7 @@ class Tool(Base):
     Age = Column(Float)
     RatePerDay = Column(Float)
     ImageURL = Column(String)
+
 
 class TypeEnum(Enum):
     hammer = "hammer"

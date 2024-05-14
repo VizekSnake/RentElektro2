@@ -1,21 +1,17 @@
 import os
-from typing import List
 
+from typing import List
 from jose import jwt, JWTError
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from core.models import User as UserModel
-from core.schemas.users import UserCreate, UserUpdate
-from core.security import get_password_hash, ACCESS_TOKEN_EXPIRE_MINUTES
+from core.security import get_password_hash, ACCESS_TOKEN_EXPIRE_MINUTES, get_db
 from core.security import create_access_token, verify_password
 from datetime import timedelta
 from passlib.context import CryptContext
 from core.schemas.users import UserCreate, UserUpdate, User, UserLogin
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from starlette.requests import Request
-
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl="token")
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = "HS256"
@@ -33,8 +29,14 @@ def get_user(db: Session, user_id: int):
 def get_all(db: Session) -> List[User]:
     return db.query(UserModel).all()
 
+
 def get_user_by_email(db: Session, email: str):
     return db.query(UserModel).filter(UserModel.email == email).first()
+
+
+def get_user_by_username(db: Session, username: str):
+    print(db.query(UserModel).filter(UserModel.username == username).first())
+    return db.query(UserModel).filter(UserModel.username == username).first()
 
 
 def create_user(db: Session, user: UserCreate):
@@ -78,27 +80,14 @@ def delete_user(db: Session, user_id: int):
         raise e
 
 
-def authenticate_user(db: Session, email: str, password: str):
-    user = get_user_by_email(db, email)
-    if not user or not verify_password(password, user.hashed_password):
+def authenticate_user(username: str, password: str, db: Session = Depends(get_db)):
+    user = db.query(UserModel)\
+        .filter(UserModel.username == username)\
+        .first()
+
+    if not user:
         return False
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
-
-
-async def get_current_user(request: Request):
-    try:
-        token = request.cookies.get("access_token")
-        if token is None:
-            return None
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        user_id: int = payload.get("id")
-        if username is None or user_id is None:
-            logout(request)
-        return {"username": username, "id": user_id}
-    except JWTError:
-        raise HTTPException(status_code=404, detail="Not found")
+    if not verify_password(password, user.hashed_password):
+        return False
+    print("Auth successfully!")
+    return user
