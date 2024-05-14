@@ -8,10 +8,15 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "@vitejs/plugin-vue": "^5.0.4",
     "axios": "^1.6.8",
     "core-js": "^3.8.3",
+    "vite": "^5.2.11",
+    "vite-plugin-vuetify": "^2.0.3",
     "vue": "^3.2.13",
-    "vue-router": "^4.0.3"
+    "vue-router": "^4.0.3",
+    "vuetify": "^3.6.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

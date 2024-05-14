@@ -22,57 +22,35 @@ export default {
     };
   },
   methods: {
-    async login() {
-      // Create URLSearchParams to send data as form-encoded
-      const formData = new URLSearchParams();
-      formData.append('username', this.username);
-      formData.append('password', this.password);
+  async login() {
+    // Create URLSearchParams to send data as form-encoded
+    const formData = new URLSearchParams();
+    formData.append('username', this.username);
+    formData.append('password', this.password);
 
-      try {
-        const response = await axios.post('http://localhost:8000/api/users/login', formData, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded' // Set the content type header for form-encoded data
-          },
-          withCredentials: true  // Important for handling cookies if you are using them
-        });
-        console.log('Logged in successfully!', response);
-        // Redirect or perform further actions post-login
-        window.location.href = '/home'; // Redirect to a home page or dashboard
-      } catch (error) {
-        console.error('Login error:', error.response.data);
-        alert("Failed to log in: " + error.response.data.detail);
-      }
+    try {
+      const response = await axios.post('http://localhost:8000/api/users/login', formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded' // Set the content type header for form-encoded data
+        },
+        withCredentials: true  // Important for handling cookies if you are using them
+      });
+
+      console.log('Logged in successfully!', response);
+      // Store the token in local storage
+      localStorage.setItem('access_token', response.data.access_token);
+
+      // Redirect to the home page or dashboard
+      window.location.href = '/home';
+    } catch (error) {
+      console.error('Login error:', error.response.data);
+      alert("Failed to log in: " + error.response.data.detail);
     }
   }
+}
+
 };
 </script>
-<!--<script>-->
-<!--import axios from 'axios';-->
-
-<!--export default {-->
-<!--  data() {-->
-<!--    return {-->
-<!--      username: '',-->
-<!--      password: ''-->
-<!--    };-->
-<!--  },-->
-<!--  methods: {-->
-<!--    async login() {-->
-<!--      try {-->
-<!--        const response = await axios.post('http://0.0.0.0:8000/api/users/login', {-->
-<!--          username: this.username,-->
-<!--          password: this.password-->
-<!--        });-->
-<!--        // Obsługa odpowiedzi - np. przekierowanie na inną stronę po zalogowaniu-->
-<!--        console.log('Zalogowano pomyślnie!', response.data);-->
-<!--      } catch (error) {-->
-<!--        console.error('Błąd logowania:', error);-->
-<!--        // Obsługa błędów - np. wyświetlenie komunikatu dla użytkownika-->
-<!--      }-->
-<!--    }-->
-<!--  }-->
-<!--};-->
-<!--</script>-->
 
 <style scoped>
 /* Dodaj stylizację dla formularza logowania */
