@@ -23,6 +23,7 @@ class UserUpdate(BaseModel):
     company: Optional[bool] = None
     # Password updates might be handled separately
     email: Optional[EmailStr] = None
+    profile_picture: Optional[str] = None
 
 
 class User(UserBase):
@@ -44,9 +45,14 @@ class UserLogin(BaseModel):
 
 class Token(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str
 
 
 class TokenData(BaseModel):
     username: Union[str, None] = None
     scopes: List[str] = []
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str

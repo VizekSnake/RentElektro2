@@ -21,10 +21,8 @@
           <v-col cols="12">
             <v-list>
               <v-list-item>
-                <v-list-item-content>
                   <v-list-item-title>Email</v-list-item-title>
                   <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
-                </v-list-item-content>
               </v-list-item>
             </v-list>
           </v-col>

@@ -1,40 +1,71 @@
-// // src/services/authService.js
-// import axios from 'axios';
-// import { ref } from 'vue';
-//
-// const isAuthenticated = ref(false);
-//
-// const authService = {
-//   async login(username, password) {
-//     const formData = new URLSearchParams();
-//     formData.append('username', username);
-//     formData.append('password', password);
-//
-//     try {
-//       const response = await axios.post('http://localhost:8000/api/users/login', formData, {
-//         headers: {
-//           'Content-Type': 'application/x-www-form-urlencoded'
-//         },
-//         withCredentials: true
-//       });
-//       isAuthenticated.value = true;
-//       return response.data;
-//     } catch (error) {
-//       isAuthenticated.value = false;
-//       throw error;
-//     }
-//   },
-//
-//   async fetchCurrentUser() {
-//
-//       const response = await axios.get('http://localhost:8000/api/users/me', {
-//         withCredentials: true
-//       });
-//       return response.data;
-//
-//   },
-//
-//   isAuthenticated
-// };
-//
-// export default authService;
+import axios from 'axios';
+
+export function saveToken(response) {
+    console.log(response)
+    const accessToken = response.data.access_token;
+    const refreshToken = response.data.refresh_token;
+    console.log(refreshToken)
+    const expiresIn = 900; // assuming 30 minutes in seconds
+    const expirationTime = new Date().getTime() + expiresIn * 1000;
+
+    localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('tokenExpiration', expirationTime);
+    localStorage.setItem('refresh_token', refreshToken); // Save refresh token
+
+    // Log to check if the token is saved correctly
+    console.log('Access Token:', localStorage.getItem('access_token'));
+    console.log('Expiration Time:', localStorage.getItem('tokenExpiration'));
+    console.log('Refresh Token:', localStorage.getItem('refresh_token'));
+}
+
+export function isTokenExpired() {
+    const expirationTime = localStorage.getItem('tokenExpiration');
+    const now = new Date().getTime();
+
+    return now > expirationTime;
+}
+
+export function getToken() {
+    if (isTokenExpired()) {
+        console.log('Token expired');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('tokenExpiration');
+        return null;
+    }
+
+    return localStorage.getItem('access_token');
+}
+
+axios.interceptors.request.use(
+    config => {
+        const token = getToken();
+        if (token) {
+            config.headers['Authorization'] = 'Bearer ' + token;
+        }
+        return config;
+    },
+    error => {
+        return Promise.reject(error);
+    }
+);
+
+export function refreshToken() {
+    return axios.post('http://localhost:8000/api/users/refresh', { refresh_token: localStorage.getItem('refresh_token') })
+        .then(response => {
+            const accessToken = response.data.access_token;
+            const expiresIn = 600; // Adjust as needed
+            const expirationTime = new Date().getTime() + expiresIn * 1000;
+
+            localStorage.setItem('access_token', accessToken);
+            localStorage.setItem('tokenExpiration', expirationTime);
+            localStorage.setItem('refresh_token', response.data.refresh_token); // Update refresh token
+        })
+        .catch(() => {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('tokenExpiration');
+            localStorage.removeItem('refresh_token');
+        });
+}
+
+// Call refreshToken periodically or based on your application's needs
+setInterval(refreshToken, 25 * 60 * 1000); // Refresh token 5 minutes before expiration

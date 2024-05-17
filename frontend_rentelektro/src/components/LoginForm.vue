@@ -11,8 +11,11 @@
     <button type="submit">Zaloguj</button>
   </form>
 </template>
+
 <script>
 import axios from 'axios';
+import { saveToken } from '@/services/authService';
+import eventBus from '@/eventBus';
 
 export default {
   data() {
@@ -22,38 +25,42 @@ export default {
     };
   },
   methods: {
-  async login() {
-    // Create URLSearchParams to send data as form-encoded
-    const formData = new URLSearchParams();
-    formData.append('username', this.username);
-    formData.append('password', this.password);
+    async login() {
+      const formData = new URLSearchParams();
+      formData.append('username', this.username);
+      formData.append('password', this.password);
 
-    try {
-      const response = await axios.post('http://localhost:8000/api/users/login', formData, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded' // Set the content type header for form-encoded data
-        },
-        withCredentials: true  // Important for handling cookies if you are using them
-      });
+      try {
+        const response = await axios.post('http://localhost:8000/api/users/token', formData, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded' // Set the content type header for form-encoded data
+          },
+          withCredentials: true // Important for handling cookies if you are using them
+        });
 
-      console.log('Logged in successfully!', response);
-      // Store the token in local storage
-      localStorage.setItem('access_token', response.data.access_token);
+        console.log('Logged in successfully!', response);
 
-      // Redirect to the home page or dashboard
-      window.location.href = '/home';
-    } catch (error) {
-      console.error('Login error:', error.response.data);
-      alert("Failed to log in: " + error.response.data.detail);
+        // Check if response and response.data are defined
+        if (response && response.data) {
+          saveToken(response);
+          saveToken(response);
+          eventBus.emit('login'); // Emit login event
+          // Redirect to the home page or dashboard
+          this.$router.push('/home'); // Use Vue Router for navigation
+        } else {
+          throw new Error('Invalid response from server');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        alert("Failed to log in: " + (error.response?.data?.detail || error.message));
+      }
     }
   }
-}
-
 };
 </script>
 
 <style scoped>
-/* Dodaj stylizację dla formularza logowania */
+/* Add styling for the login form */
 form {
   max-width: 300px;
   margin: 0 auto;

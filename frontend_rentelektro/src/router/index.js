@@ -1,11 +1,16 @@
-// src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import LoginView from '../views/LoginView.vue';
 import ProfileView from '../views/ProfileView.vue';
-import SignUpView from "@/views/SignUpView.vue";
+import SignUpView from '@/views/SignUpView.vue';
+import ToolAddView from '@/views/ToolAddView.vue';
+import { getToken, refreshToken } from '@/services/authService'; // Adjust the import path
 
 const routes = [
+    {
+    path: '/',
+    redirect: '/home'
+  },
   {
     path: '/home',
     name: 'home',
@@ -16,21 +21,12 @@ const routes = [
     name: 'about',
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   },
-      {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  },
-
   {
     path: '/login',
     name: 'login',
     component: LoginView
   },
-    {
+  {
     path: '/signup',
     name: 'signup',
     component: SignUpView
@@ -40,6 +36,12 @@ const routes = [
     name: 'profile',
     component: ProfileView,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/tool/add',
+    name: 'tool-add',
+    component: ToolAddView,
+    meta: { requiresAuth: true }
   }
 ];
 
@@ -48,16 +50,24 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  const isAuthenticated = localStorage.getItem('access_token') !== null;
+  const token = getToken();
 
-  if (requiresAuth && !isAuthenticated) {
-    next('/login');
+  if (requiresAuth) {
+    if (!token) {
+      next('/login');
+    } else {
+      try {
+        await refreshToken();
+        next();
+      } catch {
+        next('/login');
+      }
+    }
   } else {
     next();
   }
 });
 
 export default router;
-

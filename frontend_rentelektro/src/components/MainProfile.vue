@@ -52,21 +52,41 @@ export default {
         console.error('Error fetching user data:', error);
       }
     },
-    async handleUpdateProfile(updatedUser) {
-      try {
-        const token = localStorage.getItem('access_token');
-        const response = await axios.patch(`http://localhost:8000/api/users/user/${this.userId}`, updatedUser, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        this.user = { ...this.user, ...response.data };
-        console.log(this.user)
-      } catch (error) {
-        console.error('Error updating profile:', error);
-      }
+    // async handleUpdateProfile(updatedUser) {
+    //   try {
+    //     const token = localStorage.getItem('access_token');
+    //     console.log(this.userId)
+    //     console.log(updatedUser)
+    //     const response = await axios.patch(`http://localhost:8000/api/users/user/${this.userId}`, updatedUser, {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`
+    //       }
+    //     });
+    //     this.user = { ...this.user, ...response.data };
+    //     console.log(this.user)
+    //     console.log('handleUpdatedUser')
+    //   } catch (error) {
+    //     console.error('Error updating profile:', error);
+    //   }
+    // }
+  async handleUpdateProfile(updatedUser) {
+    console.log('Received updated profile data:', updatedUser); // Dodaj konsolę
+    try {
+      const token = localStorage.getItem('access_token');
+      console.log(token)
+      const response = await axios.patch(`http://localhost:8000/api/users/user/${this.userId}`, updatedUser, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      this.user = { ...this.user, ...response.data };
+      console.log('Updated user data:', this.user); // Dodaj konsolę, aby sprawdzić aktualizację
+    } catch (error) {
+      console.error('Error updating profile:', error);
     }
   }
+}
+
 }
 </script>
 

@@ -58,7 +58,7 @@ try:
 
     # Optional: perform a test query
     try:
-        result = connection.execute("SELECT 1")
+        result = connection.execute("SELECT * FROM users").fetchall()
         print("Test query successful, result:", result.scalar())
     except SQLAlchemyError as e:
         print("Test query failed:", e)

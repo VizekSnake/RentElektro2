@@ -17,6 +17,8 @@
 
 <script>
 import LogoRentElektroSVG from './LogoRentElektroSVG.vue';
+import eventBus from '@/eventBus';
+// import { removeToken } from '@/services/authService';
 
 export default {
   name: 'BaseNavbar',
@@ -25,18 +27,22 @@ export default {
   },
   data() {
     return {
-      isAuthenticated: false
+      isAuthenticated: !!localStorage.getItem('access_token')
     };
   },
   created() {
-    // Replace this with actual logic to check if the user is authenticated
-    this.isAuthenticated = !!localStorage.getItem('access_token');
+    eventBus.on('login', () => {
+      this.isAuthenticated = true;
+    });
+    eventBus.on('logout', () => {
+      this.isAuthenticated = false;
+    });
   },
   methods: {
     logout() {
-      // Replace this with actual logout logic
-      localStorage.removeItem('access_token');
+      // removeToken();
       this.isAuthenticated = false;
+      eventBus.emit('logout');
       this.$router.push('/login');
     }
   }
