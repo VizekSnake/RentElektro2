@@ -4,6 +4,7 @@ import LoginView from '../views/LoginView.vue';
 import ProfileView from '../views/ProfileView.vue';
 import SignUpView from '@/views/SignUpView.vue';
 import ToolAddView from '@/views/ToolAddView.vue';
+import ToolList from "@/views/ToolList.vue";
 import { getToken, refreshToken } from '@/services/authService'; // Adjust the import path
 
 const routes = [
@@ -42,6 +43,11 @@ const routes = [
     name: 'tool-add',
     component: ToolAddView,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/tools',
+    name: 'tools',
+    component: ToolList
   }
 ];
 

@@ -1,11 +1,12 @@
 <template>
   <v-container>
-    <v-form @submit.prevent="addTool" ref="form">
+    <v-form @submit.prevent="addTool" ref="form" v-model="isValid">
       <v-row>
         <v-col cols="12" md="6">
           <v-text-field
             label="Type"
             v-model="tool.Type"
+            :rules="[v => !!v || 'Type is required']"
             required
             outlined
           ></v-text-field>
@@ -15,6 +16,7 @@
             label="Power Source"
             v-model="tool.PowerSource"
             :items="powerSources"
+            :rules="[v => !!v || 'Power Source is required']"
             required
             outlined
           ></v-select>
@@ -23,6 +25,7 @@
           <v-text-field
             label="Brand"
             v-model="tool.Brand"
+            :rules="[v => !!v || 'Brand is required']"
             required
             outlined
           ></v-text-field>
@@ -31,6 +34,7 @@
           <v-text-field
             label="Description"
             v-model="tool.Description"
+            :rules="[v => !!v || 'Description is required']"
             required
             outlined
           ></v-text-field>
@@ -39,6 +43,7 @@
           <v-text-field
               label="Category ID"
               v-model="tool.CategoryID"
+              :rules="[v => !!v || 'Category ID is required']"
               required
               type="number"
               outlined
@@ -62,6 +67,7 @@
           <v-text-field
               label="Power"
               v-model="tool.Power"
+              :rules="[v => !!v || 'Power is required']"
               required
               type="number"
               outlined
@@ -71,6 +77,7 @@
           <v-text-field
               label="Age"
               v-model="tool.Age"
+              :rules="[v => !!v || 'Age is required']"
               required
               type="number"
               step="0.1"
@@ -81,6 +88,7 @@
           <v-text-field
               label="Rate Per Day"
               v-model="tool.RatePerDay"
+              :rules="[v => !!v || 'Rate Per Day is required']"
               required
               type="number"
               step="0.01"
@@ -91,6 +99,7 @@
           <v-text-field
               label="Image URL"
               v-model="tool.ImageURL"
+              :rules="[v => !!v || 'Image URL is required']"
               required
               outlined
           ></v-text-field>
@@ -124,10 +133,14 @@ export default {
         ImageURL: '',
       },
       powerSources: ['electric', 'gas'], // or fetch these dynamically
+      isValid: false,
     };
   },
   methods: {
     async addTool() {
+      if (!this.$refs.form.validate()) {
+        return;
+      }
       try {
         const token = localStorage.getItem('access_token');
         const response = await axios.post('http://localhost:8000/api/tool/add', this.tool, {

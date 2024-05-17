@@ -25,6 +25,11 @@ export function isTokenExpired() {
     return now > expirationTime;
 }
 
+export function removeToken() {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('tokenExpiration');
+}
+
 export function getToken() {
     if (isTokenExpired()) {
         console.log('Token expired');

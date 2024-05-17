@@ -32,7 +32,7 @@ async def update_tool(tool_id: int, tool: ToolUpdate, db: Session = Depends(get_
 
 
 @router.get("/all", response_model=List[Tool] | None)
-async def get_all_tools(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+async def get_all_tools(db: Session = Depends(get_db)):
     tools = crud_tool.get_all(db)
     if tools:
         return tools
