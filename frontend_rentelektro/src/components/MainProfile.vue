@@ -1,4 +1,3 @@
-<!-- src/components/MainProfile.vue -->
 <template>
   <v-container>
     <v-row>
@@ -32,7 +31,7 @@ export default {
     return {
       user: null,
       userId: null
-    }
+    };
   },
   created() {
     this.fetchUserData();
@@ -41,7 +40,7 @@ export default {
     async fetchUserData() {
       try {
         const token = localStorage.getItem('access_token');
-        const response = await axios.get('http://localhost:8000/api/users/me', {
+        const response = await axios.get('http://localhost:8000/api/users/me/data', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -52,41 +51,35 @@ export default {
         console.error('Error fetching user data:', error);
       }
     },
-    // async handleUpdateProfile(updatedUser) {
-    //   try {
-    //     const token = localStorage.getItem('access_token');
-    //     console.log(this.userId)
-    //     console.log(updatedUser)
-    //     const response = await axios.patch(`http://localhost:8000/api/users/user/${this.userId}`, updatedUser, {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`
-    //       }
-    //     });
-    //     this.user = { ...this.user, ...response.data };
-    //     console.log(this.user)
-    //     console.log('handleUpdatedUser')
-    //   } catch (error) {
-    //     console.error('Error updating profile:', error);
-    //   }
-    // }
-  async handleUpdateProfile(updatedUser) {
-    console.log('Received updated profile data:', updatedUser); // Dodaj konsolę
-    try {
-      const token = localStorage.getItem('access_token');
-      console.log(token)
-      const response = await axios.patch(`http://localhost:8000/api/users/user/${this.userId}`, updatedUser, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      this.user = { ...this.user, ...response.data };
-      console.log('Updated user data:', this.user); // Dodaj konsolę, aby sprawdzić aktualizację
-    } catch (error) {
-      console.error('Error updating profile:', error);
-    }
-  }
-}
+    async handleUpdateProfile(updatedUser) {
+      console.log('Received updated profile data:', updatedUser);
+      try {
+        const token = localStorage.getItem('access_token');
+        console.log('Access Token:', token);
 
+        await axios.patch(`http://localhost:8000/api/users/user/${this.userId}`, updatedUser, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        // Fetch updated user data
+        await this.fetchUserData();
+        console.log('User data refreshed:', this.user);
+      } catch (error) {
+        console.error('Error updating profile:', error);
+      }
+    }
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.fetchUserData();
+    });
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.fetchUserData();
+    next();
+  }
 }
 </script>
 

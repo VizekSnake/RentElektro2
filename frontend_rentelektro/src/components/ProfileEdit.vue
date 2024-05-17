@@ -78,17 +78,17 @@ export default {
   data() {
     return {
       form: {
-        profile_picture: this.user.profile_picture,
-        username: this.user.username,
-        email: this.user.email,
-        phone: this.user.phone,
-        firstname: this.user.firstname,
-        lastname: this.user.lastname,
-        company: this.user.company,
+        profile_picture: '',
+        username: '',
+        email: '',
+        phone: '',
+        firstname: '',
+        lastname: '',
+        company: false
       }
-    }
+    };
   },
-watch: {
+  watch: {
     user: {
       immediate: true,
       handler(newUser) {

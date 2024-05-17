@@ -15,7 +15,7 @@ from core.database import SessionLocal
 from starlette.requests import Request
 from starlette.responses import Response, HTMLResponse, RedirectResponse
 from core.security import ACCESS_TOKEN_EXPIRE_MINUTES as EXPIRE_DELTA
-from core.security import REFRESH_TOKEN_EXPIRE_DAYS  as REFRESH_DELTA
+from core.security import REFRESH_TOKEN_EXPIRE_DAYS as REFRESH_DELTA
 
 from crud.crud_user import authenticate_user
 
@@ -73,6 +73,29 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
 def read_users_me(access_token: str = Depends(oauth2_scheme)):
     payload = verify_token(access_token)
     return {"username": payload["username"], "id": payload["id"]}
+
+
+@router.get("/me/data")
+def read_current_user_data(access_token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    payload = verify_token(access_token)
+    if not payload:
+        raise HTTPException(detail='Could not validate credentials', status_code=404)
+    db_user = crud_user.get_user(db, user_id=payload["id"])
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    response = JSONResponse(content={
+        "email": db_user.email,
+        "lastname": db_user.lastname,
+        "phone": db_user.phone,
+        "profile_picture": db_user.profile_picture,
+        "is_active": db_user.is_active,
+        "username": db_user.username,
+        "firstname": db_user.firstname,
+        "company": db_user.company,
+        "role": db_user.role,
+        "id": db_user.id
+    })
+    return response
 
 
 @router.get("/user/{user_id}", response_model=User)

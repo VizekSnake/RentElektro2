@@ -8,9 +8,6 @@
       <v-card-text>
         <v-row justify="center">
           <v-col cols="12" class="text-center">
-<!--            <v-avatar size="100">-->
-<!--              <img :src="user.profile_picture" alt="profile" />-->
-<!--            </v-avatar>-->
             <v-avatar size="100" class="avatar">
               <img :src="user.profile_picture" alt="profile" class="avatar-img"/>
             </v-avatar>
