@@ -5,7 +5,8 @@ import ProfileView from '../views/ProfileView.vue';
 import SignUpView from '@/views/SignUpView.vue';
 import ToolAddView from '@/views/ToolAddView.vue';
 import ToolList from "@/views/ToolList.vue";
-import { getToken, refreshToken } from '@/services/authService'; // Adjust the import path
+import { getToken, refreshToken } from '@/services/authService';
+import ToolProfileView from "@/views/ToolProfileView.vue";
 
 const routes = [
     {
@@ -48,7 +49,8 @@ const routes = [
     path: '/tools',
     name: 'tools',
     component: ToolList
-  }
+  },
+    { path: '/tool/:id', name: 'ToolProfileView', component: ToolProfileView }
 ];
 
 const router = createRouter({

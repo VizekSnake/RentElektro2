@@ -9,7 +9,10 @@
       <input type="password" id="password" v-model="password" required>
     </div>
     <button type="submit">Zaloguj</button>
+
+    <router-link to="/signup">Nie masz konta? Zarejestruj się!</router-link>
   </form>
+
 </template>
 
 <script>

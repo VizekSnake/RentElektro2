@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import ToolAddForm from '@/components/ToolAddForm.vue';  // Adjust the path as necessary
+import ToolAddForm from '@/components/Tools/ToolAddForm.vue';  // Adjust the path as necessary
 
 export default {
   name: 'ToolAddView',

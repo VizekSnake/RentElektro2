@@ -1,5 +1,9 @@
 <template>
-  <form @submit.prevent="signup">
+  <v-container class="ma-5">
+    <ResponseMessage :message="successMessage" type="success" :showProgressBar="true" :duration="redirectDuration" v-if="successMessage" />
+    <ResponseMessage :message="errorMessage" type="error" v-if="errorMessage" />
+  </v-container>
+  <form v-if="!registrationSuccessful" @submit.prevent="signup">
     <div>
       <label for="username">Nazwa użytkownika:</label>
       <input type="text" id="username" v-model="username" required>
@@ -32,14 +36,18 @@
       <label for="password2">Powtórz hasło:</label>
       <input type="password" id="password2" v-model="password2" required>
     </div>
-    <button type="submit">Zarejestruj</button>
+     <button type="submit">Zarejestruj</button>
   </form>
 </template>
 
 <script>
 import axios from 'axios';
+import ResponseMessage from "@/components/ResponseMessage.vue";
 
 export default {
+  components: {
+    ResponseMessage
+  },
   data() {
     return {
       username: '',
@@ -50,12 +58,18 @@ export default {
       company: false,
       password1: '',
       password2: '',
+      successMessage: '',
+      errorMessage: '',
+      redirectDuration: 3000,
+      registrationSuccessful: false
     };
   },
   methods: {
     async signup() {
       if (this.password1 !== this.password2) {
-        alert("Hasła nie pasują do siebie");
+        this.errorMessage = "Hasła nie pasują do siebie";
+        this.successMessage = '';
+        this.scrollToMessage();
         return;
       }
 
@@ -76,19 +90,36 @@ export default {
           },
         });
 
+        this.successMessage = 'Rejestracja zakończona sukcesem!';
+        this.errorMessage = '';
+        this.registrationSuccessful = true;
         console.log('Signed up successfully!', response);
-
-        // Redirect to the home page or dashboard
-        window.location.href = '/home';
+        this.scrollToMessage();
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, this.redirectDuration);
       } catch (error) {
-        console.error('Sign up error:', error.response.data);
-        alert("Failed to Sign up: " + error.response.data.detail);
+        if (error.response && error.response.data && error.response.data.detail) {
+          this.errorMessage = 'Rejestracja nie powiodła się: ' + error.response.data.detail;
+        } else {
+          this.errorMessage = 'Rejestracja nie powiodła się: ' + error.message;
+        }
+        this.successMessage = '';
+        console.error('Sign up error:', error);
+        this.scrollToMessage();
       }
+    },
+    scrollToMessage() {
+      this.$nextTick(() => {
+        const container = this.$el.querySelector('.ma-5');
+        if (container) {
+          container.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
     }
   }
 };
 </script>
-
 
 <style scoped>
 form {

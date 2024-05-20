@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import MainProfile from '@/components/MainProfile.vue';
+import MainProfile from '@/components/Profile/MainProfile.vue';
 
 export default {
   name: 'ProfileView',

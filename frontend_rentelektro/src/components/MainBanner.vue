@@ -1,5 +1,5 @@
 <template>
-  <v-container class="banner">
+  <v-container class="banner elevation-10">
     <v-img :src="imageUrl" height="200px">
       <v-row class="fill-height" align="center" justify="center">
         <v-col class="text-center">
@@ -34,7 +34,9 @@ export default {
 
 <style scoped>
 .banner {
+  background-color: #007bff;
   margin-bottom: 20px;
+  border-radius: 10px;
 }
 .banner-title {
   color: white;
