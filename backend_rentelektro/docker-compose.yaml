@@ -13,8 +13,14 @@ services:
       - mongodb
       - redis
     volumes:
-      - .:/code
-
+      - .:/app
+  tests:
+      build: .
+      command: pytest
+      depends_on:
+        - backend
+      volumes:
+        - .:/app
 
 #  frontend:
 #    image: nginx:latest

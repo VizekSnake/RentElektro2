@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import List, Union, Optional
+from .tools import Tool
 
 
 class UserBase(BaseModel):
@@ -33,6 +34,7 @@ class User(UserBase):
     lastname: str
     phone: str
     company: bool
+    tools: List[Tool] = []
 
     class Config:
         from_attributes = True

@@ -17,6 +17,7 @@ class User(Base):
     profile_picture = Column(String)
     role = Column(String)
     is_active = Column(Boolean, default=True)
+    tools = relationship("Tool", back_populates="owner")
 
 
 class Tool(Base):
@@ -27,19 +28,32 @@ class Tool(Base):
     PowerSource = Column(String)
     Brand = Column(String)
     Description = Column(String)
-    CategoryID = Column(Integer)
+    Category = relationship("Category", back_populates="tools")
     Availability = Column(Boolean)
     Insurance = Column(Boolean)
     Power = Column(Integer)
     Age = Column(Float)
     RatePerDay = Column(Float)
     ImageURL = Column(String)
+    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner = relationship("User", back_populates="tools")
+
+
+class Category(Base):
+    __tablename__ = "categories"
+    id = Column(Integer, primary_key=True, index=True, unique=True)
+    name = Column(String)
+    description = Column(String)
+    active = Column(Boolean, default=True)
+    tools = relationship("Tool", back_populates="Category")
+    creator_id = Column(Integer, ForeignKey("users.id"))
 
 
 class TypeEnum(Enum):
     hammer = "hammer"
     saw = "saw"
     drill = "drill"
+
 
 class PowerSourceEnum(Enum):
     electric = "electric"

@@ -39,6 +39,9 @@ def get_user_by_username(db: Session, username: str):
     return db.query(UserModel).filter(UserModel.username == username).first()
 
 
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from fastapi import HTTPException, status
+
 def create_user(db: Session, user: UserCreate):
     hashed_password = get_password_hash(user.password)
     db_user = UserModel(hashed_password=hashed_password, **user.dict(exclude={"password"}))
@@ -47,9 +50,30 @@ def create_user(db: Session, user: UserCreate):
         db.commit()
         db.refresh(db_user)
         return db_user
+    except IntegrityError as e:
+        db.rollback()
+        if "ix_users_username" in str(e.orig):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Nazwa użytkownika już istnieje"
+            )
+        elif "ix_users_email" in str(e.orig):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Adres email już istnieje"
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Błąd podczas tworzenia użytkownika"
+            )
     except SQLAlchemyError as e:
         db.rollback()
-        raise e
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error"
+        )
+
 
 
 def update_user(db: Session, user_id: int, user: UserUpdate):

@@ -41,6 +41,7 @@ class ToolAdd(ToolBase):
 
 class Tool(ToolBase):
     id: int
+    owner_id: int
 
     class Config:
         from_attributes = True
@@ -55,3 +56,24 @@ class TypeEnum(str, Enum):
 class PowerSourceEnum(str, Enum):
     electric = "electric"
     gas = "gas"
+
+
+class ToolCategory(BaseModel):
+    name: str
+    description: str
+    active: bool
+
+    class Config:
+        from_attributes = True
+
+
+class Category(ToolCategory):
+    creator_id: int
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+class CategoryAdd(ToolCategory):
+    pass
