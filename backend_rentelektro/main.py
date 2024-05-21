@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 
-from api.api_v1.endpoints import users, tools
+from api.api_v1.endpoints import users, tools, rentals
 from api.api_v1.endpoints import maintance
 from core import models
 from core.database import engine
 from prometheus_fastapi_instrumentator import Instrumentator
 from fastapi.middleware.cors import CORSMiddleware
+
+from core.mongodb import db as mongo_db
 
 app = FastAPI(tags="Main")
 instrumentator = Instrumentator()
@@ -37,4 +39,5 @@ def read_root():
 
 app.include_router(users.router)
 app.include_router(tools.router)
+app.include_router(rentals.router)
 app.include_router(maintance.router)

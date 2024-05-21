@@ -14,31 +14,15 @@ def get_tool(db: Session, tool_id: int):
 
 def get_all_tools(db: Session) -> List[Tool]:
     return db.query(ToolModel).all()
+
+
 def get_all_categories(db: Session) -> List[Category]:
     return db.query(CategoryModel).all()
+
 
 from sqlalchemy.exc import IntegrityError
 
 
-# def add_tool(db: Session, tool: ToolAdd):
-#     try:
-#         db_tool = ToolModel(
-#             Type=tool.Type,
-#             PowerSource=tool.PowerSource,
-#             Brand=tool.Brand,
-#             Description=tool.Description,
-#             CategoryID=tool.CategoryID,
-#             Availability=tool.Availability,
-#             Insurance=tool.Insurance,
-#             Power=tool.Power,
-#             Age=tool.Age,
-#             RatePerDay=tool.RatePerDay,
-#             ImageURL=tool.ImageURL)
-#
-#         db.add(db_tool)
-#         db.commit()
-#         db.refresh(db_tool)
-#         return db_tool
 def create_tool(db: Session, tool: ToolAdd, user_id: int):
     try:
         db_tool = ToolModel(**tool.dict(), owner_id=user_id)
@@ -93,3 +77,5 @@ def create_category(db: Session, category: CategoryAdd, user_id: int):
         db.rollback()
         error_message = f"Error adding tool: {str(e)}"
         raise ValueError(error_message)
+
+
