@@ -28,7 +28,7 @@ export default {
   methods: {
     async fetchTools() {
       try {
-        const response = await axios.get('http://localhost:8000/api/tool/all');
+        const response = await axios.get('api/tool/all');
         console.log(response)
         this.tools = response.data;
       } catch (error) {

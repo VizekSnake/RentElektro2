@@ -1,7 +1,7 @@
 from typing import Any, Union, Annotated, List, Optional
 from bson import ObjectId
 from pydantic import BaseModel, Field, PlainSerializer, AfterValidator, WithJsonSchema, ConfigDict
-
+from enum import Enum, unique
 
 def validate_object_id(v: Any) -> ObjectId:
     if isinstance(v, ObjectId):
@@ -18,6 +18,18 @@ PyObjectId = Annotated[
     WithJsonSchema({"type": "string"}, mode="serialization"),
 ]
 
+@unique
+class AcceptedEnum(str, Enum):
+    accepted = "accepted"
+    rejected_by_owner = "rejected_by_owner"
+    canceled = "canceled"
+    fulfilled = "fulfilled"
+    paid_rented = "paid_rented"
+    paid_not_rented = "paid_not_rented"
+    viewed = "viewed"
+    not_viewed = "not_viewed"
+    problem = "problem"
+    scam = "scam"
 
 class Rental(BaseModel):
     id: Optional[PyObjectId] = Field(default_factory=ObjectId, alias="_id")
@@ -25,7 +37,9 @@ class Rental(BaseModel):
     user_id: str
     start_date: str
     end_date: str
-    comment: str
+    comment: Optional[str] = None
+    owner_comment: Optional[str] = ""
+    status: AcceptedEnum = AcceptedEnum.not_viewed
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,

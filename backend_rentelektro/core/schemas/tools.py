@@ -8,17 +8,18 @@ from pydantic import BaseModel
 
 
 class ToolBase(BaseModel):
-    Type: str
-    PowerSource: str
-    Brand: str
-    Description: str
-    CategoryID: int
-    Availability: bool
-    Insurance: bool
-    Power: int
-    Age: float
-    RatePerDay: float
-    ImageURL: str
+    Type: Optional[str] = None
+    PowerSource: Optional[str] = None
+    Brand: Optional[str] = None
+    Description: Optional[str] = None
+    category_id: Optional[int] = None
+    Availability: Optional[bool] = None
+    Insurance: Optional[bool] = None
+    Power: Optional[int] = None
+    Age: Optional[float] = None
+    RatePerDay: Optional[float] = None
+    ImageURL: Optional[str] = None
+    owner_id: Optional[int] = None
 
 
 class ToolUpdate(BaseModel):
@@ -26,7 +27,7 @@ class ToolUpdate(BaseModel):
     PowerSource: Optional[str] = None
     Brand: Optional[str] = None
     Description: Optional[str] = None
-    CategoryID: Optional[int] = None
+    category_id: Optional[int] = None
     Availability: Optional[bool] = None
     Insurance: Optional[bool] = None
     Power: Optional[int] = None
@@ -36,7 +37,7 @@ class ToolUpdate(BaseModel):
 
 
 class ToolAdd(ToolBase):
-    pass
+    owner_id: int
 
 
 class Tool(ToolBase):

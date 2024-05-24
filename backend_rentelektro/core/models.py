@@ -28,7 +28,8 @@ class Tool(Base):
     PowerSource = Column(String)
     Brand = Column(String)
     Description = Column(String)
-    Category = relationship("Category", back_populates="tools")
+    category_id = Column(Integer, ForeignKey('categories.id'))
+    category = relationship("Category", back_populates="tools")
     Availability = Column(Boolean)
     Insurance = Column(Boolean)
     Power = Column(Integer)
@@ -45,7 +46,7 @@ class Category(Base):
     name = Column(String)
     description = Column(String)
     active = Column(Boolean, default=True)
-    tools = relationship("Tool", back_populates="Category")
+    tools = relationship("Tool", back_populates="category")
     creator_id = Column(Integer, ForeignKey("users.id"))
 
 

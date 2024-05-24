@@ -7,7 +7,7 @@ from core.schemas.tools import ToolAdd, ToolUpdate, Tool, CategoryAdd, Category
 from core.schemas.users import User
 from typing import List
 
-router = APIRouter(prefix="/api/tool", tags=["tools"])
+router = APIRouter(prefix="/tool", tags=["tools"])
 
 
 @router.post("/add", response_model=Tool)

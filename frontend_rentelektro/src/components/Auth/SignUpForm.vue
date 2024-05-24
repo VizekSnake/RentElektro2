@@ -84,7 +84,7 @@ export default {
       };
 
       try {
-        const response = await axios.post('http://localhost:8000/api/users/register', formData, {
+        const response = await axios.post('api/users/register', formData, {
           headers: {
             'Content-Type': 'application/json'
           },

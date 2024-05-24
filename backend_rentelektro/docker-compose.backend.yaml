@@ -1,0 +1,67 @@
+version: '3.9'
+name: re_backend
+services:
+  backend:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./envs/db.env
+    depends_on:
+      - postgres
+      - mongodb
+      - redis
+    volumes:
+      - .:/app
+    networks:
+      - api-network
+      - mongodb-network
+      - postgres-network
+      - redis-network
+      - rentelektro-network
+
+  postgres:
+    image: postgres:latest
+    env_file:
+      - ./envs/db.env
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres-network
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo:latest
+    env_file:
+      - ./envs/db.env
+    environment:
+      - SCRIPT_NAME=/api
+    ports:
+      - "27017:27017"
+    networks:
+      - mongodb-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - redis-network
+
+volumes:
+  redis-data:
+  postgres-data:
+
+networks:
+  api-network:
+      driver: bridge
+  mongodb-network:
+    driver: bridge
+  postgres-network:
+    driver: bridge
+  redis-network:
+    driver: bridge

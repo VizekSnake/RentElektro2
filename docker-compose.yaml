@@ -1,75 +1,61 @@
-version: '3'
+name: "rentelektro"
+
+include:
+  - ./backend_rentelektro/docker-compose.backend.yaml
+  - ./frontend_rentelektro/docker-compose.frontend.yaml
 
 services:
-  backend:
-    build: .
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-    ports:
-      - "8000:8000"
-    env_file:
-      - ./envs/db.env
-    depends_on:
-      - postgres
-      - mongodb
-      - redis
-    volumes:
-      - .:/app
-
   nginx:
     image: nginx:latest
+    restart: on-failure
     ports:
       - "80:80"
     volumes:
-      - ./nginx:/etc/nginx/conf.d
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - backend
-
-  postgres:
-    image: postgres:latest
-    env_file:
-      - ./envs/db.env
-    ports:
-      - "5432:5432"
-
-  mongodb:
-    image: mongo:latest
-    env_file:
-      - ./envs/db.env
-    ports:
-      - "27017:27017"
+      - frontend
+    networks:
+      - app-network
+      - api-network
+      - rentelektro-network
 
   grafana:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
+    networks:
+      - rentelektro-network
 
   prometheus:
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./backend_rentelektro/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - rentelektro-network
 
   directus:
     image: directus/directus:latest
     container_name: directus
     env_file:
-      - ./envs/db.env
+      - ./backend_rentelektro/envs/db.env
     ports:
       - "8055:8055"
     depends_on:
       - postgres
       - redis
+      - mongodb
     volumes:
       - directus-data:/directus
     restart: unless-stopped
-
-  redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
+    networks:
+      - postgres-network
+      - redis-network
+      - mongodb-network
+      - rentelektro-network
+      - app-network
 
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:latest
@@ -77,10 +63,13 @@ services:
       - "9113:9113"
     depends_on:
       - nginx
+    networks:
+      - rentelektro-network
+
   cadvisor:
     image: my-custom-cadvisor:latest
     ports:
-      - "8080:8080"
+      - "8090:8090"
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -90,11 +79,14 @@ services:
       - postgres
       - mongodb
       - redis
+    networks:
+      - postgres-network
+      - mongodb-network
+      - redis-network
+
 volumes:
   directus-data:
-  redis-data:
-  mongo-data:
 
 networks:
   rentelektro-network:
-
+    driver: bridge

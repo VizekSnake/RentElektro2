@@ -41,7 +41,7 @@ export default {
     async fetchToolDetails() {
       const toolId = this.$route.params.id;
       try {
-        const response = await axios.get(`http://localhost:8000/api/tool/${toolId}`);
+        const response = await axios.get(`api/tool/${toolId}`);
         this.tool = response.data;
       } catch (error) {
         console.error('Error fetching tool details:', error);

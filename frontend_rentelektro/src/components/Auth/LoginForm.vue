@@ -34,7 +34,7 @@ export default {
       formData.append('password', this.password);
 
       try {
-        const response = await axios.post('http://localhost:8000/api/users/token', formData, {
+        const response = await axios.post('api/users/token', formData, {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded' // Set the content type header for form-encoded data
           },

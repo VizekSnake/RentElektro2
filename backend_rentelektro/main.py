@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from core.mongodb import db as mongo_db
 
-app = FastAPI(tags="Main")
+app = FastAPI(tags="Main", root_path="/api")
 instrumentator = Instrumentator()
 instrumentator.instrument(app)
 

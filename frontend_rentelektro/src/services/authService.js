@@ -55,7 +55,7 @@ axios.interceptors.request.use(
 );
 
 export function refreshToken() {
-    return axios.post('http://localhost:8000/api/users/refresh', { refresh_token: localStorage.getItem('refresh_token') })
+    return axios.post('api/users/refresh', { refresh_token: localStorage.getItem('refresh_token') })
         .then(response => {
             const accessToken = response.data.access_token;
             const expiresIn = 600; // Adjust as needed

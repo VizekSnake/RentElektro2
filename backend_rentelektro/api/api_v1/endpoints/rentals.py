@@ -4,7 +4,7 @@ from crud.crud_rentals import create_rental, get_rental, update_rental, delete_r
 
 from core.mongodb import client
 
-router = APIRouter(prefix="/api/rental", tags=["rentals"])
+router = APIRouter(prefix="/rental", tags=["rentals"])
 
 
 @router.post("/add", response_model=Rental, status_code=201)
@@ -33,6 +33,13 @@ async def read_rental(rental_id: str):
 
 @router.patch("/update/{rental_id}", response_model=Rental)
 async def update_rental_endpoint(rental_id: str, rental: RentalUpdate):
+    updated_rental = await update_rental(rental_id, rental)
+    if updated_rental is None:
+        raise HTTPException(status_code=404, detail="Rental not found")
+    return updated_rental
+
+@router.patch("/return/{rental_id}", response_model=Rental)
+async def return_rental_endpoint(rental_id: str, rental: RentalUpdate):
     updated_rental = await update_rental(rental_id, rental)
     if updated_rental is None:
         raise HTTPException(status_code=404, detail="Rental not found")

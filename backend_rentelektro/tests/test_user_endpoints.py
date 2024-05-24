@@ -34,7 +34,7 @@ def client():
 
 # Test cases
 def test_register_user(client):
-    response = client.post("/api/users/register", json={
+    response = client.post("/users/register", json={
         "email": "testuser@example.com",
         "username": "testuser",
         "password": "testpassword",
@@ -47,7 +47,7 @@ def test_register_user(client):
 
 
 def test_login(client):
-    response = client.post("/api/users/login", data={
+    response = client.post("/users/login", data={
         "username": "testuser",
         "password": "testpassword"
     })
@@ -57,38 +57,38 @@ def test_login(client):
 
 def test_read_users_me(client):
     # First, login to get a token
-    login_response = client.post("/api/users/login", data={
+    login_response = client.post("/users/login", data={
         "username": "testuser",
         "password": "testpassword"
     })
     token = login_response.json()["access_token"]
 
-    response = client.get("/api/users/me", headers={"Authorization": f"Bearer {token}"})
+    response = client.get("/users/me", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     assert response.json()["username"] == "testuser"
 
 
 def test_read_current_user_data(client):
     # First, login to get a token
-    login_response = client.post("/api/users/login", data={
+    login_response = client.post("/users/login", data={
         "username": "testuser",
         "password": "testpassword"
     })
     token = login_response.json()["access_token"]
 
-    response = client.get("/api/users/me/data", headers={"Authorization": f"Bearer {token}"})
+    response = client.get("/users/me/data", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     assert response.json()["email"] == "testuser@example.com"
 
 
 def test_get_user(client):
-    response = client.get("/api/users/user/1")
+    response = client.get("/users/user/1")
     assert response.status_code == 200
     assert response.json()["username"] == "testuser"
 
 
 def test_update_user(client):
-    response = client.patch("/api/users/user/1", json={
+    response = client.patch("/users/user/1", json={
         "firstname": "Updated",
         "lastname": "User",
     })
@@ -97,19 +97,19 @@ def test_update_user(client):
 
 
 def test_delete_user(client):
-    response = client.delete("/api/users/delete/1")
+    response = client.delete("/users/delete/1")
     assert response.status_code == 204
 
 
 def test_refresh_access_token(client):
     # First, login to get a refresh token
-    login_response = client.post("/api/users/login", data={
+    login_response = client.post("/users/login", data={
         "username": "testuser",
         "password": "testpassword"
     })
     refresh_token = login_response.json()["refresh_token"]
 
-    response = client.post("/api/users/refresh", json={"refresh_token": refresh_token})
+    response = client.post("/users/refresh", json={"refresh_token": refresh_token})
     assert response.status_code == 200
     assert "access_token" in response.json()
     assert "refresh_token" in response.json()

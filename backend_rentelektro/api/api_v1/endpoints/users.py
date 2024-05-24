@@ -21,7 +21,7 @@ from crud.crud_user import authenticate_user
 
 from core.schemas.users import RefreshTokenRequest
 
-router = APIRouter(prefix="/api/users", tags=["users"])
+router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.post("/register", response_model=User)

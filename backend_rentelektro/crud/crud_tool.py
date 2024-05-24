@@ -25,7 +25,7 @@ from sqlalchemy.exc import IntegrityError
 
 def create_tool(db: Session, tool: ToolAdd, user_id: int):
     try:
-        db_tool = ToolModel(**tool.dict(), owner_id=user_id)
+        db_tool = ToolModel(**tool.dict(exclude={"owner_id"}), owner_id=user_id)
         db.add(db_tool)
         db.commit()
         db.refresh(db_tool)

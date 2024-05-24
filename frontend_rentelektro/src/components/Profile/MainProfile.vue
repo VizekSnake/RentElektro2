@@ -40,7 +40,7 @@ export default {
     async fetchUserData() {
       try {
         const token = localStorage.getItem('access_token');
-        const response = await axios.get('http://localhost:8000/api/users/me/data', {
+        const response = await axios.get('http://localhost/api/users/me/data', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -57,7 +57,7 @@ export default {
         const token = localStorage.getItem('access_token');
         console.log('Access Token:', token);
 
-        await axios.patch(`http://localhost:8000/api/users/user/${this.userId}`, updatedUser, {
+        await axios.patch(`http://backend/api/users/user/${this.userId}`, updatedUser, {
           headers: {
             Authorization: `Bearer ${token}`
           }

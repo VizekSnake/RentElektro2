@@ -13,6 +13,11 @@ const routes = [
     path: '/',
     redirect: '/home'
   },
+
+    {
+    path: '/local_front',
+    redirect: '/home'
+  },
   {
     path: '/home',
     name: 'home',
