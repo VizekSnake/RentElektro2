@@ -36,12 +36,10 @@ export default {
       try {
         const response = await axios.post('api/users/token', formData, {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded' // Set the content type header for form-encoded data
+            'Content-Type': 'application/x-www-form-urlencoded'
           },
-          withCredentials: true // Important for handling cookies if you are using them
+          withCredentials: true
         });
-
-        console.log('Logged in successfully!', response);
 
         // Check if response and response.data are defined
         if (response && response.data) {

@@ -29,7 +29,6 @@ export default {
     async fetchTools() {
       try {
         const response = await axios.get('api/tool/all');
-        console.log(response)
         this.tools = response.data;
       } catch (error) {
         console.error('Error fetching tools:', error);

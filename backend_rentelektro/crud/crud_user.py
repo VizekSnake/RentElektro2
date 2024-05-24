@@ -35,7 +35,6 @@ def get_user_by_email(db: Session, email: str):
 
 
 def get_user_by_username(db: Session, username: str):
-    print(db.query(UserModel).filter(UserModel.username == username).first())
     return db.query(UserModel).filter(UserModel.username == username).first()
 
 
@@ -113,5 +112,4 @@ def authenticate_user(username: str, password: str, db: Session = Depends(get_db
         return False
     if not verify_password(password, user.hashed_password):
         return False
-    print("Auth successfully!")
     return user

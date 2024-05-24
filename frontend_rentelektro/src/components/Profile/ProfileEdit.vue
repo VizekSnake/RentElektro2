@@ -98,7 +98,6 @@ export default {
   },
   methods: {
     updateProfile() {
-      console.log('Emitting update-profile');
       this.$emit('update-profile', this.form);
     }
   }

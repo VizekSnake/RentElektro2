@@ -45,7 +45,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token = create_access_token({"username": user.username, "id": user.id},
                                        expires_delta=timedelta(minutes=EXPIRE_DELTA))
     refresh_token = create_refresh_token({"username": user.username, "id": user.id})
-    print(f"Refresh token: {refresh_token}")
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
@@ -145,7 +144,6 @@ def refresh_access_token(request: RefreshTokenRequest):
     refresh_token = request.refresh_token
     payload = verify_token(refresh_token)
     new_access_token = create_access_token(data={"username": payload["username"], "id": payload["id"]})
-    print(new_access_token)
     new_refresh_token = create_refresh_token(data={"username": payload["username"], "id": payload["id"]})
 
     return {"access_token": new_access_token, "refresh_token": new_refresh_token, "token_type": "bearer"}

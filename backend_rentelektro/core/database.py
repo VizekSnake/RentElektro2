@@ -52,19 +52,6 @@ try:
         pool_recycle=3600,
     )
 
-    # Attempt to connect to the database
-    connection = engine.connect()
-    print("Database connection successful.")
-
-    # Optional: perform a test query
-    try:
-        result = connection.execute("SELECT * FROM users").fetchall()
-        print("Test query successful, result:", result.scalar())
-    except SQLAlchemyError as e:
-        print("Test query failed:", e)
-    finally:
-        connection.close()  # Make sure to close the connection
-
 except SQLAlchemyError as ex:
     print(f"Database connection failed: {ex}")
 

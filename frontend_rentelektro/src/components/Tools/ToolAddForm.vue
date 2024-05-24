@@ -149,11 +149,9 @@ export default {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log('Tool added successfully!', response.data);
         this.$refs.form.reset();  // Reset the form after successful submission
         this.$emit('tool-added');  // Emit an event to inform the parent component
       } catch (error) {
-        console.error('Error adding tool:', error.response.data);
         alert(`Failed to add tool: ${error.response.data.detail}`);
       }
     },

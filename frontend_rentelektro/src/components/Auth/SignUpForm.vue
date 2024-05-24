@@ -93,7 +93,6 @@ export default {
         this.successMessage = 'Rejestracja zakończona sukcesem!';
         this.errorMessage = '';
         this.registrationSuccessful = true;
-        console.log('Signed up successfully!', response);
         this.scrollToMessage();
         setTimeout(() => {
           window.location.href = '/login';

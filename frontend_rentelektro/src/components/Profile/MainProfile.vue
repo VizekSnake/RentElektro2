@@ -52,10 +52,8 @@ export default {
       }
     },
     async handleUpdateProfile(updatedUser) {
-      console.log('Received updated profile data:', updatedUser);
       try {
         const token = localStorage.getItem('access_token');
-        console.log('Access Token:', token);
 
         await axios.patch(`http://backend/api/users/user/${this.userId}`, updatedUser, {
           headers: {
@@ -65,7 +63,6 @@ export default {
 
         // Fetch updated user data
         await this.fetchUserData();
-        console.log('User data refreshed:', this.user);
       } catch (error) {
         console.error('Error updating profile:', error);
       }

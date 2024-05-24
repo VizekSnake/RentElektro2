@@ -1,21 +1,14 @@
 import axios from 'axios';
 
 export function saveToken(response) {
-    console.log(response)
     const accessToken = response.data.access_token;
     const refreshToken = response.data.refresh_token;
-    console.log(refreshToken)
     const expiresIn = 900; // assuming 30 minutes in seconds
     const expirationTime = new Date().getTime() + expiresIn * 1000;
 
     localStorage.setItem('access_token', accessToken);
     localStorage.setItem('tokenExpiration', expirationTime);
-    localStorage.setItem('refresh_token', refreshToken); // Save refresh token
-
-    // Log to check if the token is saved correctly
-    console.log('Access Token:', localStorage.getItem('access_token'));
-    console.log('Expiration Time:', localStorage.getItem('tokenExpiration'));
-    console.log('Refresh Token:', localStorage.getItem('refresh_token'));
+    localStorage.setItem('refresh_token', refreshToken);
 }
 
 export function isTokenExpired() {
