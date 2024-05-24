@@ -49,6 +49,13 @@ class Category(Base):
     tools = relationship("Tool", back_populates="category")
     creator_id = Column(Integer, ForeignKey("users.id"))
 
+class Review(Base):
+    __tablename__ = "reviews"
+    id = Column(Integer, primary_key=True, index=True)
+    tool_id = Column(Integer, index=True)
+    user_id = Column(Integer)
+    rating = Column(Float)  # Allow decimal values
+    comment = Column(String, nullable=True)
 
 class TypeEnum(Enum):
     hammer = "hammer"

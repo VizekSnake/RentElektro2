@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from api.api_v1.endpoints import users, tools, rentals
+from api.api_v1.endpoints import users, tools, rentals, reviews
 from api.api_v1.endpoints import maintance
 from core import models
 from core.database import engine
@@ -41,3 +41,4 @@ app.include_router(users.router)
 app.include_router(tools.router)
 app.include_router(rentals.router)
 app.include_router(maintance.router)
+app.include_router(reviews.router)
