@@ -40,7 +40,7 @@ services:
     image: directus/directus:latest
     container_name: directus
     env_file:
-      - ./backend_rentelektro/envs/db.env
+      - backend_rentelektro/envs/directus.dev.env
     ports:
       - "8055:8055"
     depends_on:
