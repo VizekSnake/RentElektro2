@@ -6,15 +6,13 @@
         application:</p>
     <h3>Frontend</h3>
     <ul>
-        <li><strong>Angular</strong>: A platform and framework for building single-page client applications using HTML
-            and TypeScript. Angular provides a comprehensive solution for developing efficient and sophisticated web
-            applications.
+        <li><strong>Vue.js</strong>: A progressive JavaScript framework for building user interfaces. Vue.js provides a flexible and performant solution for developing sophisticated web applications.
         </li>
     </ul>
     <h3>Backend</h3>
     <ul>
         <li><strong>FastAPI</strong>: A modern, fast (high-performance) web framework for building APIs with Python 3.12
-            based on standard Python type hints. FastAPI integrates seamlessly with our frontend Angular application,
+            based on standard Python type hints. FastAPI integrates seamlessly with our frontend Vue.js application,
             providing robust backend services.
         </li>
     </ul>
@@ -45,7 +43,7 @@
     <h3>Testing</h3>
     <ul>
         <li><strong>Cypress</strong>: An all-in-one testing framework, assertion library, with mocking and stubbing,
-            perfect for end-to-end testing of our Angular applications.
+            perfect for end-to-end testing of our Vue.js applications.
         </li>
     </ul>
     <h3>Message Queue</h3>
@@ -109,12 +107,12 @@
     <ul>
         <li><strong>Web Application Firewall (WAF)</strong>, <strong>Selenium</strong> for browser compatibility tests,
             <strong>GraphQL</strong> as an alternative to RESTful APIs, <strong>PWA Technologies</strong> for offline
-            capabilities, and <strong>State Management</strong> tools for Angular apps further enrich our application’s
+            capabilities, and <strong>State Management</strong> tools for Vue.js apps further enrich our application’s
             architecture.
         </li>
     </ul>
     <hr>
-    </div>
+</div>
 
 <div class="markdown w-full break-words">
     <h2>User Management</h2>
@@ -168,7 +166,7 @@
             Permissions</strong>: Admin can adjust rules and permissions.
         </li>
     </ul>
-    <h2>Maintenance and ServiceTracking</h2>
+    <h2>Maintenance and Service Tracking</h2>
     <ul>
         <li><strong>Report Tool Issue / Schedule Maintenance / View Scheduled Maintenance / Cancel
             Scheduled Maintenance / Update Scheduled Maintenance / View Tool Issues / Update Tool Issue Status /
@@ -189,5 +187,3 @@
         </li>
     </ul>
 </div>
-
-
