@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter
 
 router = APIRouter()
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
