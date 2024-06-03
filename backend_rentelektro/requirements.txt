@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 sqlalchemy
+alembic
 gunicorn
 python-jose
 bcrypt
@@ -19,3 +20,4 @@ redis
 motor==3.1.2
 pymongo==4.6.3
 mongo-tools
+fastapi-debug-toolbar==0.6.3

@@ -3,7 +3,7 @@ FROM python:3.12
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-
+ENV DEBUG=true
 # Set the working directory inside the container
 WORKDIR /app
 
