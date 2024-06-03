@@ -9,6 +9,8 @@ services:
     env_file:
       - envs/config.dev.env
       - envs/postgres.dev.env
+    environment:
+      - DEBUG=true
     depends_on:
       - postgres
       - mongodb
