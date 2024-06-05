@@ -5,17 +5,12 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from core.dependencies import get_db
-from core.security import get_current_user
 from crud import crud_user
 from core.schemas.users import UserCreate, UserUpdate, User, UserLogin, Token
 from core.security import oauth2_scheme, create_access_token, create_refresh_token, verify_token, get_user_exception, \
     token_exception
-from typing import List, Optional
-from core.database import SessionLocal
-from starlette.requests import Request
-from starlette.responses import Response, HTMLResponse, RedirectResponse
+from typing import List
 from core.security import ACCESS_TOKEN_EXPIRE_MINUTES as EXPIRE_DELTA
-from core.security import REFRESH_TOKEN_EXPIRE_DAYS as REFRESH_DELTA
 
 from crud.crud_user import authenticate_user
 

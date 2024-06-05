@@ -1,4 +1,4 @@
-from pydantic import BaseModel, confloat, field_validator
+from pydantic import BaseModel, confloat, field_validator, ConfigDict
 from typing import Optional
 
 
@@ -16,5 +16,4 @@ class ReviewCreate(ReviewBase):
 class Review(ReviewBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

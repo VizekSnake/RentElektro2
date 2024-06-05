@@ -1,3 +1,4 @@
+import warnings
 from datetime import datetime, timedelta, timezone
 from os import environ
 from typing import Optional
@@ -11,8 +12,7 @@ from starlette.requests import Request
 from core.dependencies import get_db
 from core.models import User as UserModel
 
-from core.schemas.users import TokenData
-
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="passlib.utils")
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 SECRET_KEY = environ.get("SECRET_KEY")

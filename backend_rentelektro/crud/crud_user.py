@@ -43,7 +43,7 @@ from fastapi import HTTPException, status
 
 def create_user(db: Session, user: UserCreate):
     hashed_password = get_password_hash(user.password)
-    db_user = UserModel(hashed_password=hashed_password, **user.dict(exclude={"password"}))
+    db_user = UserModel(hashed_password=hashed_password, **user.model_dump(exclude={"password"}))
     db.add(db_user)
     try:
         db.commit()

@@ -9,8 +9,6 @@ from core.database import engine
 from prometheus_fastapi_instrumentator import Instrumentator
 from fastapi.middleware.cors import CORSMiddleware
 from debug_toolbar.middleware import DebugToolbarMiddleware
-from starlette.middleware.errors import ServerErrorMiddleware
-from core.mongodb import db as mongo_db
 
 app = FastAPI(tags="Main", root_path="/api")
 app.debug = os.getenv("DEBUG", "true").lower() == "true"
