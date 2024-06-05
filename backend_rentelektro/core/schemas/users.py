@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import List, Union, Optional
 from .tools import Tool
 
@@ -14,6 +14,8 @@ class UserCreate(UserBase):
     phone: str
     company: bool
     password: str
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class UserUpdate(BaseModel):
@@ -36,8 +38,7 @@ class User(UserBase):
     company: bool
     tools: List[Tool] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserLogin(BaseModel):

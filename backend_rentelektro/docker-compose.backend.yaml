@@ -22,7 +22,6 @@ services:
       - mongodb-network
       - postgres-network
       - redis-network
-      - rentelektro-network
 
   postgres:
     image: postgres:latest
@@ -53,6 +52,25 @@ services:
     volumes:
       - redis-data:/data
     networks:
+      - redis-network
+
+  tests:
+    build: .
+    command: [ "sh", "-c", "sleep 5 && pytest" ]
+    env_file:
+      - envs/config.dev.env
+      - envs/postgres.dev.env
+      - envs/mongodb.dev.env
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - backend
+    volumes:
+      - .:/app
+    networks:
+      - api-network
+      - mongodb-network
+      - postgres-network
       - redis-network
 
 volumes:
