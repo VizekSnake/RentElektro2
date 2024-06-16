@@ -1,7 +1,30 @@
-from sqlalchemy import Boolean, Column, Integer, String, Text, Float, Enum, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, Text, Float, Enum as SQLAlchemyEnum, ForeignKey, DateTime, Boolean, Date
 from core.database import Base
 from sqlalchemy.orm import relationship
+from enum import Enum as PyEnum
 
+class TypeEnum(SQLAlchemyEnum):
+    hammer = "hammer"
+    saw = "saw"
+    drill = "drill"
+
+
+class PowerSourceEnum(SQLAlchemyEnum):
+    electric = "electric"
+    gas = "gas"
+
+
+class AcceptedEnum(PyEnum):
+    accepted = "accepted"
+    rejected_by_owner = "rejected_by_owner"
+    canceled = "canceled"
+    fulfilled = "fulfilled"
+    paid_rented = "paid_rented"
+    paid_not_rented = "paid_not_rented"
+    viewed = "viewed"
+    not_viewed = "not_viewed"
+    problem = "problem"
+    scam = "scam"
 
 class User(Base):
     __tablename__ = "users"
@@ -28,7 +51,7 @@ class Tool(Base):
     PowerSource = Column(String)
     Brand = Column(String)
     Description = Column(String)
-    category_id = Column(Integer, ForeignKey('categories.id'))
+    category_id = Column(Integer, ForeignKey("categories.id"))
     category = relationship("Category", back_populates="tools")
     Availability = Column(Boolean)
     Insurance = Column(Boolean)
@@ -49,20 +72,25 @@ class Category(Base):
     tools = relationship("Tool", back_populates="category")
     creator_id = Column(Integer, ForeignKey("users.id"))
 
+
 class Review(Base):
     __tablename__ = "reviews"
     id = Column(Integer, primary_key=True, index=True)
     tool_id = Column(Integer, index=True)
     user_id = Column(Integer)
-    rating = Column(Float)  # Allow decimal values
+    rating = Column(Float)
     comment = Column(String, nullable=True)
 
-class TypeEnum(Enum):
-    hammer = "hammer"
-    saw = "saw"
-    drill = "drill"
+
+class Rental(Base):
+    __tablename__ = "rentals"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    tool_id = Column(Integer, ForeignKey("tools.id"))
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime,nullable=False)
+    comment = Column(String, nullable=True)
+    owner_comment = Column(String, nullable=True)
+    status = Column(SQLAlchemyEnum(AcceptedEnum))
 
 
-class PowerSourceEnum(Enum):
-    electric = "electric"
-    gas = "gas"

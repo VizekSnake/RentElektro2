@@ -20,7 +20,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.post("/register", response_model=User)
-async def register_user(user: UserCreate, db: Session = Depends(get_db)):
+async def register_user(user: UserCreate, db: Session = Depends(get_db)) -> User:
     db_user = crud_user.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -58,19 +58,14 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
     return response
 
 
-# @router.get("/me")
-# def read_users_me(access_token: str = Depends(oauth2_scheme)):
-#     payload = verify_token(access_token)
-#     return {"username": payload.username}
-
 @router.get("/me")
-def read_users_me(access_token: str = Depends(oauth2_scheme)):
+def read_users_me(access_token: str = Depends(oauth2_scheme)) -> dict:
     payload = verify_token(access_token)
     return {"username": payload["username"], "id": payload["id"]}
 
 
 @router.get("/me/data")
-def read_current_user_data(access_token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def read_current_user_data(access_token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> JSONResponse:
     payload = verify_token(access_token)
     if not payload:
         raise HTTPException(detail='Could not validate credentials', status_code=404)
@@ -125,14 +120,6 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
     crud_user.delete_user(db=db, user_id=user_id)
     return {"ok": True}
 
-
-# @router.post("/refresh", response_model=Token)
-# def refresh_access_token(refresh_token: str):
-#     print(refresh_token)
-#     payload = verify_token(refresh_token)
-#     new_access_token = create_access_token(data={**payload.dict()})
-#     new_refresh_token = create_refresh_token(data={**payload.dict()})
-#     return {"access_token": new_access_token, "refresh_token": new_refresh_token, "token_type": "bearer"}
 
 @router.post("/refresh", response_model=Token)
 def refresh_access_token(request: RefreshTokenRequest):

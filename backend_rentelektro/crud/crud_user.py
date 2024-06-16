@@ -1,17 +1,15 @@
 import os
 
 from typing import List
-from jose import jwt, JWTError
-from fastapi import HTTPException, Depends
+from fastapi import Depends
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
 from core.models import User as UserModel
 from core.security import get_password_hash, ACCESS_TOKEN_EXPIRE_MINUTES, get_db
 from core.security import create_access_token, verify_password
-from datetime import timedelta
 from passlib.context import CryptContext
 from core.schemas.users import UserCreate, UserUpdate, User, UserLogin
-from starlette.requests import Request
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from fastapi import HTTPException, status
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = "HS256"
@@ -36,10 +34,6 @@ def get_user_by_email(db: Session, email: str):
 
 def get_user_by_username(db: Session, username: str):
     return db.query(UserModel).filter(UserModel.username == username).first()
-
-
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from fastapi import HTTPException, status
 
 def create_user(db: Session, user: UserCreate):
     hashed_password = get_password_hash(user.password)
