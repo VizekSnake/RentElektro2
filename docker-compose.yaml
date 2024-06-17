@@ -46,14 +46,12 @@ services:
     depends_on:
       - postgres
       - redis
-      - mongodb
     volumes:
       - directus-data:/directus
     restart: unless-stopped
     networks:
       - postgres-network
       - redis-network
-      - mongodb-network
       - rentelektro-network
       - app-network
 
