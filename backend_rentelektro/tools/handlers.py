@@ -1,11 +1,8 @@
 from typing import List
-import json
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from core.models import Tool as ToolModel
-from core.models import Category as CategoryModel
-
-from core.schemas.tools import ToolAdd, ToolUpdate, Tool, CategoryAdd, Category
+from tools.models import Tool as ToolModel, Category as CategoryModel
+from tools.schemas import ToolAdd, ToolUpdate, Tool, CategoryAdd, Category
 
 
 def get_tool(db: Session, tool_id: int):

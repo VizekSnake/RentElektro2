@@ -1,8 +1,8 @@
 name: "rentelektro"
 
 include:
-  - ./backend_rentelektro/docker-compose.backend.yaml
-  - ./frontend_rentelektro/docker-compose.frontend.yaml
+  - ./backend_rentelektro/docker-compose.yaml
+  - ./frontend_rentelektro/docker-compose.yaml
 
 services:
   nginx:

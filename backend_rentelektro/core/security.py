@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 from core.dependencies import get_db
-from core.models import User as UserModel
+from users.models import User as UserModel
 
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="passlib.utils")
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -38,27 +38,6 @@ def create_refresh_token(data: dict):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
-
-
-# def verify_token(token: str, credentials_exception):
-#     try:
-#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-#         username: str = payload.get("sub")
-#         if username is None:
-#             raise credentials_exception
-#         return username
-#     except JWTError:
-#         raise credentials_exception
-
-# def verify_token(access_token: str):
-#     try:
-#         payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
-#         username: str = payload.get("username")
-#         if username is None:
-#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-#         return TokenData(username=username)
-#     except JWTError:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 def verify_token(token: str):
     try:

@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URL: str
 
     # Application Settings
-    APP_NAME: str = "FastAPI Application"
+    APP_NAME: str = "RentElektroAPI"
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     # Security
     ALGORITHM: str = "HS256"
-    ADMIN_EMAIL: EmailStr = "karol.gaca@imagen.team"
+    ADMIN_EMAIL: EmailStr = os.environ.get("ADMIN_EMAIL")
 
     class Config:
         # Configuration class meta-data
@@ -31,7 +31,6 @@ class Settings(BaseSettings):
         env_file_encoding = 'utf-8'
 
 
-# Construct the connection URL using environment variables
 DB_USER = os.environ.get("POSTGRES_USER")
 DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 DB_HOST = os.environ.get("POSTGRES_HOST")

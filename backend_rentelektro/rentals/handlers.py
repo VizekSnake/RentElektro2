@@ -1,13 +1,12 @@
 from typing import Union, Optional, List
 
-from core.schemas.rentals import RentalAdd, Rental, RentalUpdate
-from core.models import Rental as RentalModel
+from rentals.schemas import RentalAdd, RentalUpdate,AcceptedEnum
+from rentals.models import Rental as RentalModel
 from sqlalchemy import and_, exists
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException, status
-from core.schemas.rentals import AcceptedEnum
 
 
 async def create_rental(

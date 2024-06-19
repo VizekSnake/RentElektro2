@@ -3,11 +3,11 @@ import os
 from typing import List
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from core.models import User as UserModel
-from core.security import get_password_hash, ACCESS_TOKEN_EXPIRE_MINUTES, get_db
-from core.security import create_access_token, verify_password
+from users.models import User as UserModel
+from core.security import get_password_hash, get_db
+from core.security import  verify_password
 from passlib.context import CryptContext
-from core.schemas.users import UserCreate, UserUpdate, User, UserLogin
+from users.schemas import UserCreate, UserUpdate, User
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from fastapi import HTTPException, status
 
