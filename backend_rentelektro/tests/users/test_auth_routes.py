@@ -5,8 +5,8 @@ from sqlalchemy.orm import sessionmaker
 from main import app
 from core.database import Base
 from core.dependencies import get_db
-from crud.crud_user import create_user
-from core.schemas.users import UserCreate
+from users.handlers import create_user
+from users.schemas import UserCreate
 
 # Create a test database
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import List, Union, Optional
-from .tools import Tool
+from tools.schemas import Tool
 
 
 class UserBase(BaseModel):

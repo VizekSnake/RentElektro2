@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from core.schemas.reviews import Review, ReviewCreate
-from crud.crud_reviews import get_reviews, create_review
+from reviews.schemas import Review, ReviewCreate
+from reviews.handlers import get_reviews, create_review
 from core.dependencies import get_db
 from statistics import mean
 

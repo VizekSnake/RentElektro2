@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from core.dependencies import get_db
-from crud.crud_tool import create_tool, get_tool, update_tool, get_all_tools, create_category, get_all_categories
+from tools.handlers import create_tool, get_tool, update_tool, get_all_tools, create_category, get_all_categories
 from core.security import get_current_user
-from core.schemas.tools import ToolAdd, ToolUpdate, Tool, CategoryAdd, Category
-from core.schemas.users import User
+from tools.schemas import ToolAdd, ToolUpdate, Tool, CategoryAdd, Category
+from users.schemas import User
 from typing import List
 
 router = APIRouter(prefix="/tool", tags=["tools"])

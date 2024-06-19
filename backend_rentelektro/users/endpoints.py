@@ -1,36 +1,32 @@
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from core.dependencies import get_db
-from crud import crud_user
-from core.schemas.users import UserCreate, UserUpdate, User, UserLogin, Token
-from core.security import oauth2_scheme, create_access_token, create_refresh_token, verify_token, get_user_exception, \
-    token_exception
+from users.schemas import UserCreate, UserUpdate, User, Token, RefreshTokenRequest
+from core.security import oauth2_scheme, create_access_token, create_refresh_token, verify_token
 from typing import List
 from core.security import ACCESS_TOKEN_EXPIRE_MINUTES as EXPIRE_DELTA
 
-from crud.crud_user import authenticate_user
-
-from core.schemas.users import RefreshTokenRequest
+import users.handlers
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.post("/register", response_model=User)
-async def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = crud_user.get_user_by_email(db, email=user.email)
+async def register_user(user: UserCreate, db: Session = Depends(get_db)) -> User:
+    db_user = users.handlers.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    return crud_user.create_user(db=db, user=user)
+    return users.handlers.create_user(db=db, user=user)
 
 
 @router.post("/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
                                  db: Session = Depends(get_db)):
-    user = authenticate_user(form_data.username, form_data.password, db)
+    user = users.handlers.authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -46,7 +42,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 @router.post("/login", response_model=dict)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(),
                 db: Session = Depends(get_db)):
-    user = authenticate_user(form_data.username, form_data.password, db)
+    user = users.handlers.authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
@@ -58,23 +54,18 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
     return response
 
 
-# @router.get("/me")
-# def read_users_me(access_token: str = Depends(oauth2_scheme)):
-#     payload = verify_token(access_token)
-#     return {"username": payload.username}
-
 @router.get("/me")
-def read_users_me(access_token: str = Depends(oauth2_scheme)):
+def read_users_me(access_token: str = Depends(oauth2_scheme)) -> dict:
     payload = verify_token(access_token)
     return {"username": payload["username"], "id": payload["id"]}
 
 
 @router.get("/me/data")
-def read_current_user_data(access_token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def read_current_user_data(access_token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> JSONResponse:
     payload = verify_token(access_token)
     if not payload:
         raise HTTPException(detail='Could not validate credentials', status_code=404)
-    db_user = crud_user.get_user(db, user_id=payload["id"])
+    db_user = users.handlers.get_user(db, user_id=payload["id"])
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     response = JSONResponse(content={
@@ -94,7 +85,7 @@ def read_current_user_data(access_token: str = Depends(oauth2_scheme), db: Sessi
 
 @router.get("/user/{user_id}", response_model=User)
 async def get_user(user_id: int, db: Session = Depends(get_db)):
-    db_user = crud_user.get_user(db, user_id=user_id)
+    db_user = users.handlers.get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
@@ -102,7 +93,7 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
 
 @router.get("/all", response_model=List[User] | None)
 async def get_all_users(db: Session = Depends(get_db)):
-    users = crud_user.get_all(db)  # Assuming crud_user has a get_all function
+    users = users.handlers.get_all(db)  # Assuming crud_user has a get_all function
     if users:
         return users
     else:
@@ -111,28 +102,20 @@ async def get_all_users(db: Session = Depends(get_db)):
 
 @router.patch("/user/{user_id}", response_model=User)
 async def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
-    db_user = crud_user.get_user(db, user_id=user_id)
+    db_user = get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return crud_user.update_user(db=db, user_id=user_id, user=user)
+    return users.handlers.update_user(db=db, user_id=user_id, user=user)
 
 
 @router.delete("/delete/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(user_id: int, db: Session = Depends(get_db)):
-    db_user = crud_user.get_user(db, user_id=user_id)
+    db_user = get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    crud_user.delete_user(db=db, user_id=user_id)
+    delete_user(db=db, user_id=user_id)
     return {"ok": True}
 
-
-# @router.post("/refresh", response_model=Token)
-# def refresh_access_token(refresh_token: str):
-#     print(refresh_token)
-#     payload = verify_token(refresh_token)
-#     new_access_token = create_access_token(data={**payload.dict()})
-#     new_refresh_token = create_refresh_token(data={**payload.dict()})
-#     return {"access_token": new_access_token, "refresh_token": new_refresh_token, "token_type": "bearer"}
 
 @router.post("/refresh", response_model=Token)
 def refresh_access_token(request: RefreshTokenRequest):

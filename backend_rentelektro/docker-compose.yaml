@@ -13,13 +13,11 @@ services:
       - DEBUG=true
     depends_on:
       - postgres
-      - mongodb
       - redis
     volumes:
       - .:/app
     networks:
       - api-network
-      - mongodb-network
       - postgres-network
       - redis-network
 
@@ -33,17 +31,6 @@ services:
       - postgres-network
     volumes:
       - postgres-data:/var/lib/postgresql/data
-
-  mongodb:
-    image: mongo:latest
-    env_file:
-      - envs/mongodb.dev.env
-    environment:
-      - SCRIPT_NAME=/api
-    ports:
-      - "27017:27017"
-    networks:
-      - mongodb-network
 
   redis:
     image: redis:latest
@@ -60,7 +47,6 @@ services:
     env_file:
       - envs/config.dev.env
       - envs/postgres.dev.env
-      - envs/mongodb.dev.env
     environment:
       - PYTHONPATH=/app
     depends_on:
@@ -69,7 +55,6 @@ services:
       - .:/app
     networks:
       - api-network
-      - mongodb-network
       - postgres-network
       - redis-network
 
@@ -80,8 +65,6 @@ volumes:
 networks:
   api-network:
       driver: bridge
-  mongodb-network:
-    driver: bridge
   postgres-network:
     driver: bridge
   redis-network:

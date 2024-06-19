@@ -1,8 +1,8 @@
 name: "rentelektro"
 
 include:
-  - ./backend_rentelektro/docker-compose.backend.yaml
-  - ./frontend_rentelektro/docker-compose.frontend.yaml
+  - ./backend_rentelektro/docker-compose.yaml
+  - ./frontend_rentelektro/docker-compose.yaml
 
 services:
   nginx:
@@ -46,14 +46,12 @@ services:
     depends_on:
       - postgres
       - redis
-      - mongodb
     volumes:
       - directus-data:/directus
     restart: unless-stopped
     networks:
       - postgres-network
       - redis-network
-      - mongodb-network
       - rentelektro-network
       - app-network
 
