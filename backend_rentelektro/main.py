@@ -1,20 +1,19 @@
 import os
 
-from fastapi import FastAPI
-
-from users import endpoints as users
-from tools import endpoints as tools
-from reviews import endpoints as reviews
-from rentals import endpoints as rentals
-from maintance import endpoints as maintance
-from users import models as users_db
-from tools import models as tools_db
-from reviews import models as reviews_db
-from rentals import models as rentals_db
 from core.database import engine
-from prometheus_fastapi_instrumentator import Instrumentator
-from fastapi.middleware.cors import CORSMiddleware
 from debug_toolbar.middleware import DebugToolbarMiddleware
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from maintance import endpoints as maintance
+from prometheus_fastapi_instrumentator import Instrumentator
+from rentals import endpoints as rentals
+from rentals import models as rentals_db
+from reviews import endpoints as reviews
+from reviews import models as reviews_db
+from tools import endpoints as tools
+from tools import models as tools_db
+from users import endpoints as users
+from users import models as users_db
 
 app = FastAPI(tags="RentElektro", root_path="/api")
 app.debug = os.getenv("DEBUG", "true").lower() == "true"

@@ -1,6 +1,9 @@
-from sqlalchemy import Boolean, Column, Integer, String, Float, Enum as SQLAlchemyEnum, ForeignKey, Boolean
 from core.database import Base
+from sqlalchemy import Boolean, Column
+from sqlalchemy import Enum as SQLAlchemyEnum
+from sqlalchemy import Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+
 
 class TypeEnum(SQLAlchemyEnum):
     hammer = "hammer"

@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String,Float
 from core.database import Base
+from sqlalchemy import Column, Float, Integer, String
+
 
 class Review(Base):
     __tablename__ = "reviews"

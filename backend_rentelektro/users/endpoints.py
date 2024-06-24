@@ -1,16 +1,17 @@
 from datetime import timedelta
-
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
-from fastapi.responses import JSONResponse
-from core.dependencies import get_db
-from users.schemas import UserCreate, UserUpdate, User, Token, RefreshTokenRequest
-from core.security import oauth2_scheme, create_access_token, create_refresh_token, verify_token
 from typing import List
-from core.security import ACCESS_TOKEN_EXPIRE_MINUTES as EXPIRE_DELTA
 
 import users.handlers
+from core.dependencies import get_db
+from core.security import ACCESS_TOKEN_EXPIRE_MINUTES as EXPIRE_DELTA
+from core.security import (create_access_token, create_refresh_token,
+                           oauth2_scheme, verify_token)
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
+from users.schemas import (RefreshTokenRequest, Token, User, UserCreate,
+                           UserUpdate)
 
 router = APIRouter(prefix="/users", tags=["users"])
 

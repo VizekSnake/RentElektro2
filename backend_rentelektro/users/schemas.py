@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
-from typing import List, Union, Optional
+from typing import List, Optional, Union
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from tools.schemas import Tool
 
 

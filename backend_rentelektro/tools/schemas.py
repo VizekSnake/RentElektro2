@@ -1,10 +1,7 @@
 from enum import Enum
+from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
-from typing import Optional
-
-from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class ToolBase(BaseModel):

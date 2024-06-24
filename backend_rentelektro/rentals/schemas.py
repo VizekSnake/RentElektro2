@@ -1,11 +1,8 @@
 from datetime import date, datetime
-from typing import List, Optional
-from pydantic import (
-    BaseModel,
-    field_validator,
-    ConfigDict,
-)
 from enum import Enum, unique
+from typing import List, Optional
+
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
 @unique

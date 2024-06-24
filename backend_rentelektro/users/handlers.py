@@ -1,15 +1,13 @@
 import os
-
 from typing import List
-from fastapi import Depends
+
+from core.security import get_db, get_password_hash, verify_password
+from fastapi import Depends, HTTPException, status
+from passlib.context import CryptContext
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 from users.models import User as UserModel
-from core.security import get_password_hash, get_db
-from core.security import  verify_password
-from passlib.context import CryptContext
-from users.schemas import UserCreate, UserUpdate, User
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from fastapi import HTTPException, status
+from users.schemas import User, UserCreate, UserUpdate
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = "HS256"

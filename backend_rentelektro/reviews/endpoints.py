@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from typing import List
-from reviews.schemas import Review, ReviewCreate
-from reviews.handlers import get_reviews, create_review
-from core.dependencies import get_db
 from statistics import mean
 
+from core.dependencies import get_db
+from fastapi import APIRouter, Depends, HTTPException
+from reviews.handlers import create_review, get_reviews
+from reviews.schemas import Review, ReviewCreate
+from sqlalchemy.orm import Session
 from starlette.responses import JSONResponse
 
 router = APIRouter()
@@ -29,5 +28,6 @@ def read_reviews(tool_id: int, skip: int = 0, limit: int = 10, db: Session = Dep
         average_rating = mean(ratings)
     else:
         average_rating = None
-    response = JSONResponse(content={"comments": comments, "average_rating": average_rating})
+    response = JSONResponse(content={"comments": comments,
+                            "average_rating": average_rating})
     return response

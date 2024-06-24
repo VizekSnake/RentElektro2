@@ -1,8 +1,10 @@
 from typing import List
+
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from tools.models import Tool as ToolModel, Category as CategoryModel
-from tools.schemas import ToolAdd, ToolUpdate, Tool, CategoryAdd, Category
+from tools.models import Category as CategoryModel
+from tools.models import Tool as ToolModel
+from tools.schemas import Category, CategoryAdd, Tool, ToolAdd, ToolUpdate
 
 
 def get_tool(db: Session, tool_id: int):
@@ -17,12 +19,10 @@ def get_all_categories(db: Session) -> List[Category]:
     return db.query(CategoryModel).all()
 
 
-from sqlalchemy.exc import IntegrityError
-
-
 def create_tool(db: Session, tool: ToolAdd, user_id: int):
     try:
-        db_tool = ToolModel(**tool.dict(exclude={"owner_id"}), owner_id=user_id)
+        db_tool = ToolModel(**tool.model_dump(exclude={"owner_id"}),
+                            owner_id=user_id)
         db.add(db_tool)
         db.commit()
         db.refresh(db_tool)
@@ -46,7 +46,7 @@ def delete_tool(db: Session, tool_id: int):
         raise e
 
 
-def update_tool(db: Session, tool_id: int, tool: ToolUpdate):
+def edit_tool(db: Session, tool_id: int, tool: ToolUpdate):
     db_tool = get_tool(db, tool_id)
     if not db_tool:
         return None
@@ -64,7 +64,8 @@ def update_tool(db: Session, tool_id: int, tool: ToolUpdate):
 
 def create_category(db: Session, category: CategoryAdd, user_id: int):
     try:
-        db_category = CategoryModel(**category.dict(), creator_id=user_id)
+        db_category = CategoryModel(**category.model_dump(),
+                                    creator_id=user_id)
         db.add(db_category)
         db.commit()
         db.refresh(db_category)
@@ -74,5 +75,3 @@ def create_category(db: Session, category: CategoryAdd, user_id: int):
         db.rollback()
         error_message = f"Error adding tool: {str(e)}"
         raise ValueError(error_message)
-
-

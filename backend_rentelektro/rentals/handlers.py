@@ -1,12 +1,11 @@
-from typing import Union, Optional, List
+from typing import List, Optional, Union
 
-from rentals.schemas import RentalAdd, RentalUpdate,AcceptedEnum
-from rentals.models import Rental as RentalModel
-from sqlalchemy import and_, exists
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException, status
+from rentals.models import Rental as RentalModel
+from rentals.schemas import AcceptedEnum, RentalAdd, RentalUpdate
+from sqlalchemy import and_, exists
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.orm import Session
 
 
 async def create_rental(
@@ -25,7 +24,8 @@ async def create_rental(
 
     if overlapping_rentals:
         raise HTTPException(
-            status_code=400, detail="The tool is already rented for the given period."
+            status_code=400,
+            detail="The tool is already rented for the given period."
         )
 
     db_rental = RentalModel(**rental.model_dump())
@@ -36,7 +36,8 @@ async def create_rental(
         return db_rental
     except IntegrityError as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail=f"Error while creating rental {e}")
+        raise HTTPException(status_code=400,
+                            detail=f"Error while creating rental {e}")
 
 
 async def get_rental(db: Session, rental_id: int) -> Optional[RentalModel]:
@@ -49,7 +50,8 @@ async def update_rental(
 ) -> Optional[RentalModel]:
     db_rental = await get_rental(db, rental_id)
     if not db_rental:
-        raise HTTPException(404, "The rental does not exist. Error during update")
+        raise HTTPException(404,
+                            "The rental does not exist. Error during update")
     for key, value in vars(rental).items():
         if value is not None:
             setattr(db_rental, key, value)
@@ -74,7 +76,7 @@ async def delete_rental(db: Session, rental_id: int) -> None:
         db.commit()
     except SQLAlchemyError as e:
         db.rollback()
-        raise HTTPException(500, "Error while deleting rental")
+        raise HTTPException(500, f"Error while deleting rental: {e}")
     raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
 
 

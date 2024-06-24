@@ -1,16 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends
-from rentals.schemas import Rental, RentalAdd, RentalCollection, RentalUpdate
-from rentals.handlers import (
-    create_rental,
-    get_rental,
-    update_rental,
-    delete_rental,
-    get_all_rentals,
-)
-
-from sqlalchemy.orm import Session
-
 from core.dependencies import get_db
+from fastapi import APIRouter, Depends, HTTPException
+from rentals.handlers import (create_rental, delete_rental, get_all_rentals,
+                              get_rental, update_rental)
+from rentals.schemas import Rental, RentalAdd, RentalCollection, RentalUpdate
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/rental", tags=["rentals"])
 

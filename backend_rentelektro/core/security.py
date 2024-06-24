@@ -3,16 +3,16 @@ from datetime import datetime, timedelta, timezone
 from os import environ
 from typing import Optional
 
+from core.dependencies import get_db
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
-from fastapi import HTTPException, status, Depends
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-from starlette.requests import Request
-from core.dependencies import get_db
 from users.models import User as UserModel
 
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="passlib.utils")
+warnings.filterwarnings("ignore", category=DeprecationWarning,
+                        module="passlib.utils")
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 SECRET_KEY = environ.get("SECRET_KEY")
@@ -39,14 +39,17 @@ def create_refresh_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+
 def verify_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         if payload.get("username") is None or payload.get("id") is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="Invalid token")
         return payload
     except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Invalid token")
 
 
 def verify_password(plain_password, hashed_password):
@@ -75,7 +78,8 @@ def token_exception():
     return token_exception_response
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+async def get_current_user(token: str = Depends(oauth2_scheme),
+                           db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: int = payload.get("id")
@@ -87,4 +91,3 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         return user
     except JWTError:
         raise get_user_exception()
-
