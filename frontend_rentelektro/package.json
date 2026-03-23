@@ -3,32 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "lint": "eslint src --ext .js,.vue"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
-    "@vitejs/plugin-vue": "^5.0.4",
     "axios": "^1.6.8",
-    "core-js": "^3.8.3",
     "jwt-decode": "^4.0.0",
     "mitt": "^3.0.1",
-    "vite": "^5.2.11",
-    "vite-plugin-vuetify": "^2.0.3",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vuetify": "^3.6.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.16",
-    "@babel/eslint-parser": "^7.12.16",
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-plugin-router": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
-    "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3"
+    "@babel/core": "^7.28.0",
+    "@babel/eslint-parser": "^7.28.0",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "eslint": "^8.57.1",
+    "eslint-plugin-vue": "^9.33.0",
+    "vite": "^8.0.2",
+    "vite-plugin-vuetify": "^2.1.3",
+    "vue-eslint-parser": "^9.4.3"
   },
   "eslintConfig": {
     "root": true,
@@ -40,7 +37,8 @@
       "eslint:recommended"
     ],
     "parserOptions": {
-      "parser": "@babel/eslint-parser"
+      "parser": "@babel/eslint-parser",
+      "requireConfigFile": false
     },
     "rules": {}
   },

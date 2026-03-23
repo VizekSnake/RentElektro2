@@ -12,7 +12,6 @@ environ
 pytest
 pydantic[email]
 pydantic-settings
-django-environ
 psycopg2-binary
 python-multipart
 httpx

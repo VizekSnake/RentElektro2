@@ -1,5 +1,5 @@
 # Use the official Node.js image as the base image
-FROM node:16
+FROM node:20
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -8,28 +8,13 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
 # Copy the rest of the application code into the container
 COPY . .
 
-# Expose port 8080 for the Vue.js application
+# Expose port 8080 for the Vite development server
 EXPOSE 8080
 
-# Command to build the Vue.js application
-CMD ["npm", "run", "build"]
-
-# Dockerfile
-# Stage 1 - the build process
-#FROM node:16.13 AS build
-#WORKDIR /app
-#COPY package*.json ./
-#RUN npm install
-#COPY . .
-#RUN npm run build
-#
-## Stage 2 - the production environment
-#FROM nginx:1.25.3
-#COPY --from=build /app/dist /usr/share/nginx/html
-#EXPOSE 80
-#CMD ["nginx", "-g", "daemon off;"]
+# Command to run the Vite development server
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

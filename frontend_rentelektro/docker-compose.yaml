@@ -6,11 +6,10 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:80"
+      - "8080:8080"
     restart: on-failure
     tty: true
     stdin_open: true
-    command: npm run serve
     networks:
       - app-network
       - api-network
@@ -19,4 +18,3 @@ services:
 networks:
   app-network:
     driver: bridge
-

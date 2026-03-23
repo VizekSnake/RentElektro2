@@ -143,7 +143,7 @@ export default {
       }
       try {
         const token = localStorage.getItem('access_token');
-        const response = await axios.post('api/tool/add', this.tool, {
+        await axios.post('api/tool/add', this.tool, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
