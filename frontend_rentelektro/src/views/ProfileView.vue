@@ -1,23 +1,16 @@
-<!-- src/views/ProfileView.vue -->
 <template>
-  <div class="profile-view">
-    <MainProfile />
-  </div>
+  <PageSection
+    title="Twoj profil"
+    subtitle="Zarzadzaj danymi konta, ustawieniami i aktywnoscia zwiazana z wynajmami."
+  >
+    <SectionCard>
+      <MainProfile />
+    </SectionCard>
+  </PageSection>
 </template>
 
-<script>
-import MainProfile from '@/components/Profile/MainProfile.vue';
-
-export default {
-  name: 'ProfileView',
-  components: {
-    MainProfile
-  }
-}
+<script setup lang="ts">
+import MainProfile from '@/features/profile/components/MainProfile.vue';
+import PageSection from '@/shared/ui/organisms/PageSection.vue';
+import SectionCard from '@/shared/ui/organisms/SectionCard.vue';
 </script>
-
-<style scoped>
-.profile-view {
-  padding: 20px;
-}
-</style>

@@ -160,3 +160,7 @@ cython_debug/
 .idea/
 *.dev.env
 node_modules
+.DS_Store
+*.swp
+*.swo
+backend_rentelektro/test.db

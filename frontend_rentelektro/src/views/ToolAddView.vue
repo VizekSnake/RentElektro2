@@ -1,32 +1,23 @@
 <template>
-  <v-container>
-    <v-card>
-      <v-card-title>
-        <h3>Add New Tool</h3>
-      </v-card-title>
-      <v-card-text>
-        <ToolAddForm @tool-added="handleToolAdded" />
-      </v-card-text>
-    </v-card>
-  </v-container>
+  <PageSection
+    title="Dodaj narzędzie"
+    subtitle="Uzupełnij podstawowe parametry oferty, aby opublikować sprzęt w katalogu."
+  >
+    <SectionCard title="Nowa oferta" subtitle="Im lepszy opis i zdjęcie, tym czytelniejsza karta produktu.">
+      <ToolAddForm @tool-added="handleToolAdded" />
+    </SectionCard>
+  </PageSection>
 </template>
 
-<script>
-import ToolAddForm from '@/components/Tools/ToolAddForm.vue';  // Adjust the path as necessary
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+import ToolAddForm from '@/features/tools/components/ToolAddForm.vue';
+import PageSection from '@/shared/ui/organisms/PageSection.vue';
+import SectionCard from '@/shared/ui/organisms/SectionCard.vue';
 
-export default {
-  name: 'ToolAddView',
-  components: {
-    ToolAddForm,
-  },
-  methods: {
-    handleToolAdded() {
-      // Handle the event when a tool is successfully added
-      this.$router.push('/tools');  // Redirect to the tools list page or any other page
-    },
-  },
+const router = useRouter();
+
+const handleToolAdded = async (): Promise<void> => {
+  await router.push('/tools');
 };
 </script>
-
-<style scoped>
-</style>

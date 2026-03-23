@@ -1,19 +1,13 @@
 <template>
-  <div class="signup">
-    <img alt="Vue logo" src="../assets/logo.png">
+  <AuthLayout
+    title="Rejestracja"
+    subtitle="Załóż konto w RentElektro i zacznij wynajmować lub udostępniać sprzęt."
+  >
     <SignUpForm />
-  </div>
+  </AuthLayout>
 </template>
 
-<script>
-// @ is an alias to /src
-import SignUpForm from "@/components/Auth/SignUpForm.vue";
-
-export default {
-  name: 'LoginView',
-  components: {
-    SignUpForm
-  }
-}
+<script setup lang="ts">
+import SignUpForm from "@/features/auth/components/SignUpForm.vue";
+import AuthLayout from '@/shared/ui/templates/AuthLayout.vue';
 </script>
-q

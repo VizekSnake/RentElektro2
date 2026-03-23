@@ -1,18 +1,13 @@
 <template>
-  <div class="login">
-    <img alt="Vue logo" src="../assets/logo.png">
+  <AuthLayout
+    title="Logowanie"
+    subtitle="Zaloguj się, aby zarządzać profilem, dodawać narzędzia i obsługiwać wynajmy."
+  >
     <LoginForm />
-  </div>
+  </AuthLayout>
 </template>
 
-<script>
-// @ is an alias to /src
-import LoginForm from '@/components/Auth/LoginForm.vue'
-
-export default {
-  name: 'LoginView',
-  components: {
-    LoginForm
-  }
-}
+<script setup lang="ts">
+import LoginForm from '@/features/auth/components/LoginForm.vue';
+import AuthLayout from '@/shared/ui/templates/AuthLayout.vue';
 </script>

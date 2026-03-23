@@ -1,0 +1,24 @@
+/* Layout and generic helpers */
+#app {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app-main {
+  padding-top: 88px;
+}
+
+.app-inline-link {
+  color: inherit;
+  font-weight: 600;
+}
+
+.app-visually-hidden {
+  display: none;
+}
+
+@media (max-width: 959px) {
+  .app-main {
+    padding-top: 76px;
+  }
+}

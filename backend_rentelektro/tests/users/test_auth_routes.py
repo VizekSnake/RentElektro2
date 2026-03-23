@@ -1,57 +1,3 @@
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from main import app
-from core.database import Base
-from core.dependencies import get_db
-from users.handlers import create_user
-from users.schemas import UserCreate
-
-# Create a test database
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-# Override the get_db dependency to use the test database
-def override_get_db():
-    try:
-        db = TestingSessionLocal()
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-@pytest.fixture(scope="function")
-def client():
-    Base.metadata.create_all(bind=engine)  # Create the tables
-    with TestClient(app) as c:
-        yield c
-    Base.metadata.drop_all(bind=engine)  # Drop the tables after tests
-
-
-@pytest.fixture(scope="function")
-def test_user():
-    user_data = {
-        "email": "testuser@example.com",
-        "username": "testuser",
-        "password": "testpassword",
-        "firstname": "Test",
-        "lastname": "User",
-        "phone": "1234567890",
-        "company": True,
-    }
-    user = UserCreate(**user_data)
-    with TestingSessionLocal() as db:
-        created_user = create_user(db, user)
-        db.commit()
-        return created_user
-
-
 def test_register_user(client):
     response = client.post(
         "http://0.0.0.0:8000/api/users/register",
@@ -76,7 +22,6 @@ def test_login(client, test_user):
     )
     assert response.status_code == 200
     assert "access_token" in response.json()
-    Base.metadata.drop_all(engine)
 
 
 def test_read_users_me(client, test_user):

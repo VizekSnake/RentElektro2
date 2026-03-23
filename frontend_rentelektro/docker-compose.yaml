@@ -1,10 +1,10 @@
-version: '3.9'
-name: re_frontend
 services:
   frontend:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      - VITE_API_PROXY_TARGET=http://nginx:80
     ports:
       - "8080:8080"
     restart: on-failure
@@ -12,8 +12,6 @@ services:
     stdin_open: true
     networks:
       - app-network
-      - api-network
-      - rentelektro-network
 
 networks:
   app-network:
