@@ -7,7 +7,15 @@ from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from app.modules.users import service as users_service
 from app.core.dependencies import get_db
-from app.modules.users.schemas import UserCreate, UserUpdate, User, Token, RefreshTokenRequest
+from app.modules.users.schemas import (
+    AccountAnonymizeRequest,
+    PasswordChangeRequest,
+    RefreshTokenRequest,
+    Token,
+    User,
+    UserCreate,
+    UserUpdate,
+)
 from app.core.security import (
     ACCESS_TOKEN_EXPIRE_MINUTES as EXPIRE_DELTA,
     create_access_token,
@@ -126,6 +134,28 @@ async def get_all_users(db: Session = Depends(get_db)):
 @router.patch("/user/{user_id}", response_model=User)
 async def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
     return users_service.update_user(db=db, user_id=user_id, user_update=user)
+
+
+@router.post("/me/password", status_code=status.HTTP_204_NO_CONTENT)
+async def change_current_user_password(
+    payload: PasswordChangeRequest,
+    db: Session = Depends(get_db),
+    access_token: str = Depends(get_access_token),
+):
+    current_user = read_users_me(access_token)
+    users_service.change_password(db=db, user_id=current_user["id"], payload=payload)
+
+
+@router.post("/me/anonymize", status_code=status.HTTP_204_NO_CONTENT)
+async def anonymize_current_user(
+    payload: AccountAnonymizeRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+    access_token: str = Depends(get_access_token),
+):
+    current_user = read_users_me(access_token)
+    users_service.anonymize_user(db=db, user_id=current_user["id"], payload=payload)
+    clear_auth_cookies(response)
 
 
 @router.delete("/delete/{user_id}", status_code=status.HTTP_204_NO_CONTENT)

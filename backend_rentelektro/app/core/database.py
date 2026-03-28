@@ -1,7 +1,8 @@
 import os
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 DB_USER = os.environ.get("POSTGRES_USER")
 DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
@@ -12,6 +13,11 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DB_CONNECTION_STRING = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 SQLALCHEMY_DATABASE_URL = DB_CONNECTION_STRING
 
+
+class Base(DeclarativeBase):
+    pass
+
+
 try:
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL,
@@ -20,10 +26,7 @@ try:
         pool_timeout=30,
         pool_recycle=3600,
     )
-
 except SQLAlchemyError as ex:
     print(f"Database connection failed: {ex}")
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-

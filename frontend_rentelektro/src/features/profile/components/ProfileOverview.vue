@@ -1,37 +1,60 @@
 <template>
-  <v-container class="app-profile-overview" max-width="600px">
-    <v-card>
-      <v-card-title class="text-center">
-        <h3>Profil użytkownika</h3>
-      </v-card-title>
-      <v-card-text>
-        <v-row justify="center">
-          <v-col cols="12" class="text-center">
-            <v-avatar size="100" class="avatar">
-              <img :src="user.profile_picture" alt="profile" class="app-avatar-img">
-            </v-avatar>
-          </v-col>
-          <v-col cols="12" class="text-center">
-            <h2>{{ user.username }}</h2>
-          </v-col>
-          <v-col cols="12">
-            <v-list>
-              <v-list-item>
-                <v-list-item-title>Email</v-list-item-title>
-                <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-  </v-container>
+  <section class="app-profile-overview-card">
+    <div class="app-profile-overview-grid">
+      <div class="d-flex align-center ga-4">
+        <v-avatar size="104" class="app-profile-avatar">
+          <img v-if="user.profile_picture" :src="user.profile_picture" alt="profile" class="app-avatar-img">
+          <span v-else class="text-h4 font-weight-bold">{{ initials }}</span>
+        </v-avatar>
+
+        <div class="d-flex flex-column ga-2">
+          <div class="text-overline">Konto</div>
+          <h2 class="text-h4 font-weight-bold mb-0">{{ fullName }}</h2>
+          <div class="text-body-1 app-muted-copy">@{{ user.username }}</div>
+          <div class="d-flex flex-wrap ga-2 mt-1">
+            <v-chip color="primary" variant="tonal" size="small">
+              {{ user.company ? 'Konto firmowe' : 'Konto prywatne' }}
+            </v-chip>
+            <v-chip :color="user.is_active ? 'success' : 'warning'" variant="tonal" size="small">
+              {{ user.is_active ? 'Aktywne' : 'Nieaktywne' }}
+            </v-chip>
+          </div>
+        </div>
+      </div>
+
+      <div class="app-profile-quick-stats">
+        <div class="app-profile-stat">
+          <span class="app-profile-stat-label">Email</span>
+          <strong>{{ user.email }}</strong>
+        </div>
+        <div class="app-profile-stat">
+          <span class="app-profile-stat-label">Telefon</span>
+          <strong>{{ user.phone || 'Nie dodano' }}</strong>
+        </div>
+        <div class="app-profile-stat">
+          <span class="app-profile-stat-label">Rola</span>
+          <strong>{{ user.role || 'Użytkownik' }}</strong>
+        </div>
+      </div>
+    </div>
+  </section>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { UserProfile } from '@/types/profile';
 
-defineProps<{
+const props = defineProps<{
   user: UserProfile;
 }>();
+
+const fullName = computed(() => {
+  const value = `${props.user.firstname} ${props.user.lastname}`.trim();
+  return value || props.user.username;
+});
+
+const initials = computed(() => {
+  const source = fullName.value.split(' ').filter(Boolean).slice(0, 2);
+  return source.map((item) => item[0]?.toUpperCase() ?? '').join('') || 'R';
+});
 </script>

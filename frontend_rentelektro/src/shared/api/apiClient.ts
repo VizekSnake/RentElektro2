@@ -1,8 +1,9 @@
-import axios from 'axios';
+import createClient from 'openapi-fetch';
+import type { paths } from '@/shared/api/schema';
 
-const apiClient = axios.create({
-  baseURL: '/api',
-  withCredentials: true,
+const apiClient = createClient<paths>({
+  baseUrl: '/api',
+  credentials: 'include',
 });
 
 export default apiClient;

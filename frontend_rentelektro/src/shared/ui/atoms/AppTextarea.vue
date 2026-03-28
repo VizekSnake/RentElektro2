@@ -2,7 +2,7 @@
   <v-textarea
     :model-value="modelValue"
     :label="label"
-    :rules="rules"
+    :rules="normalizedRules"
     :hint="hint"
     :persistent-hint="persistentHint"
     :prepend-inner-icon="prependInnerIcon"
@@ -16,11 +16,13 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 defineOptions({
   inheritAttrs: false,
 });
 
-defineProps<{
+const props = defineProps<{
   modelValue?: string | null;
   label?: string;
   rules?: unknown[];
@@ -32,6 +34,8 @@ defineProps<{
   placeholder?: string;
   disabled?: boolean;
 }>();
+
+const normalizedRules = computed(() => props.rules as never);
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | null];

@@ -1,7 +1,7 @@
 services:
   backend:
     build: .
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     ports:
       - "8000:8000"
     env_file:
@@ -15,6 +15,20 @@ services:
       - redis
     volumes:
       - .:/app
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+          ignore:
+            - .venv/
+            - __pycache__/
+            - .pytest_cache/
+            - .ruff_cache/
+        - action: rebuild
+          path: pyproject.toml
+        - action: rebuild
+          path: Dockerfile
     networks:
       - api-network
       - postgres-network
@@ -43,7 +57,7 @@ services:
 
   tests:
     build: .
-    command: [ "sh", "-c", "sleep 5 && pytest" ]
+    command: [ "sh", "-c", "sleep 5 && poetry run pytest" ]
     env_file:
       - envs/config.dev.env
       - envs/postgres.dev.env

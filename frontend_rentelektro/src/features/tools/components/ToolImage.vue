@@ -1,17 +1,19 @@
 <template>
-  <v-img
-    :src="imageUrl"
-    height="420"
-    cover
-    class="rounded-lg"
-    :aspect-ratio="4 / 3"
-  >
-    <template #placeholder>
-      <div class="d-flex align-center justify-center fill-height bg-grey-lighten-3">
-        <v-icon size="56" color="grey-darken-1">mdi-tools</v-icon>
-      </div>
-    </template>
-  </v-img>
+  <div class="app-tool-detail-image-shell">
+    <v-img
+      :src="imageUrl"
+      height="420"
+      contain
+      class="app-tool-detail-image"
+      :aspect-ratio="4 / 3"
+    >
+      <template #placeholder>
+        <div class="app-tool-detail-image-placeholder">
+          <v-icon size="56" color="grey-darken-1">mdi-tools</v-icon>
+        </div>
+      </template>
+    </v-img>
+  </div>
 </template>
 
 <script setup lang="ts">

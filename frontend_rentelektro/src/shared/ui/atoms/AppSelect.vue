@@ -5,7 +5,7 @@
     :items="items"
     :item-title="itemTitle"
     :item-value="itemValue"
-    :rules="rules"
+    :rules="normalizedRules"
     :hint="hint"
     :persistent-hint="persistentHint"
     :prepend-inner-icon="prependInnerIcon"
@@ -16,15 +16,17 @@
   />
 </template>
 
-<script setup lang="ts" generic="TItem">
+<script setup lang="ts">
+import { computed } from 'vue';
+
 defineOptions({
   inheritAttrs: false,
 });
 
-defineProps<{
-  modelValue?: string | number | boolean | null;
+const props = defineProps<{
+  modelValue?: string | number | boolean | symbol | null;
   label?: string;
-  items?: TItem[];
+  items?: readonly unknown[];
   itemTitle?: string;
   itemValue?: string;
   rules?: unknown[];
@@ -35,7 +37,9 @@ defineProps<{
   loading?: boolean;
 }>();
 
+const normalizedRules = computed(() => props.rules as never);
+
 const emit = defineEmits<{
-  'update:modelValue': [value: string | number | boolean | null];
+  'update:modelValue': [value: string | number | boolean | symbol | null];
 }>();
 </script>

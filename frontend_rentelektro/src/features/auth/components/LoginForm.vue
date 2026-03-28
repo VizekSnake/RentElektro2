@@ -44,16 +44,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import type { AxiosError } from 'axios';
 import { useAuth } from '@/composables/useAuth';
 import eventBus from '@/eventBus';
+import { getApiErrorMessage } from '@/shared/api/apiErrors';
 import AppButton from '@/shared/ui/atoms/AppButton.vue';
 import AppTextField from '@/shared/ui/atoms/AppTextField.vue';
 import ResponseMessage from '@/shared/ui/molecules/ResponseMessage.vue';
-
-type ApiError = {
-  detail?: string;
-};
 
 const router = useRouter();
 const { login: loginUser, isSubmitting } = useAuth();
@@ -69,8 +65,7 @@ const login = async (): Promise<void> => {
     eventBus.emit('login');
     await router.push('/home');
   } catch (error) {
-    const axiosError = error as AxiosError<ApiError>;
-    errorMessage.value = `Logowanie nie powiodło się: ${axiosError.response?.data?.detail ?? axiosError.message}`;
+    errorMessage.value = `Logowanie nie powiodło się: ${getApiErrorMessage(error, 'Nieznany błąd.')}`;
   }
 };
 </script>

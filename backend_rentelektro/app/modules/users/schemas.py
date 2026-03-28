@@ -75,6 +75,15 @@ class UserLogin(BaseModel):
     password: str
 
 
+class PasswordChangeRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class AccountAnonymizeRequest(BaseModel):
+    current_password: str
+
+
 class Token(BaseModel):
     access_token: str
     refresh_token: str

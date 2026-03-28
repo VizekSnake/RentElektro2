@@ -1,11 +1,7 @@
 import { computed, ref } from 'vue';
-import type { AxiosError } from 'axios';
+import { getApiErrorMessage } from '@/shared/api/apiErrors';
 import { createTool, fetchToolCategories } from '@/services/toolService';
-import type { ToolCategory, ToolFormPayload } from '@/types/tools';
-
-type ApiError = {
-  detail?: string;
-};
+import type { Tool, ToolCategory, ToolFormPayload } from '@/types/tools';
 
 export function useToolForm() {
   const categories = ref<ToolCategory[]>([]);
@@ -35,22 +31,20 @@ export function useToolForm() {
     try {
       categories.value = await fetchToolCategories();
     } catch (error) {
-      const axiosError = error as AxiosError<ApiError>;
-      errorMessage.value = axiosError.response?.data?.detail ?? 'Nie udało się pobrać kategorii.';
+      errorMessage.value = getApiErrorMessage(error, 'Nie udało się pobrać kategorii.');
     } finally {
       isLoadingCategories.value = false;
     }
   };
 
-  const addTool = async (payload: ToolFormPayload): Promise<void> => {
+  const addTool = async (payload: ToolFormPayload): Promise<Tool> => {
     isSubmitting.value = true;
     errorMessage.value = '';
 
     try {
-      await createTool(payload);
+      return await createTool(payload);
     } catch (error) {
-      const axiosError = error as AxiosError<ApiError>;
-      errorMessage.value = axiosError.response?.data?.detail ?? 'Nie udało się dodać narzędzia.';
+      errorMessage.value = getApiErrorMessage(error, 'Nie udało się dodać narzędzia.');
       throw error;
     } finally {
       isSubmitting.value = false;

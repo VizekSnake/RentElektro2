@@ -10,6 +10,18 @@ services:
     restart: on-failure
     tty: true
     stdin_open: true
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+          ignore:
+            - node_modules/
+            - dist/
+        - action: rebuild
+          path: package.json
+        - action: rebuild
+          path: package-lock.json
     networks:
       - app-network
 

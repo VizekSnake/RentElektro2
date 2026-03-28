@@ -2,7 +2,7 @@
   <div class="d-flex flex-column ga-5">
     <div>
       <TagGroup class="mb-2" :tags="statusTags" />
-      <h2 class="text-h4 font-weight-bold mb-1">{{ tool.Type }}</h2>
+      <h2 class="text-h4 font-weight-bold mb-1">{{ tool.TypeLabel || tool.Type }}</h2>
       <p class="text-body-1 text-medium-emphasis">{{ tool.Brand }}</p>
     </div>
 
@@ -27,7 +27,7 @@ const categoryId = computed(() => getToolCategoryId(props.tool));
 const statusTags = computed<TagGroupItem[]>(() => {
   const items: TagGroupItem[] = [
     {
-      label: props.tool.PowerSource || 'n/a',
+      label: props.tool.PowerSourceLabel || props.tool.PowerSource || 'n/a',
       color: 'secondary',
       variant: 'flat',
       size: 'small',

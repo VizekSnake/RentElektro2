@@ -1,6 +1,11 @@
 import { ref } from 'vue';
-import { fetchProfile, updateProfile } from '@/services/profileService';
-import type { UserProfile, UserProfileUpdate } from '@/types/profile';
+import { anonymizeAccount, changePassword, fetchProfile, updateProfile } from '@/services/profileService';
+import type {
+  AccountAnonymizePayload,
+  PasswordChangePayload,
+  UserProfile,
+  UserProfileUpdate,
+} from '@/types/profile';
 
 export function useProfile() {
   const user = ref<UserProfile | null>(null);
@@ -39,6 +44,36 @@ export function useProfile() {
     }
   };
 
+  const updatePassword = async (payload: PasswordChangePayload): Promise<boolean> => {
+    isSubmitting.value = true;
+    errorMessage.value = '';
+
+    try {
+      await changePassword(payload);
+      return true;
+    } catch (error) {
+      errorMessage.value = error instanceof Error ? error.message : 'Nie udało się zmienić hasła.';
+      return false;
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
+  const anonymizeCurrentAccount = async (payload: AccountAnonymizePayload): Promise<boolean> => {
+    isSubmitting.value = true;
+    errorMessage.value = '';
+
+    try {
+      await anonymizeAccount(payload);
+      return true;
+    } catch (error) {
+      errorMessage.value = error instanceof Error ? error.message : 'Nie udało się zanonimizować konta.';
+      return false;
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
   return {
     user,
     isLoading,
@@ -46,5 +81,7 @@ export function useProfile() {
     errorMessage,
     fetchUserData,
     saveProfile,
+    updatePassword,
+    anonymizeCurrentAccount,
   };
 }

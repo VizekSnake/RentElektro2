@@ -1,15 +1,14 @@
 from enum import Enum
-
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import Optional
 
-from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class ToolBase(BaseModel):
     Type: Optional[str] = None
+    TypeLabel: Optional[str] = None
     PowerSource: Optional[str] = None
+    PowerSourceLabel: Optional[str] = None
     Brand: Optional[str] = None
     Description: Optional[str] = None
     category_id: Optional[int] = None
@@ -75,3 +74,23 @@ class Category(ToolCategory):
 
 class CategoryAdd(ToolCategory):
     pass
+
+
+class ToolListFilters(BaseModel):
+    search: str | None = None
+    power_source: str | None = None
+    availability: bool | None = None
+    category_id: int | None = None
+    sort: str = "newest"
+    page: int = 1
+    page_size: int = 9
+
+
+class PaginatedTools(BaseModel):
+    items: list[Tool]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+
+    model_config = ConfigDict(from_attributes=True)

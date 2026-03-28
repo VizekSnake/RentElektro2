@@ -3,7 +3,7 @@
     :model-value="modelValue"
     :label="label"
     :type="type"
-    :rules="rules"
+    :rules="normalizedRules"
     :hint="hint"
     :persistent-hint="persistentHint"
     :prepend-inner-icon="prependInnerIcon"
@@ -19,11 +19,13 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 defineOptions({
   inheritAttrs: false,
 });
 
-defineProps<{
+const props = defineProps<{
   modelValue?: string | number | null;
   label?: string;
   type?: string;
@@ -37,6 +39,8 @@ defineProps<{
   disabled?: boolean;
   loading?: boolean;
 }>();
+
+const normalizedRules = computed(() => props.rules as never);
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | number | null];

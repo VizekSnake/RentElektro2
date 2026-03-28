@@ -1,4 +1,5 @@
 import logging
+from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -7,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.modules.users import repository
 from app.core.security import get_password_hash, verify_password
 from app.modules.users.models import User as UserModel
-from app.modules.users.schemas import UserCreate, UserUpdate
+from app.modules.users.schemas import AccountAnonymizeRequest, PasswordChangeRequest, UserCreate, UserUpdate
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +82,52 @@ def delete_user(db: Session, user_id: int) -> None:
     db_user = get_user_or_404(db, user_id)
     try:
         db.delete(db_user)
+        db.commit()
+    except SQLAlchemyError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error",
+        ) from exc
+
+
+def change_password(db: Session, user_id: int, payload: PasswordChangeRequest) -> None:
+    user = get_user_or_404(db, user_id)
+    if not verify_password(payload.current_password, user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Aktualne hasło jest nieprawidłowe.")
+
+    if len(payload.new_password) < 8:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Nowe hasło musi mieć co najmniej 8 znaków.")
+
+    user.hashed_password = get_password_hash(payload.new_password)
+    try:
+        db.commit()
+    except SQLAlchemyError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error",
+        ) from exc
+
+
+def anonymize_user(db: Session, user_id: int, payload: AccountAnonymizeRequest) -> None:
+    user = get_user_or_404(db, user_id)
+    if not verify_password(payload.current_password, user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Aktualne hasło jest nieprawidłowe.")
+
+    suffix = f"{user.id}-{int(datetime.now(UTC).timestamp())}"
+    user.email = f"anon-{suffix}@deleted.rentelektro.local"
+    user.username = f"anon_{suffix}"
+    user.firstname = "Usunięte"
+    user.lastname = "Konto"
+    user.phone = ""
+    user.company = False
+    user.profile_picture = None
+    user.role = None
+    user.is_active = False
+    user.hashed_password = get_password_hash(f"deleted-account-{suffix}")
+
+    try:
         db.commit()
     except SQLAlchemyError as exc:
         db.rollback()

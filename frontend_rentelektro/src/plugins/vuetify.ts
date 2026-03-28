@@ -7,13 +7,13 @@ import * as directives from 'vuetify/directives';
 const rentElektroTheme: ThemeDefinition = {
   dark: false,
   colors: {
-    background: '#f4f1ea',
-    surface: '#fffdf8',
-    primary: '#1f4d3a',
-    secondary: '#cf6f2e',
-    accent: '#7d8f69',
+    background: '#f7f4ef',
+    surface: '#ffffff',
+    primary: '#f97316',
+    secondary: '#1f2937',
+    accent: '#fdba74',
     success: '#2e7d32',
-    warning: '#b7791f',
+    warning: '#d97706',
     error: '#c62828',
     info: '#1565c0',
   },
@@ -30,7 +30,7 @@ const vuetify = createVuetify({
   },
   defaults: {
     VApp: {
-      style: 'background: linear-gradient(180deg, #f4f1ea 0%, #fbf8f1 45%, #f1ede5 100%);',
+      style: 'background: linear-gradient(180deg, #fbf9f5 0%, #f6f1e8 42%, #f3ece1 100%);',
     },
     VAppBar: {
       elevation: 0,
@@ -38,9 +38,9 @@ const vuetify = createVuetify({
     },
     VBtn: {
       color: 'primary',
-      rounded: 'lg',
+      rounded: 'xl',
       variant: 'flat',
-      style: 'text-transform:none;font-weight:700;letter-spacing:-0.01em;',
+      style: 'text-transform:none;font-weight:700;letter-spacing:-0.02em;',
     },
     VCard: {
       rounded: 'xl',
@@ -56,16 +56,19 @@ const vuetify = createVuetify({
       color: 'primary',
       density: 'comfortable',
       variant: 'outlined',
+      rounded: 'xl',
     },
     VTextarea: {
       color: 'primary',
       density: 'comfortable',
       variant: 'outlined',
+      rounded: 'xl',
     },
     VSelect: {
       color: 'primary',
       density: 'comfortable',
       variant: 'outlined',
+      rounded: 'xl',
     },
     VCheckbox: {
       color: 'primary',

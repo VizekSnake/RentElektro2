@@ -1,5 +1,5 @@
-import type { AxiosError } from 'axios';
 import apiClient from '@/shared/api/apiClient';
+import { assertApiResponse, unwrapApiResponse } from '@/shared/api/apiErrors';
 import { createLogger } from '@/shared/lib/logger';
 
 const logger = createLogger('auth-service');
@@ -7,11 +7,6 @@ const logger = createLogger('auth-service');
 export type SessionUser = {
   id: number;
   username: string;
-};
-
-type LoginResult = {
-  authenticated: boolean;
-  token_type: string;
 };
 
 export type SignUpPayload = {
@@ -24,30 +19,33 @@ export type SignUpPayload = {
   password: string;
 };
 
-type ApiError = {
-  detail?: string;
-};
-
 export async function loginWithPassword(username: string, password: string): Promise<void> {
-  const formData = new URLSearchParams();
-  formData.append('username', username);
-  formData.append('password', password);
-
   logger.info('login_attempt', { username });
 
-  await apiClient.post<LoginResult>('/users/token', formData, {
+  const response = await apiClient.POST('/users/token', {
+    body: {
+      username,
+      password,
+    },
+    bodySerializer(body) {
+      const formData = new URLSearchParams();
+      formData.append('username', body.username);
+      formData.append('password', body.password);
+      return formData;
+    },
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
+  unwrapApiResponse(response, 'Logowanie nie powiodło się.');
 
   logger.info('login_success', { username });
 }
 
 export async function getSessionUser(): Promise<SessionUser | null> {
   try {
-    const response = await apiClient.get<SessionUser>('/users/me');
-    return response.data;
+    const response = await apiClient.GET('/users/me');
+    return unwrapApiResponse(response, 'Nie udało się pobrać sesji użytkownika.');
   } catch {
     return null;
   }
@@ -56,7 +54,8 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 export async function refreshToken(): Promise<boolean> {
   try {
     logger.info('refresh_token_attempt');
-    await apiClient.post('/users/refresh', {});
+    const response = await apiClient.POST('/users/refresh', {});
+    unwrapApiResponse(response, 'Odświeżenie sesji nie powiodło się.');
     logger.info('refresh_token_success');
     return true;
   } catch {
@@ -82,7 +81,8 @@ export async function ensureAuthenticated(): Promise<boolean> {
 
 export async function logoutSession(): Promise<void> {
   try {
-    await apiClient.post('/users/logout', {});
+    const response = await apiClient.POST('/users/logout', {});
+    assertApiResponse(response, 'Wylogowanie nie powiodło się.');
   } catch {
     logger.warn('logout_request_failed');
   }
@@ -91,14 +91,10 @@ export async function logoutSession(): Promise<void> {
 
 export async function registerUser(payload: SignUpPayload): Promise<void> {
   try {
-    await apiClient.post('/users/register', payload, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await apiClient.POST('/users/register', { body: payload });
+    assertApiResponse(response, 'Rejestracja nie powiodła się.');
   } catch (error) {
-    const axiosError = error as AxiosError<ApiError>;
-    logger.warn('register_failed', { detail: axiosError.response?.data?.detail });
+    logger.warn('register_failed', { detail: error instanceof Error ? error.message : undefined });
     throw error;
   }
 }

@@ -15,7 +15,7 @@ defineOptions({
 });
 
 withDefaults(defineProps<{
-  modelValue?: boolean;
+  modelValue?: boolean | null;
   label?: string;
   hideDetails?: boolean;
   disabled?: boolean;
@@ -27,6 +27,6 @@ withDefaults(defineProps<{
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [value: boolean];
+  'update:modelValue': [value: boolean | null];
 }>();
 </script>

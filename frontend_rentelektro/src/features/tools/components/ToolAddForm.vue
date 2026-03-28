@@ -1,123 +1,145 @@
 <template>
-  <div class="d-flex flex-column ga-5">
+  <div class="app-tool-add-form d-flex flex-column ga-5">
     <ResponseMessage v-if="successMessage" :message="successMessage" type="success" />
     <ResponseMessage v-if="errorMessage" :message="errorMessage" type="error" />
 
     <v-form ref="formRef" @submit.prevent="addTool">
       <div class="d-flex flex-column ga-6">
-        <FormSection
-          title="Podstawowe informacje"
-          description="Nazwa, marka i opis budują pierwsze wrażenie oferty."
-        >
-          <v-row>
-            <v-col cols="12" md="6">
-              <AppTextField
-                v-model="tool.Type"
-                label="Typ narzędzia"
-                prepend-inner-icon="mdi-hammer-screwdriver"
-                :rules="requiredRule('Typ narzędzia')"
-              />
-            </v-col>
-            <v-col cols="12" md="6">
-              <AppTextField
-                v-model="tool.Brand"
-                label="Marka"
-                prepend-inner-icon="mdi-tag-outline"
-                :rules="requiredRule('Marka')"
-              />
-            </v-col>
-            <v-col cols="12" md="6">
-              <AppSelect
-                v-model="tool.PowerSource"
-                label="Źródło zasilania"
-                :items="powerSources"
-                prepend-inner-icon="mdi-power-plug-outline"
-                :rules="requiredRule('Źródło zasilania')"
-              />
-            </v-col>
-            <v-col cols="12" md="6">
-              <AppSelect
-                v-model="tool.category_id"
-                label="Kategoria"
-                :items="categoryOptions"
-                item-title="title"
-                item-value="value"
-                prepend-inner-icon="mdi-shape-outline"
-                :loading="isLoadingCategories"
-                :disabled="isLoadingCategories || categoryOptions.length === 0"
-                :hint="categoryHint"
-                persistent-hint
-                :rules="requiredRule('Kategoria')"
-              />
-            </v-col>
-            <v-col cols="12">
-              <AppTextarea
-                v-model="tool.Description"
-                label="Opis"
-                prepend-inner-icon="mdi-text-box-outline"
-                :rules="requiredRule('Opis')"
-                rows="4"
-                auto-grow
-              />
-            </v-col>
-          </v-row>
-        </FormSection>
+        <div class="app-tool-add-form-section">
+          <FormSection
+            title="Podstawowe informacje"
+            description="Nazwa, marka i opis budują pierwsze wrażenie oferty."
+          >
+            <v-row>
+              <v-col cols="12" md="6">
+                <AppSelect
+                  v-model="tool.Type"
+                  label="Typ narzędzia"
+                  :items="toolTypeOptions"
+                  item-title="title"
+                  item-value="value"
+                  prepend-inner-icon="mdi-hammer-screwdriver"
+                  :rules="requiredRule('Typ narzędzia')"
+                  hint="Wybierz typ z katalogu ofert, żeby marka i karta narzędzia były spójne."
+                  persistent-hint
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <AppSelect
+                  v-model="tool.Brand"
+                  label="Marka"
+                  :items="brandOptions"
+                  item-title="title"
+                  item-value="value"
+                  prepend-inner-icon="mdi-tag-outline"
+                  :rules="requiredRule('Marka')"
+                  hint="Wybierz markę z katalogu dostępnego w serwisie."
+                  persistent-hint
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <AppSelect
+                  v-model="tool.PowerSource"
+                  label="Źródło zasilania"
+                  :items="powerSources"
+                  prepend-inner-icon="mdi-power-plug-outline"
+                  :rules="requiredRule('Źródło zasilania')"
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <AppSelect
+                  v-model="tool.category_id"
+                  label="Kategoria"
+                  :items="categoryOptions"
+                  item-title="title"
+                  item-value="value"
+                  prepend-inner-icon="mdi-shape-outline"
+                  :loading="isLoadingCategories"
+                  :disabled="isLoadingCategories || categoryOptions.length === 0"
+                  :hint="categoryHint"
+                  persistent-hint
+                  :rules="requiredRule('Kategoria')"
+                />
+              </v-col>
+              <v-col cols="12">
+                <AppTextarea
+                  v-model="tool.Description"
+                  label="Opis oferty"
+                  prepend-inner-icon="mdi-text-box-outline"
+                  :rules="requiredRule('Opis')"
+                  hint="Napisz krótko, do czego nadaje się sprzęt i w jakim jest stanie."
+                  persistent-hint
+                  rows="4"
+                  auto-grow
+                />
+              </v-col>
+            </v-row>
+          </FormSection>
+        </div>
 
-        <FormSection
-          title="Parametry techniczne"
-          description="Podaj dane potrzebne do oceny stanu i opłacalności wynajmu."
-        >
-          <v-row>
-            <v-col cols="12" md="4">
-              <AppTextField
-                v-model.number="tool.Power"
-                label="Moc"
-                type="number"
-                prepend-inner-icon="mdi-flash-outline"
-                :rules="requiredRule('Moc')"
-              />
-            </v-col>
-            <v-col cols="12" md="4">
-              <AppTextField
-                v-model.number="tool.Age"
-                label="Wiek"
-                type="number"
-                step="0.1"
-                prepend-inner-icon="mdi-timer-sand"
-                :rules="requiredRule('Wiek')"
-              />
-            </v-col>
-            <v-col cols="12" md="4">
-              <AppTextField
-                v-model.number="tool.RatePerDay"
-                label="Cena za dzień"
-                type="number"
-                step="0.01"
-                prefix="PLN"
-                prepend-inner-icon="mdi-cash"
-                :rules="requiredRule('Cena za dzień')"
-              />
-            </v-col>
-          </v-row>
+        <div class="app-tool-add-form-section">
+          <FormSection
+            title="Parametry techniczne"
+            description="Podaj dane potrzebne do oceny stanu i opłacalności wynajmu."
+          >
+            <v-row>
+              <v-col cols="12" md="4">
+                <AppTextField
+                  v-model.number="tool.Power"
+                  label="Moc"
+                  type="number"
+                  prepend-inner-icon="mdi-flash-outline"
+                  :rules="requiredRule('Moc')"
+                  hint="Np. 1200"
+                  persistent-hint
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <AppTextField
+                  v-model.number="tool.Age"
+                  label="Wiek"
+                  type="number"
+                  step="0.1"
+                  prepend-inner-icon="mdi-timer-sand"
+                  :rules="requiredRule('Wiek')"
+                  hint="W latach"
+                  persistent-hint
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <AppTextField
+                  v-model.number="tool.RatePerDay"
+                  label="Cena za dzień"
+                  type="number"
+                  step="0.01"
+                  prefix="PLN"
+                  prepend-inner-icon="mdi-cash"
+                  :rules="requiredRule('Cena za dzień')"
+                />
+              </v-col>
+            </v-row>
 
-          <ImageDropzone
-            v-model="tool.ImageURL"
-            :rules="requiredRule('Zdjęcie')"
-            @invalid-file="errorMessage = $event"
-          />
-        </FormSection>
+            <ImageDropzone
+              v-model="tool.ImageURL"
+              :rules="requiredRule('Zdjęcie')"
+              @invalid-file="errorMessage = $event"
+            />
+          </FormSection>
+        </div>
 
-        <FormSection
-          title="Status oferty"
-          description="Zaznacz, czy narzędzie jest już dostępne i czy ma ubezpieczenie."
-        >
-          <div class="d-flex flex-column flex-md-row ga-4">
-            <AppCheckbox v-model="tool.Availability" label="Dostępne od razu" hide-details />
-            <AppCheckbox v-model="tool.Insurance" label="Objęte ubezpieczeniem" hide-details />
-          </div>
-        </FormSection>
+        <div class="app-tool-add-form-section">
+          <FormSection
+            title="Status oferty"
+            description="Zaznacz, czy narzędzie jest już dostępne i czy ma ubezpieczenie."
+          >
+            <div class="app-tool-add-status-row d-flex flex-column flex-md-row ga-4">
+              <AppCheckbox v-model="tool.Availability" label="Dostępne od razu" hide-details />
+              <AppCheckbox v-model="tool.Insurance" label="Objęte ubezpieczeniem" hide-details />
+            </div>
+          </FormSection>
+        </div>
 
-        <div class="d-flex flex-column flex-sm-row ga-3">
+        <div class="app-tool-add-actions d-flex flex-column flex-sm-row ga-3">
           <AppButton type="submit" :loading="isSubmitting" prepend-icon="mdi-content-save-outline">
             Zapisz ofertę
           </AppButton>
@@ -142,12 +164,17 @@ import AppTextarea from '@/shared/ui/atoms/AppTextarea.vue';
 import FormSection from '@/shared/ui/molecules/FormSection.vue';
 import ResponseMessage from '@/shared/ui/molecules/ResponseMessage.vue';
 import ImageDropzone from '@/features/tools/components/ImageDropzone.vue';
-import type { ToolFormPayload } from '@/types/tools';
+import { TOOL_BRAND_OPTIONS, TOOL_TYPE_OPTIONS } from '@/features/tools/constants/toolCatalog';
+import type { Tool, ToolFormPayload } from '@/types/tools';
 
-const emit = defineEmits(['tool-added']);
+const emit = defineEmits<{
+  'tool-added': [tool: Tool];
+}>();
 
 const formRef = ref<VForm | null>(null);
 const powerSources = ['electric', 'gas'];
+const brandOptions = TOOL_BRAND_OPTIONS;
+const toolTypeOptions = TOOL_TYPE_OPTIONS;
 const successMessage = ref('');
 const {
   categoryOptions,
@@ -176,7 +203,8 @@ const createInitialTool = (): ToolFormPayload => ({
 const tool = ref<ToolFormPayload>(createInitialTool());
 
 const requiredRule = (label: string) => [
-  (value: string | number | null) => !!value || `${label} jest wymagane`,
+  (value: string | number | null) =>
+    (value !== null && value !== '' && value !== undefined) || `${label} jest wymagane`,
 ];
 
 const resetForm = (): void => {
@@ -196,11 +224,9 @@ const addTool = async (): Promise<void> => {
   successMessage.value = '';
 
   try {
-    await createToolOffer(tool.value);
-
-    successMessage.value = 'Narzędzie zostało dodane do katalogu.';
-    emit('tool-added');
-    resetForm();
+    const createdTool = await createToolOffer(tool.value);
+    successMessage.value = 'Oferta została opublikowana.';
+    emit('tool-added', createdTool);
   } catch {
     return;
   }
