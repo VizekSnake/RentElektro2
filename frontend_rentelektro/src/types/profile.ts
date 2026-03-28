@@ -17,3 +17,12 @@ export type UserProfileUpdate = Partial<
     'profile_picture' | 'username' | 'email' | 'phone' | 'firstname' | 'lastname' | 'company'
   >
 >;
+
+export type PasswordChangePayload = {
+  current_password: string;
+  new_password: string;
+};
+
+export type AccountAnonymizePayload = {
+  current_password: string;
+};

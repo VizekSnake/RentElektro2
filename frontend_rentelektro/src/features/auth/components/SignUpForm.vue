@@ -100,17 +100,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { AxiosError } from 'axios';
 import { useRouter } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
+import { getApiErrorMessage } from '@/shared/api/apiErrors';
 import AppButton from '@/shared/ui/atoms/AppButton.vue';
 import AppCheckbox from '@/shared/ui/atoms/AppCheckbox.vue';
 import AppTextField from '@/shared/ui/atoms/AppTextField.vue';
 import ResponseMessage from '@/shared/ui/molecules/ResponseMessage.vue';
-
-type ApiError = {
-  detail?: string;
-};
 
 const router = useRouter();
 const { signup: register, isSubmitting } = useAuth();
@@ -159,8 +155,7 @@ const signup = async (): Promise<void> => {
       void router.push('/login');
     }, redirectDuration);
   } catch (error) {
-    const axiosError = error as AxiosError<ApiError>;
-    errorMessage.value = `Rejestracja nie powiodła się: ${axiosError.response?.data?.detail ?? axiosError.message}`;
+    errorMessage.value = `Rejestracja nie powiodła się: ${getApiErrorMessage(error, 'Nieznany błąd.')}`;
   }
 };
 </script>

@@ -43,10 +43,6 @@ export default defineConfig({
             return 'vue-core';
           }
 
-          if (id.includes('node_modules/axios')) {
-            return 'axios';
-          }
-
           if (id.includes('/src/features/auth/')) {
             return 'feature-auth';
           }

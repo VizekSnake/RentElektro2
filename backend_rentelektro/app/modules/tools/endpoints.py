@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends, status
+from typing import List
+
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
+
 from app.modules.tools import service as tools_service
 from app.core.dependencies import get_db
 from app.core.security import get_current_user
-from app.modules.tools.schemas import ToolAdd, ToolUpdate, Tool, CategoryAdd, Category
+from app.modules.tools.schemas import Category, CategoryAdd, PaginatedTools, Tool, ToolAdd, ToolListFilters, ToolUpdate
 from app.modules.users.schemas import User
-from typing import List
 
 router = APIRouter(prefix="/tool", tags=["tools"])
 
@@ -31,14 +33,40 @@ async def update_tool(tool_id: int, tool: ToolUpdate, db: Session = Depends(get_
     return tools_service.update_tool(db=db, tool_id=tool_id, tool_update=tool, owner_id=user.id)
 
 
-@router.get("/all", response_model=List[Tool] | None)
-async def get_all(db: Session = Depends(get_db)):
-    return tools_service.list_tools_or_404(db)
+@router.get("/all", response_model=PaginatedTools)
+async def get_all(
+    search: str | None = Query(default=None),
+    power_source: str | None = Query(default=None),
+    availability: bool | None = Query(default=None),
+    category_id: int | None = Query(default=None),
+    sort: str = Query(default="newest"),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=9, ge=1, le=24),
+    db: Session = Depends(get_db),
+):
+    filters = ToolListFilters(
+        search=search,
+        power_source=power_source,
+        availability=availability,
+        category_id=category_id,
+        sort=sort,
+        page=page,
+        page_size=page_size,
+    )
+    return tools_service.list_tools_or_404(db, filters)
 
 
 @router.get("/category/all", response_model=List[Category] | None)
 async def get_all_category(db: Session = Depends(get_db)):
     return tools_service.list_categories_or_404(db)
+
+
+@router.get("/mine", response_model=List[Tool])
+async def get_my_tools(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return tools_service.list_owner_tools(db, user.id)
 
 
 @router.get("/{tool_id}", response_model=Tool)

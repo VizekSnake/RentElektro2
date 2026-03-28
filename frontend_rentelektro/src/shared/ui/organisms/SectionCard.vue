@@ -22,9 +22,9 @@
 withDefaults(defineProps<{
   title?: string;
   subtitle?: string;
-  variant?: string;
+  variant?: 'flat' | 'text' | 'outlined' | 'tonal' | 'plain' | 'elevated';
   elevation?: number | string;
-  border?: boolean | string;
+  border?: boolean | 'sm' | 'md' | 'lg';
 }>(), {
   title: '',
   subtitle: '',

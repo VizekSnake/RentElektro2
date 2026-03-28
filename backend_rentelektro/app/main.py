@@ -25,6 +25,7 @@ except Exception:  # pragma: no cover - optional dev dependency
 app = FastAPI(tags="RentElektro")
 app.debug = os.getenv("DEBUG", "true").lower() == "true"
 debug_toolbar_enabled = os.getenv("DEBUG_TOOLBAR", "false").lower() == "true"
+auto_create_schema = os.getenv("AUTO_CREATE_SCHEMA", "true").lower() == "true"
 
 if debug_toolbar_enabled and DebugToolbarMiddleware is not None:
     app.add_middleware(
@@ -35,10 +36,11 @@ if debug_toolbar_enabled and DebugToolbarMiddleware is not None:
 instrumentator = Instrumentator()
 instrumentator.instrument(app)
 
-users_db.Base.metadata.create_all(bind=engine)
-tools_db.Base.metadata.create_all(bind=engine)
-rentals_db.Base.metadata.create_all(bind=engine)
-reviews_db.Base.metadata.create_all(bind=engine)
+if auto_create_schema:
+    users_db.Base.metadata.create_all(bind=engine)
+    tools_db.Base.metadata.create_all(bind=engine)
+    rentals_db.Base.metadata.create_all(bind=engine)
+    reviews_db.Base.metadata.create_all(bind=engine)
 
 
 @app.middleware("http")

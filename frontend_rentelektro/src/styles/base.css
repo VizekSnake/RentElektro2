@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 html,
 body,
@@ -10,9 +10,9 @@ body {
   margin: 0;
   font-family: var(--app-font-family);
   background:
-    radial-gradient(circle at top left, rgba(207, 111, 46, 0.16), transparent 24%),
-    radial-gradient(circle at top right, rgba(31, 77, 58, 0.18), transparent 28%),
-    linear-gradient(180deg, #f2eee6 0%, #fbf8f1 48%, #efe8dc 100%);
+    radial-gradient(circle at top left, rgba(249, 115, 22, 0.18), transparent 28%),
+    radial-gradient(circle at 85% 10%, rgba(251, 191, 36, 0.12), transparent 24%),
+    linear-gradient(180deg, #fcfaf7 0%, #f6f0e7 55%, #f3ece3 100%);
   color: var(--app-color-ink);
 }
 
@@ -34,4 +34,15 @@ h5,
 h6 {
   font-family: var(--app-display-font-family);
   letter-spacing: -0.03em;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.75), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
+  z-index: 0;
 }
