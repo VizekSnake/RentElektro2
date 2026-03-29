@@ -113,20 +113,3 @@ Run:
 cd backend_rentelektro
 python3 -m app.scripts.seed_data
 ```
-
-## Notes
-
-- public tool list shows only active listings
-- owners can manage their own listings directly from the tool profile
-- rental center separates pending, current, archived, and owner inventory flows
-- account deletion is handled as anonymization instead of hard delete
-
-## Repository Status
-
-The project has recently been updated with:
-
-- SQLAlchemy 2 model style
-- Poetry-based backend dependencies
-- Alembic migrations
-- backend linting via Ruff
-- richer frontend UX and marketplace flows
