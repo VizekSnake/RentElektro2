@@ -32,6 +32,9 @@
     "vue-tsc": "^2.2.12",
     "vue-eslint-parser": "^9.4.3"
   },
+  "overrides": {
+    "lodash": "^4.18.0"
+  },
   "eslintConfig": {
     "root": true,
     "env": {
