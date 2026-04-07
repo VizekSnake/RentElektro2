@@ -559,7 +559,7 @@
   text-align: center;
 }
 
-.app-home-showcase-image :deep(.v-responsive__content) {
+.app-home-showcase-image .v-responsive__content {
   position: relative;
 }
 
@@ -847,7 +847,7 @@
   overflow: hidden;
 }
 
-.app-tool-detail-image :deep(img) {
+.app-tool-detail-image img {
   object-fit: contain;
   padding: 1rem;
 }
