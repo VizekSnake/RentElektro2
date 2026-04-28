@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
-from app.api.router import api_router
+from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.database import Base, engine
 from app.core.logging import setup_logging

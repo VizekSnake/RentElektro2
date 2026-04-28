@@ -7,9 +7,6 @@ services:
     env_file:
       - envs/config.dev.env
       - envs/postgres.dev.env
-    environment:
-      - DEBUG=true
-      - PYTHONDONTWRITEBYTECODE=1
     depends_on:
       - postgres
     volumes:

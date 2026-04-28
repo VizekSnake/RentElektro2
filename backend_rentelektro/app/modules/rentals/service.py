@@ -14,6 +14,7 @@ from app.modules.rentals.schemas import (
     RentalDecisionUpdate,
     RentalInboxItem,
     RentalInboxTool,
+    RentalNotificationsReadResult,
     RentalNotificationsReadUpdate,
     RentalOwnerStatusUpdate,
     RentalParticipant,
@@ -302,7 +303,7 @@ def mark_notifications_read(
     db: Session,
     user_id: int,
     payload: RentalNotificationsReadUpdate,
-) -> dict[str, int | str]:
+) -> RentalNotificationsReadResult:
     updated_owner = 0
     updated_renter = 0
     now = datetime.now(UTC).replace(tzinfo=None)
@@ -332,11 +333,11 @@ def mark_notifications_read(
 
     try:
         db.commit()
-        return {
-            "scope": payload.scope,
-            "updated_owner": updated_owner,
-            "updated_renter": updated_renter,
-        }
+        return RentalNotificationsReadResult(
+            scope=payload.scope,
+            updated_owner=updated_owner,
+            updated_renter=updated_renter,
+        )
     except SQLAlchemyError as exc:
         db.rollback()
         raise HTTPException(

@@ -18,11 +18,13 @@ from app.modules.users import service as users_service
 from app.modules.users.models import User as UserModel
 from app.modules.users.schemas import (
     AccountAnonymizeRequest,
+    LoginResult,
     PasswordChangeRequest,
     RefreshTokenRequest,
     Token,
     User as UserResponse,
     UserCreate,
+    UserProfile,
     UserUpdate,
 )
 
@@ -61,7 +63,7 @@ def create_login_response(user: UserModel) -> JSONResponse:
         expires_delta=timedelta(minutes=EXPIRE_DELTA),
     )
     refresh_token = create_refresh_token({"username": user.username, "id": user.id})
-    response = JSONResponse(content={"token_type": "bearer", "authenticated": True})
+    response = JSONResponse(LoginResult(authenticated=True, token_type="bearer").model_dump())
     set_auth_cookies(response, access_token, refresh_token)
     return response
 
@@ -71,7 +73,7 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)) -> User
     return users_service.create_user(db=db, user=user)
 
 
-@router.post("/token")
+@router.post("/token", response_model=LoginResult)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
@@ -85,7 +87,7 @@ async def login_for_access_token(
     return create_login_response(user)
 
 
-@router.post("/login", response_model=dict)
+@router.post("/login", response_model=LoginResult)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = users_service.authenticate_user(form_data.username, form_data.password, db)
     if not user:
@@ -99,29 +101,13 @@ def read_users_me(access_token: str = Depends(get_access_token)) -> dict:
     return {"username": payload["username"], "id": payload["id"]}
 
 
-@router.get("/me/data")
+@router.get("/me/data", response_model=UserProfile)
 def read_current_user_data(
     access_token: str = Depends(get_access_token), db: Session = Depends(get_db)
-) -> JSONResponse:
+) -> UserProfile:
     payload = verify_token(access_token)
-    if not payload:
-        raise HTTPException(detail="Could not validate credentials", status_code=404)
     db_user = users_service.get_user_or_404(db, user_id=payload["id"])
-    response = JSONResponse(
-        content={
-            "email": db_user.email,
-            "lastname": db_user.lastname,
-            "phone": db_user.phone,
-            "profile_picture": db_user.profile_picture,
-            "is_active": db_user.is_active,
-            "username": db_user.username,
-            "firstname": db_user.firstname,
-            "company": db_user.company,
-            "role": db_user.role,
-            "id": db_user.id,
-        }
-    )
-    return response
+    return UserProfile.model_validate(db_user, from_attributes=True)
 
 
 @router.get("", response_model=list[UserResponse] | None)
@@ -156,25 +142,25 @@ def refresh_access_token(
     response: Response,
     request: Request,
     payload: RefreshTokenRequest | None = Body(default=None),
-):
+) -> Token:
     refresh_token = payload.refresh_token if payload else request.cookies.get("refresh_token")
     if not refresh_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing refresh token"
         )
-    payload = verify_token(refresh_token)
+    token_payload = verify_token(refresh_token)
     new_access_token = create_access_token(
-        data={"username": payload["username"], "id": payload["id"]}
+        data={"username": token_payload["username"], "id": token_payload["id"]}
     )
     new_refresh_token = create_refresh_token(
-        data={"username": payload["username"], "id": payload["id"]}
+        data={"username": token_payload["username"], "id": token_payload["id"]}
     )
     set_auth_cookies(response, new_access_token, new_refresh_token)
-    return {
-        "access_token": new_access_token,
-        "refresh_token": new_refresh_token,
-        "token_type": "bearer",
-    }
+    return Token(
+        access_token=new_access_token,
+        refresh_token=new_refresh_token,
+        token_type="bearer",
+    )
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)

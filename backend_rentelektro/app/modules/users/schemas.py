@@ -72,6 +72,20 @@ class User(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class UserProfile(UserBase):
+    id: int
+    username: str
+    firstname: str
+    lastname: str
+    phone: str
+    company: bool
+    profile_picture: str | None
+    is_active: bool
+    role: str | None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class UserLogin(BaseModel):
     username: str
     password: str
@@ -89,6 +103,11 @@ class AccountAnonymizeRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     refresh_token: str
+    token_type: str
+
+
+class LoginResult(BaseModel):
+    authenticated: bool
     token_type: str
 
 

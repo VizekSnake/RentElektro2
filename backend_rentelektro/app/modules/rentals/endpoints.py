@@ -9,6 +9,7 @@ from app.modules.rentals.schemas import (
     RentalAdd,
     RentalDecisionUpdate,
     RentalInboxItem,
+    RentalNotificationsReadResult,
     RentalNotificationsReadUpdate,
     RentalOwnerStatusUpdate,
     RentalPaymentUpdate,
@@ -49,7 +50,7 @@ async def get_my_rentals(
     return rentals_service.list_renter_requests(db, user.id)
 
 
-@router.patch("/notifications/read", response_model=dict)
+@router.patch("/notifications/read", response_model=RentalNotificationsReadResult)
 async def mark_rental_notifications_read(
     payload: RentalNotificationsReadUpdate,
     db: Session = Depends(get_db),

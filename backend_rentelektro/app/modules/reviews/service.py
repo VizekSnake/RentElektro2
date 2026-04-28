@@ -1,16 +1,29 @@
-from statistics import mean
-
 from fastapi import HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.modules.reviews import repository
 from app.modules.reviews.models import Review as ReviewModel
-from app.modules.reviews.schemas import ReviewCreate
+from app.modules.reviews.schemas import ReviewCreate, ReviewSummary
+from app.modules.tools.models import Tool as ToolModel
 
 
-def create_review(db: Session, review: ReviewCreate) -> ReviewModel:
-    db_review = ReviewModel(**review.model_dump())
+def create_review(db: Session, review: ReviewCreate, user_id: int) -> ReviewModel:
+    tool = db.get(ToolModel, review.tool_id)
+    if tool is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tool not found")
+    if tool.owner_id == user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You cannot review your own tool.",
+        )
+    if repository.get_for_tool_by_user(db, review.tool_id, user_id) is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="You have already reviewed this tool.",
+        )
+
+    db_review = ReviewModel(**review.model_dump(), user_id=user_id)
     db.add(db_review)
     try:
         db.commit()
@@ -24,12 +37,18 @@ def create_review(db: Session, review: ReviewCreate) -> ReviewModel:
         ) from exc
 
 
-def get_reviews_summary(db: Session, tool_id: int, skip: int = 0, limit: int = 10) -> dict:
+def get_reviews_summary(db: Session, tool_id: int, skip: int = 0, limit: int = 10) -> ReviewSummary:
+    tool = db.get(ToolModel, tool_id)
+    if tool is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tool not found")
+
     reviews = repository.list_for_tool(db, tool_id=tool_id, skip=skip, limit=limit)
-    if not reviews:
-        raise HTTPException(status_code=404, detail="No reviews found")
+    total_reviews = repository.count_for_tool(db, tool_id)
+    average_rating = repository.get_average_rating_for_tool(db, tool_id)
 
     comments = [review.comment for review in reviews if review.comment is not None]
-    ratings = [review.rating for review in reviews if review.rating is not None]
-    average_rating = mean(ratings) if ratings else None
-    return {"comments": comments, "average_rating": average_rating}
+    return ReviewSummary(
+        comments=comments,
+        average_rating=average_rating,
+        total_reviews=total_reviews,
+    )

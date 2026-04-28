@@ -27,6 +27,20 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
 
+def get_required_env(name: str) -> str:
+    value = os.environ.get(name)
+    if value is None:
+        raise RuntimeError(f"Missing required environment variable: {name}")
+    return value
+
+
+def get_optional_int_env(name: str) -> int | None:
+    value = os.environ.get(name)
+    if value is None or value == "":
+        return None
+    return int(value)
+
+
 def build_database_url() -> str:
     explicit_url = os.environ.get("DATABASE_URL")
     if explicit_url:
@@ -38,13 +52,13 @@ def build_database_url() -> str:
             username=os.environ.get("POSTGRES_USER"),
             password=os.environ.get("POSTGRES_PASSWORD"),
             host=os.environ.get("POSTGRES_HOST"),
-            port=os.environ.get("POSTGRES_PORT"),
+            port=get_optional_int_env("POSTGRES_PORT"),
             database=os.environ.get("POSTGRES_DB"),
         )
     )
 
 
 settings = Settings(
-    SECRET_KEY=os.environ.get("SECRET_KEY"),
+    SECRET_KEY=get_required_env("SECRET_KEY"),
     SQLALCHEMY_DATABASE_URL=build_database_url(),
 )

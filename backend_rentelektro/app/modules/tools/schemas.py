@@ -1,37 +1,29 @@
-from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
 
-class ToolBase(BaseModel):
+class ToolWriteFields(BaseModel):
     Type: Optional[str] = None
+    PowerSource: Optional[str] = None
+    Brand: Optional[str] = None
+    Description: Optional[str] = None
+    category_id: Optional[int] = None
+    Availability: Optional[bool] = None
+    Insurance: Optional[bool] = None
+    Power: Optional[int] = None
+    Age: Optional[float] = None
+    RatePerDay: Optional[float] = None
+    ImageURL: Optional[str] = None
+
+
+class ToolBase(ToolWriteFields):
     TypeLabel: Optional[str] = None
-    PowerSource: Optional[str] = None
     PowerSourceLabel: Optional[str] = None
-    Brand: Optional[str] = None
-    Description: Optional[str] = None
-    category_id: Optional[int] = None
-    Availability: Optional[bool] = None
-    Insurance: Optional[bool] = None
-    Power: Optional[int] = None
-    Age: Optional[float] = None
-    RatePerDay: Optional[float] = None
-    ImageURL: Optional[str] = None
 
 
-class ToolUpdate(BaseModel):
-    Type: Optional[str] = None
-    PowerSource: Optional[str] = None
-    Brand: Optional[str] = None
-    Description: Optional[str] = None
-    category_id: Optional[int] = None
-    Availability: Optional[bool] = None
-    Insurance: Optional[bool] = None
-    Power: Optional[int] = None
-    Age: Optional[float] = None
-    RatePerDay: Optional[float] = None
-    ImageURL: Optional[str] = None
+class ToolUpdate(ToolWriteFields):
+    pass
 
 
 class ToolAdd(ToolBase):
@@ -43,17 +35,6 @@ class Tool(ToolBase):
     owner_id: int
 
     model_config = ConfigDict(from_attributes=True)
-
-
-class TypeEnum(str, Enum):
-    hammer = "hammer"
-    saw = "saw"
-    drill = "drill"
-
-
-class PowerSourceEnum(str, Enum):
-    electric = "electric"
-    gas = "gas"
 
 
 class ToolCategory(BaseModel):

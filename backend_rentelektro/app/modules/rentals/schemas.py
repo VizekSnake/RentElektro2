@@ -112,3 +112,9 @@ class RentalInboxItem(BaseModel):
 
 class RentalNotificationsReadUpdate(BaseModel):
     scope: Literal["owner", "renter", "all"] = "all"
+
+
+class RentalNotificationsReadResult(BaseModel):
+    scope: Literal["owner", "renter", "all"]
+    updated_owner: int
+    updated_renter: int

@@ -4,17 +4,23 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ReviewBase(BaseModel):
-    tool_id: int
-    user_id: int
     rating: Annotated[float, Field(ge=1.0, le=5.0)]
     comment: Optional[str] = None
 
 
 class ReviewCreate(ReviewBase):
-    pass
+    tool_id: int
 
 
 class Review(ReviewBase):
     id: int
+    tool_id: int
+    user_id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ReviewSummary(BaseModel):
+    comments: list[str]
+    average_rating: float | None
+    total_reviews: int

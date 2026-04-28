@@ -1,6 +1,6 @@
 import warnings
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Optional, TypedDict
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -22,6 +22,11 @@ ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 REFRESH_TOKEN_EXPIRE_DAYS = settings.REFRESH_TOKEN_EXPIRE_DAYS
 
 
+class TokenPayload(TypedDict):
+    username: str
+    id: int
+
+
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
@@ -41,12 +46,18 @@ def create_refresh_token(data: dict):
     return encoded_jwt
 
 
-def verify_token(token: str):
+def verify_token(token: str) -> TokenPayload:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        if payload.get("username") is None or payload.get("id") is None:
+        if not isinstance(payload, dict):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-        return payload
+
+        username = payload.get("username")
+        user_id = payload.get("id")
+        if not isinstance(username, str) or not isinstance(user_id, int):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+        return {"username": username, "id": user_id}
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
@@ -68,15 +79,6 @@ def get_user_exception():
     return credentials_exception
 
 
-def token_exception():
-    token_exception_response = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Incorrect username or password",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    return token_exception_response
-
-
 async def get_access_token(
     request: Request, bearer_token: str | None = Depends(oauth2_scheme)
 ) -> str:
@@ -88,13 +90,10 @@ async def get_access_token(
 
 async def get_current_user(token: str = Depends(get_access_token), db: Session = Depends(get_db)):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: int = payload.get("id")
-        if user_id is None:
-            raise get_user_exception()
-        user = db.query(UserModel).filter(UserModel.id == user_id).first()
+        payload = verify_token(token)
+        user = db.query(UserModel).filter(UserModel.id == payload["id"]).first()
         if user is None:
             raise get_user_exception()
         return user
-    except JWTError:
+    except HTTPException:
         raise get_user_exception()

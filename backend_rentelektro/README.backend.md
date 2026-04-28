@@ -58,18 +58,10 @@ poetry run pytest
 After PostgreSQL is running and environment variables are loaded, you can fill the database with a repeatable starter dataset:
 
 ```bash
-python3 -m app.scripts.seed_data
+poetry run python -m app.scripts.seed_data
 ```
 
 The seed is idempotent for the prepared records, so re-running it should not duplicate the sample users, categories, tools, rentals, or reviews.
-
-### Upgrade rentals schema
-
-If you already have an existing database and want to use the newer rental payment / pickup / return fields, run:
-
-```bash
-python3 -m app.scripts.upgrade_rentals_schema
-```
 
 ### Alembic migrations
 
@@ -81,6 +73,8 @@ To run the current migration chain:
 cd backend_rentelektro
 poetry run alembic upgrade head
 ```
+
+Alembic is the only supported migration path for schema changes. Do not modify tables with ad hoc SQL scripts outside migration files.
 
 Environment variables for PostgreSQL are read in `alembic/env.py`, so use the same `.env` / container environment as the application.
 
@@ -114,3 +108,24 @@ Auto-fix import ordering and basic issues:
 cd backend_rentelektro
 poetry run ruff check . --fix
 ```
+
+### Pre-commit hooks
+
+Backend uses `pre-commit` hooks for automated checks before commit and push.
+
+Install hooks:
+
+```bash
+poetry -C backend_rentelektro run pre-commit install --hook-type pre-commit --hook-type pre-push
+```
+
+Run them manually on the whole repo:
+
+```bash
+poetry -C backend_rentelektro run pre-commit run --all-files
+```
+
+Configured checks:
+
+- `pre-commit`: `ruff format --check`, `ruff check`
+- `pre-push`: `pytest`
