@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum as PyEnum
 
-from sqlalchemy import DateTime, Enum as SQLAlchemyEnum, ForeignKey, String
+from sqlalchemy import DateTime, Enum as SQLAlchemyEnum, ForeignKey, String, false
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -38,7 +38,7 @@ class Rental(Base):
         default=AcceptedEnum.not_viewed,
         server_default=AcceptedEnum.not_viewed.value,
     )
-    is_paid: Mapped[bool] = mapped_column(default=False, server_default="0")
+    is_paid: Mapped[bool] = mapped_column(default=False, server_default=false())
     paid_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     handed_over_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     returned_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

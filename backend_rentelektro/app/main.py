@@ -7,17 +7,13 @@ from fastapi.responses import PlainTextResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.v1.router import api_router
-from app.core.config import settings
-from app.core.database import Base, engine
+from app.core.config import get_settings
 from app.core.logging import setup_logging
 from app.modules.maintenance import endpoints as maintenance
-from app.modules.rentals import models as rentals_db  # noqa: F401
-from app.modules.reviews import models as reviews_db  # noqa: F401
-from app.modules.tools import models as tools_db  # noqa: F401
-from app.modules.users import models as users_db  # noqa: F401
 
 setup_logging()
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 
 async def log_requests(request: Request, call_next):
@@ -63,7 +59,7 @@ def configure_routes(app: FastAPI) -> None:
     app.include_router(maintenance.router)
 
 
-def read_root():
+def read_root() -> str:
     logger.info("root_endpoint_called")
     return r"""
  ____            _   _____ _           _             
@@ -81,9 +77,6 @@ def create_app() -> FastAPI:
     app = FastAPI(title=settings.APP_NAME, debug=settings.DEBUG, tags=["RentElektro"])
     configure_middlewares(app)
     configure_routes(app)
-
-    if settings.AUTO_CREATE_SCHEMA:
-        Base.metadata.create_all(bind=engine)
 
     return app
 

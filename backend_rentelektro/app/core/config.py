@@ -1,21 +1,32 @@
-import os
+from functools import lru_cache
+from pathlib import Path
 
 from pydantic import EmailStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL
 
+BASE_DIR = Path(__file__).resolve().parents[2]
+DEFAULT_ENV_FILES = (
+    str(BASE_DIR / "envs" / "config.dev.env"),
+    str(BASE_DIR / "envs" / "postgres.dev.env"),
+)
+
 
 class Settings(BaseSettings):
     APP_NAME: str = "RentElektroAPI"
     API_V1_STR: str = "/api/v1"
-    DEBUG: bool = True
-    AUTO_CREATE_SCHEMA: bool = False
+    APP_DEBUG: bool = True
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ALGORITHM: str = "HS256"
     SECRET_KEY: str
-    SQLALCHEMY_DATABASE_URL: str
-    ADMIN_EMAIL: EmailStr | None = os.environ.get("ADMIN_EMAIL")
+    DATABASE_URL: str | None = None
+    POSTGRES_USER: str | None = None
+    POSTGRES_PASSWORD: str | None = None
+    POSTGRES_HOST: str | None = None
+    POSTGRES_PORT: int | None = None
+    POSTGRES_DB: str | None = None
+    ADMIN_EMAIL: EmailStr | None = None
     COOKIE_SECURE: bool = False
     BACKEND_CORS_ORIGINS: list[str] = [
         "http://localhost",
@@ -24,41 +35,43 @@ class Settings(BaseSettings):
         "http://localhost:8000",
     ]
 
-    model_config = SettingsConfigDict(extra="ignore")
-
-
-def get_required_env(name: str) -> str:
-    value = os.environ.get(name)
-    if value is None:
-        raise RuntimeError(f"Missing required environment variable: {name}")
-    return value
-
-
-def get_optional_int_env(name: str) -> int | None:
-    value = os.environ.get(name)
-    if value is None or value == "":
-        return None
-    return int(value)
-
-
-def build_database_url() -> str:
-    explicit_url = os.environ.get("DATABASE_URL")
-    if explicit_url:
-        return explicit_url
-
-    return str(
-        URL.create(
-            drivername="postgresql+psycopg2",
-            username=os.environ.get("POSTGRES_USER"),
-            password=os.environ.get("POSTGRES_PASSWORD"),
-            host=os.environ.get("POSTGRES_HOST"),
-            port=get_optional_int_env("POSTGRES_PORT"),
-            database=os.environ.get("POSTGRES_DB"),
-        )
+    model_config = SettingsConfigDict(
+        extra="ignore",
+        env_file=DEFAULT_ENV_FILES,
+        env_file_encoding="utf-8",
     )
 
+    @property
+    def DEBUG(self) -> bool:
+        return self.APP_DEBUG
 
-settings = Settings(
-    SECRET_KEY=get_required_env("SECRET_KEY"),
-    SQLALCHEMY_DATABASE_URL=build_database_url(),
-)
+    @property
+    def SQLALCHEMY_DATABASE_URL(self) -> str:
+        if self.DATABASE_URL:
+            return self.DATABASE_URL
+
+        required_parts = {
+            "POSTGRES_USER": self.POSTGRES_USER,
+            "POSTGRES_PASSWORD": self.POSTGRES_PASSWORD,
+            "POSTGRES_HOST": self.POSTGRES_HOST,
+            "POSTGRES_DB": self.POSTGRES_DB,
+        }
+        missing = [name for name, value in required_parts.items() if not value]
+        if missing:
+            missing_vars = ", ".join(missing)
+            raise RuntimeError(f"Missing required database environment variables: {missing_vars}")
+
+        return URL.create(
+            drivername="postgresql+psycopg2",
+            username=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
+            host=self.POSTGRES_HOST,
+            port=self.POSTGRES_PORT,
+            database=self.POSTGRES_DB,
+        ).render_as_string(hide_password=False)
+
+
+@lru_cache
+def get_settings() -> Settings:
+    # SECRET_KEY is intentionally required and comes from env files at runtime.
+    return Settings()  # type: ignore[call-arg]

@@ -47,6 +47,10 @@ Run the app locally:
 poetry run uvicorn app.main:app --reload
 ```
 
+Local Poetry commands load `envs/config.dev.env` and `envs/postgres.dev.env` automatically. The committed dev database config points to `127.0.0.1:5432`, so commands started on your host machine can talk to the PostgreSQL container exposed by Docker. Docker Compose overrides `POSTGRES_HOST=postgres` inside containers. Use `APP_DEBUG=true|false` in project env files instead of a generic `DEBUG` variable, which often collides with shell or IDE defaults.
+
+Application settings follow the FastAPI pattern from the official docs: `Settings` lives in `app/core/config.py` and `get_settings()` caches a single instance with `@lru_cache`.
+
 Run tests:
 
 ```bash
@@ -55,17 +59,19 @@ poetry run pytest
 
 ### Seed development data
 
-After PostgreSQL is running and environment variables are loaded, you can fill the database with a repeatable starter dataset:
+After PostgreSQL is running and the schema has been created with Alembic, you can fill the database with a repeatable starter dataset:
 
 ```bash
+docker compose up -d postgres
+poetry run alembic upgrade head
 poetry run python -m app.scripts.seed_data
 ```
 
-The seed is idempotent for the prepared records, so re-running it should not duplicate the sample users, categories, tools, rentals, or reviews.
+The seed is idempotent for the prepared records, so re-running it should not duplicate the sample users, categories, tools, rentals, or reviews. It no longer creates tables on its own.
 
 ### Alembic migrations
 
-The backend now includes a basic Alembic setup in `backend_rentelektro/alembic`.
+The backend now includes a basic Alembic setup in `backend_rentelektro/migrations`.
 
 To run the current migration chain:
 
@@ -78,11 +84,13 @@ Alembic is the only supported migration path for schema changes. Do not modify t
 
 Environment variables for PostgreSQL are read in `alembic/env.py`, so use the same `.env` / container environment as the application.
 
-The app does not auto-run `Base.metadata.create_all()` by default. If you want the dev server to create missing tables on startup, set:
+If you have an old local database created before Alembic became the only schema path, recreate it or stamp it manually before using migrations:
 
 ```bash
-AUTO_CREATE_SCHEMA=true
+poetry run alembic stamp head
 ```
+
+Use `stamp head` only when the existing schema already matches the current models.
 
 ### Ruff linting
 

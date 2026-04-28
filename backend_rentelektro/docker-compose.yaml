@@ -1,7 +1,7 @@
 services:
   backend:
     build: .
-    command: poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     ports:
       - "8000:8000"
     env_file:
@@ -9,8 +9,13 @@ services:
       - envs/postgres.dev.env
     depends_on:
       - postgres
+    environment:
+      - POSTGRES_HOST=postgres
+      - POETRY_VIRTUALENVS_CREATE=false
+      - POETRY_VIRTUALENVS_IN_PROJECT=false
     volumes:
       - .:/app
+      - /app/.venv
     develop:
       watch:
         - action: sync
@@ -43,17 +48,21 @@ services:
 
   tests:
     build: .
-    command: [ "sh", "-c", "sleep 5 && poetry run pytest" ]
+    command: [ "sh", "-c", "sleep 5 && python -m pytest" ]
     env_file:
       - envs/config.dev.env
       - envs/postgres.dev.env
     environment:
+      - POSTGRES_HOST=postgres
+      - POETRY_VIRTUALENVS_CREATE=false
+      - POETRY_VIRTUALENVS_IN_PROJECT=false
       - PYTHONPATH=/app
       - PYTHONDONTWRITEBYTECODE=1
     depends_on:
       - backend
     volumes:
       - .:/app
+      - /app/.venv
     networks:
       - api-network
       - postgres-network

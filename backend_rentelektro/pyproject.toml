@@ -41,7 +41,7 @@ build-backend = "poetry.core.masonry.api"
 target-version = "py312"
 line-length = 100
 extend-exclude = [
-  "alembic/versions",
+  "migrations",
 ]
 
 [tool.ruff.lint]

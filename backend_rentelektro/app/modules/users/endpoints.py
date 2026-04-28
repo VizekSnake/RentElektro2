@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
+from app.core.config import get_settings
 from app.core.dependencies import get_db
 from app.core.security import (
     ACCESS_TOKEN_EXPIRE_MINUTES as EXPIRE_DELTA,
@@ -29,6 +29,7 @@ from app.modules.users.schemas import (
 )
 
 router = APIRouter(prefix="/users", tags=["users"])
+settings = get_settings()
 
 
 def set_auth_cookies(response: Response, access_token: str, refresh_token: str) -> None:

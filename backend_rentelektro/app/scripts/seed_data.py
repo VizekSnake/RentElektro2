@@ -3,9 +3,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Final, TypedDict
 
+from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 
-from app.core.database import Base, SessionLocal, engine
+from app.core.database import SessionLocal, engine
 from app.modules.rentals.models import AcceptedEnum, Rental
 from app.modules.reviews.models import Review
 from app.modules.tools.models import Category, Tool
@@ -686,10 +687,17 @@ def ensure_reviews(session: Session, users: dict[str, User], tools: dict[str, To
 
 
 def seed() -> None:
+    existing_tables = set(inspect(engine).get_table_names())
+    required_tables = {"users", "categories", "tools", "rentals", "reviews"}
+    missing_tables = sorted(required_tables - existing_tables)
+    if missing_tables:
+        raise RuntimeError(
+            "Database schema is missing required tables: "
+            f"{', '.join(missing_tables)}. Run 'poetry run alembic upgrade head' first."
+        )
+
     session: Session = SessionLocal()
     try:
-        Base.metadata.create_all(bind=engine)
-
         users = ensure_users(session)
         categories = ensure_categories(session, users)
         tools = ensure_tools(session, users, categories)

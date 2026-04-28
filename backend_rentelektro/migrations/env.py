@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from alembic import context
-from app.core.config import settings
+from app.core.config import get_settings
 from app.core.database import Base
 from app.modules.rentals import models as rentals_models  # noqa: F401
 from app.modules.reviews import models as reviews_models  # noqa: F401
@@ -13,7 +13,7 @@ from app.modules.tools import models as tools_models  # noqa: F401
 from app.modules.users import models as users_models  # noqa: F401
 
 config = context.config
-
+settings = get_settings()
 
 config.set_main_option("sqlalchemy.url", settings.SQLALCHEMY_DATABASE_URL)
 
@@ -60,3 +60,6 @@ def run() -> None:
         run_migrations_offline()
     else:
         run_migrations_online()
+
+
+run()

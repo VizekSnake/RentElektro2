@@ -2,7 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-from app.core.config import settings
+from app.core.config import get_settings
+
+settings = get_settings()
 
 
 class Base(DeclarativeBase):
