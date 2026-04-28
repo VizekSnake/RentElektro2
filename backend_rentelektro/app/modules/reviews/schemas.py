@@ -1,5 +1,6 @@
-from pydantic import BaseModel, confloat, field_validator, ConfigDict
 from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, confloat
 
 
 class ReviewBase(BaseModel):

@@ -44,7 +44,9 @@ def list_for_owner(db: Session, owner_id: int) -> list[tuple[RentalModel, ToolMo
     )
 
 
-def list_for_renter(db: Session, renter_id: int) -> list[tuple[RentalModel, ToolModel, UserModel, UserModel]]:
+def list_for_renter(
+    db: Session, renter_id: int
+) -> list[tuple[RentalModel, ToolModel, UserModel, UserModel]]:
     owner = aliased(UserModel)
     requester = aliased(UserModel)
     return (

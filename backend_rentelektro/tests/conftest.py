@@ -1,6 +1,15 @@
-import os
+"""Test fixtures need environment variables before importing the FastAPI app."""
 
+# ruff: noqa: E402
+
+import os
+import sys
+from pathlib import Path
+
+os.environ.setdefault("AUTO_CREATE_SCHEMA", "false")
 os.environ.setdefault("SECRET_KEY", "test-secret-key")
+os.environ.setdefault("DATABASE_URL", "sqlite://")
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import pytest
 from fastapi.testclient import TestClient
@@ -8,12 +17,16 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from core.database import Base
-from core.dependencies import get_db
-from core.security import get_current_user
-from main import app
-from users.handlers import create_user
-from users.schemas import UserCreate
+from app.core.database import Base
+from app.core.dependencies import get_db
+from app.core.security import get_current_user
+from app.main import app
+from app.modules.rentals import models as rentals_models  # noqa: F401
+from app.modules.reviews import models as reviews_models  # noqa: F401
+from app.modules.tools import models as tools_models  # noqa: F401
+from app.modules.users import models as users_models  # noqa: F401
+from app.modules.users.schemas import UserCreate
+from app.modules.users.service import create_user
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 engine = create_engine(

@@ -1,24 +1,25 @@
+from datetime import UTC, datetime
+
 from fastapi import HTTPException, status
-from datetime import datetime, UTC
 from sqlalchemy import and_, exists
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.modules.rentals import repository
-from app.modules.tools.models import Tool as ToolModel
 from app.modules.rentals.models import Rental as RentalModel
 from app.modules.rentals.schemas import (
     AcceptedEnum,
     RentalAdd,
     RentalDecisionUpdate,
     RentalInboxItem,
+    RentalInboxTool,
     RentalNotificationsReadUpdate,
     RentalOwnerStatusUpdate,
-    RentalPaymentUpdate,
     RentalParticipant,
-    RentalInboxTool,
+    RentalPaymentUpdate,
     RentalUpdate,
 )
+from app.modules.tools.models import Tool as ToolModel
 
 
 def _normalize_rental_status(status: AcceptedEnum | None) -> AcceptedEnum:
@@ -166,12 +167,18 @@ def list_rentals(db: Session) -> list[RentalModel]:
 
 def list_owner_inbox(db: Session, owner_id: int) -> list[RentalInboxItem]:
     rows = repository.list_for_owner(db, owner_id)
-    return [_serialize_rental_feed_item(rental, tool, requester, owner) for rental, tool, requester, owner in rows]
+    return [
+        _serialize_rental_feed_item(rental, tool, requester, owner)
+        for rental, tool, requester, owner in rows
+    ]
 
 
 def list_renter_requests(db: Session, renter_id: int) -> list[RentalInboxItem]:
     rows = repository.list_for_renter(db, renter_id)
-    return [_serialize_rental_feed_item(rental, tool, requester, owner) for rental, tool, requester, owner in rows]
+    return [
+        _serialize_rental_feed_item(rental, tool, requester, owner)
+        for rental, tool, requester, owner in rows
+    ]
 
 
 def decide_rental(
@@ -313,11 +320,7 @@ def mark_notifications_read(
         updated_owner = len(owner_rows)
 
     if payload.scope in {"renter", "all"}:
-        renter_rows = (
-            db.query(RentalModel)
-            .filter(RentalModel.user_id == user_id)
-            .all()
-        )
+        renter_rows = db.query(RentalModel).filter(RentalModel.user_id == user_id).all()
         unread_renter_rows = [
             rental
             for rental in renter_rows

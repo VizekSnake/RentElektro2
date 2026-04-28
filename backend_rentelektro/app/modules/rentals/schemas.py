@@ -1,10 +1,12 @@
 from datetime import date, datetime
-from typing import List, Literal, Optional
+from typing import Literal, Optional
+
 from pydantic import (
     BaseModel,
-    field_validator,
     ConfigDict,
+    field_validator,
 )
+
 from app.modules.rentals.models import AcceptedEnum
 
 

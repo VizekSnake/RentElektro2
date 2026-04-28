@@ -38,24 +38,6 @@ services:
       - rentelektro-network
       - api-network
 
-  directus:
-    image: directus/directus:latest
-    container_name: directus
-    env_file:
-      - backend_rentelektro/envs/directus.dev.env
-    ports:
-      - "8055:8055"
-    depends_on:
-      - postgres
-      - redis
-    volumes:
-      - directus-data:/directus
-    restart: unless-stopped
-    networks:
-      - postgres-network
-      - redis-network
-      - app-network
-
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:latest
     command:
@@ -68,17 +50,12 @@ services:
       - rentelektro-network
       - api-network
 
-volumes:
-  directus-data:
-
 networks:
   app-network:
     driver: bridge
   api-network:
     driver: bridge
   postgres-network:
-    driver: bridge
-  redis-network:
     driver: bridge
   rentelektro-network:
     driver: bridge

@@ -5,10 +5,15 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.modules.users import repository
 from app.core.security import get_password_hash, verify_password
+from app.modules.users import repository
 from app.modules.users.models import User as UserModel
-from app.modules.users.schemas import AccountAnonymizeRequest, PasswordChangeRequest, UserCreate, UserUpdate
+from app.modules.users.schemas import (
+    AccountAnonymizeRequest,
+    PasswordChangeRequest,
+    UserCreate,
+    UserUpdate,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -94,10 +99,15 @@ def delete_user(db: Session, user_id: int) -> None:
 def change_password(db: Session, user_id: int, payload: PasswordChangeRequest) -> None:
     user = get_user_or_404(db, user_id)
     if not verify_password(payload.current_password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Aktualne hasło jest nieprawidłowe.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Aktualne hasło jest nieprawidłowe."
+        )
 
     if len(payload.new_password) < 8:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Nowe hasło musi mieć co najmniej 8 znaków.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Nowe hasło musi mieć co najmniej 8 znaków.",
+        )
 
     user.hashed_password = get_password_hash(payload.new_password)
     try:
@@ -113,7 +123,9 @@ def change_password(db: Session, user_id: int, payload: PasswordChangeRequest) -
 def anonymize_user(db: Session, user_id: int, payload: AccountAnonymizeRequest) -> None:
     user = get_user_or_404(db, user_id)
     if not verify_password(payload.current_password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Aktualne hasło jest nieprawidłowe.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Aktualne hasło jest nieprawidłowe."
+        )
 
     suffix = f"{user.id}-{int(datetime.now(UTC).timestamp())}"
     user.email = f"anon-{suffix}@deleted.rentelektro.local"
@@ -138,7 +150,11 @@ def anonymize_user(db: Session, user_id: int, payload: AccountAnonymizeRequest) 
 
 
 def authenticate_user(username: str, password: str, db: Session) -> UserModel | bool:
-    logger.info("authenticate_user_attempt username=%s password_bytes=%s", username, len(password.encode("utf-8")))
+    logger.info(
+        "authenticate_user_attempt username=%s password_bytes=%s",
+        username,
+        len(password.encode("utf-8")),
+    )
     user = repository.get_by_username(db, username)
     if not user:
         logger.warning("authenticate_user_not_found username=%s", username)

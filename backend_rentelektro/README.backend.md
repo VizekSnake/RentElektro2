@@ -9,14 +9,13 @@ This is the backend service for the RentElektro project, built with FastAPI.
 
 - RESTful API for managing users, tools, and rentals
 - JWT-based authentication
-- Integration with PostgreSQL, MongoDB, and Redis
+- Integration with PostgreSQL
 - Real-time monitoring with Prometheus
 
 ## Technology Stack
 
 - **Framework:** FastAPI
-- **Database:** PostgreSQL, MongoDB
-- **Cache:** Redis
+- **Database:** PostgreSQL
 - **Monitoring:** Prometheus
 - **Containerization:** Docker
 
@@ -85,15 +84,22 @@ poetry run alembic upgrade head
 
 Environment variables for PostgreSQL are read in `alembic/env.py`, so use the same `.env` / container environment as the application.
 
-By default the app still auto-runs `Base.metadata.create_all()` on startup. If you want to rely only on migrations, set:
+The app does not auto-run `Base.metadata.create_all()` by default. If you want the dev server to create missing tables on startup, set:
 
 ```bash
-AUTO_CREATE_SCHEMA=false
+AUTO_CREATE_SCHEMA=true
 ```
 
 ### Ruff linting
 
 Backend uses `ruff` configuration from `backend_rentelektro/pyproject.toml`.
+
+Format code:
+
+```bash
+cd backend_rentelektro
+poetry run ruff format .
+```
 
 Run lint:
 

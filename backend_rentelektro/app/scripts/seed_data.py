@@ -3,12 +3,13 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Final, TypedDict
 
+from sqlalchemy.orm import Session
+
 from app.core.database import Base, SessionLocal, engine
-from app.modules.reviews.models import Review
 from app.modules.rentals.models import AcceptedEnum, Rental
+from app.modules.reviews.models import Review
 from app.modules.tools.models import Category, Tool
 from app.modules.users.models import User
-from sqlalchemy.orm import Session
 
 
 class UserSeed(TypedDict):

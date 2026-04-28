@@ -5,7 +5,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 
-
 TOOL_TYPE_LABELS: dict[str, str] = {
     "drill": "Wiertarka",
     "drill_driver": "Wiertarko-wkretarka",

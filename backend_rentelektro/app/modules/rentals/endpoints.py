@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.core.dependencies import get_db
 from app.core.security import get_current_user
 from app.modules.rentals import service as rentals_service
-from app.core.dependencies import get_db
 from app.modules.rentals.schemas import (
     Rental,
     RentalAdd,

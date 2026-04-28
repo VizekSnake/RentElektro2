@@ -1,38 +1,21 @@
 from __future__ import annotations
 
-import os
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from alembic import context
+from app.core.config import settings
 from app.core.database import Base
-from app.modules.reviews import models as reviews_models  # noqa: F401
 from app.modules.rentals import models as rentals_models  # noqa: F401
+from app.modules.reviews import models as reviews_models  # noqa: F401
 from app.modules.tools import models as tools_models  # noqa: F401
 from app.modules.users import models as users_models  # noqa: F401
 
 config = context.config
 
 
-def configure_database_url() -> None:
-    explicit_url = os.environ.get("DATABASE_URL")
-    if explicit_url:
-        config.set_main_option("sqlalchemy.url", explicit_url)
-        return
-
-    db_user = os.environ.get("POSTGRES_USER")
-    db_password = os.environ.get("POSTGRES_PASSWORD")
-    db_host = os.environ.get("POSTGRES_HOST")
-    db_port = os.environ.get("POSTGRES_PORT")
-    db_name = os.environ.get("POSTGRES_DB")
-
-    if all([db_user, db_password, db_host, db_port, db_name]):
-        database_url = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
-        config.set_main_option("sqlalchemy.url", database_url)
-
-
-configure_database_url()
+config.set_main_option("sqlalchemy.url", settings.SQLALCHEMY_DATABASE_URL)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)

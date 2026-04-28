@@ -5,16 +5,24 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.modules.tools import repository
-from app.modules.tools.models import Category as CategoryModel
-from app.modules.tools.models import Tool as ToolModel
-from app.modules.tools.schemas import CategoryAdd, PaginatedTools, ToolAdd, ToolListFilters, ToolUpdate
+from app.modules.tools.models import Category as CategoryModel, Tool as ToolModel
+from app.modules.tools.schemas import (
+    CategoryAdd,
+    PaginatedTools,
+    ToolAdd,
+    ToolListFilters,
+    ToolUpdate,
+)
 
 logger = logging.getLogger(__name__)
 
 
 def create_tool(db: Session, tool: ToolAdd, user_id: int) -> ToolModel:
     logger.info("create_tool_attempt owner_id=%s type=%s brand=%s", user_id, tool.Type, tool.Brand)
-    db_tool = ToolModel(**tool.model_dump(exclude={"owner_id"}), owner_id=user_id)
+    db_tool = ToolModel(
+        **tool.model_dump(exclude={"owner_id", "TypeLabel", "PowerSourceLabel"}),
+        owner_id=user_id,
+    )
     db.add(db_tool)
     try:
         db.commit()
@@ -41,7 +49,9 @@ def create_category(db: Session, category: CategoryAdd, user_id: int) -> Categor
         return db_category
     except IntegrityError as exc:
         db.rollback()
-        logger.warning("create_category_integrity_error creator_id=%s name=%s", user_id, category.name)
+        logger.warning(
+            "create_category_integrity_error creator_id=%s name=%s", user_id, category.name
+        )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Error adding category",

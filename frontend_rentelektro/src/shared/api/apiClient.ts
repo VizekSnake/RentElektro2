@@ -2,7 +2,7 @@ import createClient from 'openapi-fetch';
 import type { paths } from '@/shared/api/schema';
 
 const apiClient = createClient<paths>({
-  baseUrl: '/api',
+  baseUrl: '/api/v1',
   credentials: 'include',
 });
 

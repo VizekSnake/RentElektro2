@@ -8,7 +8,7 @@
 ![Package Manager](https://img.shields.io/badge/backend%20deps-Poetry-3b82f6)
 ![Docker](https://img.shields.io/badge/dev-Docker%20Compose-2496ed)
 
-NEW RentElektro is a marketplace-style web application for renting tools and managing offers, requests, payments, and listing lifecycle in one product flow. The project includes a FastAPI backend, a Vue 3 frontend, PostgreSQL, Redis, monitoring tooling, and a Docker-based local environment.
+NEW RentElektro is a marketplace-style web application for renting tools and managing offers, requests, payments, and listing lifecycle in one product flow. The project includes a FastAPI backend, a Vue 3 frontend, PostgreSQL, monitoring tooling, and a Docker-based local environment.
 
 ## What Is Included
 
@@ -17,7 +17,7 @@ NEW RentElektro is a marketplace-style web application for renting tools and man
 - demo seed data with users, offers, reviews, and rental scenarios
 - Docker setup for local development
 - Alembic migrations for backend schema changes
-- Prometheus / Grafana / NGINX / Redis / Directus infrastructure already wired into the repo
+- Prometheus / Grafana / NGINX infrastructure already wired into the repo
 
 ## Architecture
 
@@ -30,7 +30,7 @@ NEW RentElektro is a marketplace-style web application for renting tools and man
 - `nginx`  
   reverse proxy for local stack
 
-- `fluentd`, `prometheus`, `grafana`  
+- `prometheus`, `grafana`  
   observability stack
 
 ## Quick Start
@@ -58,7 +58,6 @@ docker compose up --watch
 
 - Frontend: `http://localhost:5173` or proxied through NGINX depending on your compose setup
 - Backend API: `http://localhost:8000`
-- Directus: `http://localhost:8055`
 - Grafana: `http://localhost:3000`
 - Prometheus: `http://localhost:9090`
 

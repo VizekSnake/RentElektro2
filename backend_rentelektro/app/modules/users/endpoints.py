@@ -1,12 +1,21 @@
 import os
 from datetime import timedelta
+from typing import List
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response, status
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from fastapi.responses import JSONResponse
-from app.modules.users import service as users_service
+
 from app.core.dependencies import get_db
+from app.core.security import (
+    ACCESS_TOKEN_EXPIRE_MINUTES as EXPIRE_DELTA,
+    create_access_token,
+    create_refresh_token,
+    get_access_token,
+    verify_token,
+)
+from app.modules.users import service as users_service
 from app.modules.users.schemas import (
     AccountAnonymizeRequest,
     PasswordChangeRequest,
@@ -16,15 +25,6 @@ from app.modules.users.schemas import (
     UserCreate,
     UserUpdate,
 )
-from app.core.security import (
-    ACCESS_TOKEN_EXPIRE_MINUTES as EXPIRE_DELTA,
-    create_access_token,
-    create_refresh_token,
-    get_access_token,
-    oauth2_scheme,
-    verify_token,
-)
-from typing import List
 
 router = APIRouter(prefix="/users", tags=["users"])
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() == "true"
@@ -62,8 +62,9 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)) -> User
 
 
 @router.post("/token")
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
-                                 db: Session = Depends(get_db)):
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+):
     user = users_service.authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
@@ -71,8 +72,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token = create_access_token({"username": user.username, "id": user.id},
-                                       expires_delta=timedelta(minutes=EXPIRE_DELTA))
+    access_token = create_access_token(
+        {"username": user.username, "id": user.id}, expires_delta=timedelta(minutes=EXPIRE_DELTA)
+    )
     refresh_token = create_refresh_token({"username": user.username, "id": user.id})
     response = JSONResponse(content={"token_type": "bearer", "authenticated": True})
     set_auth_cookies(response, access_token, refresh_token)
@@ -80,17 +82,19 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 
 @router.post("/login", response_model=dict)
-async def login(form_data: OAuth2PasswordRequestForm = Depends(),
-                db: Session = Depends(get_db)):
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = users_service.authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-    access_token = create_access_token({"username": user.username, "id": user.id},
-                                       expires_delta=timedelta(minutes=EXPIRE_DELTA))
+    access_token = create_access_token(
+        {"username": user.username, "id": user.id}, expires_delta=timedelta(minutes=EXPIRE_DELTA)
+    )
 
     response = JSONResponse(content={"token_type": "bearer", "authenticated": True})
-    set_auth_cookies(response, access_token, create_refresh_token({"username": user.username, "id": user.id}))
+    set_auth_cookies(
+        response, access_token, create_refresh_token({"username": user.username, "id": user.id})
+    )
     return response
 
 
@@ -101,23 +105,27 @@ def read_users_me(access_token: str = Depends(get_access_token)) -> dict:
 
 
 @router.get("/me/data")
-def read_current_user_data(access_token: str = Depends(get_access_token), db: Session = Depends(get_db)) -> JSONResponse:
+def read_current_user_data(
+    access_token: str = Depends(get_access_token), db: Session = Depends(get_db)
+) -> JSONResponse:
     payload = verify_token(access_token)
     if not payload:
-        raise HTTPException(detail='Could not validate credentials', status_code=404)
+        raise HTTPException(detail="Could not validate credentials", status_code=404)
     db_user = users_service.get_user_or_404(db, user_id=payload["id"])
-    response = JSONResponse(content={
-        "email": db_user.email,
-        "lastname": db_user.lastname,
-        "phone": db_user.phone,
-        "profile_picture": db_user.profile_picture,
-        "is_active": db_user.is_active,
-        "username": db_user.username,
-        "firstname": db_user.firstname,
-        "company": db_user.company,
-        "role": db_user.role,
-        "id": db_user.id
-    })
+    response = JSONResponse(
+        content={
+            "email": db_user.email,
+            "lastname": db_user.lastname,
+            "phone": db_user.phone,
+            "profile_picture": db_user.profile_picture,
+            "is_active": db_user.is_active,
+            "username": db_user.username,
+            "firstname": db_user.firstname,
+            "company": db_user.company,
+            "role": db_user.role,
+            "id": db_user.id,
+        }
+    )
     return response
 
 
@@ -171,12 +179,22 @@ def refresh_access_token(
 ):
     refresh_token = payload.refresh_token if payload else request.cookies.get("refresh_token")
     if not refresh_token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing refresh token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing refresh token"
+        )
     payload = verify_token(refresh_token)
-    new_access_token = create_access_token(data={"username": payload["username"], "id": payload["id"]})
-    new_refresh_token = create_refresh_token(data={"username": payload["username"], "id": payload["id"]})
+    new_access_token = create_access_token(
+        data={"username": payload["username"], "id": payload["id"]}
+    )
+    new_refresh_token = create_refresh_token(
+        data={"username": payload["username"], "id": payload["id"]}
+    )
     set_auth_cookies(response, new_access_token, new_refresh_token)
-    return {"access_token": new_access_token, "refresh_token": new_refresh_token, "token_type": "bearer"}
+    return {
+        "access_token": new_access_token,
+        "refresh_token": new_refresh_token,
+        "token_type": "bearer",
+    }
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)

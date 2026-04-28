@@ -3,18 +3,19 @@ from datetime import datetime, timedelta, timezone
 from os import environ
 from typing import Optional
 
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
-from fastapi import HTTPException, status, Depends
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette.requests import Request
+
 from app.core.dependencies import get_db
 from app.modules.users.models import User as UserModel
 
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="passlib.utils")
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token", auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/users/token", auto_error=False)
 SECRET_KEY = environ.get("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 10
@@ -38,6 +39,7 @@ def create_refresh_token(data: dict):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 def verify_token(token: str):
     try:
@@ -75,7 +77,9 @@ def token_exception():
     return token_exception_response
 
 
-async def get_access_token(request: Request, bearer_token: str | None = Depends(oauth2_scheme)) -> str:
+async def get_access_token(
+    request: Request, bearer_token: str | None = Depends(oauth2_scheme)
+) -> str:
     token = bearer_token or request.cookies.get("access_token")
     if not token:
         raise get_user_exception()

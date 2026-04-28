@@ -2,7 +2,6 @@ from sqlalchemy import text
 
 from app.core.database import SessionLocal
 
-
 ALTER_STATEMENTS = [
     """
     ALTER TABLE rentals

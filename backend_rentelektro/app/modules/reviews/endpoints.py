@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+
+from app.core.dependencies import get_db
 from app.modules.reviews import service as reviews_service
 from app.modules.reviews.schemas import Review, ReviewCreate
-from app.core.dependencies import get_db
 
 router = APIRouter()
 

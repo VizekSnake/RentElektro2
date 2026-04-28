@@ -1,5 +1,7 @@
+from typing import List, Optional, Union
+
 from pydantic import AliasChoices, BaseModel, ConfigDict, EmailStr, Field
-from typing import List, Union, Optional
+
 from app.modules.tools.schemas import Tool
 
 

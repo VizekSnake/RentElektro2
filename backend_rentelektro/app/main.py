@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 from time import perf_counter
 
 from fastapi import FastAPI, Request
@@ -7,40 +7,27 @@ from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.router import api_router
-from app.core.database import engine
+from app.core.config import settings
+from app.core.database import Base, engine
 from app.core.logging import setup_logging
-from app.modules.reviews import models as reviews_db
-from app.modules.rentals import models as rentals_db
-from app.modules.tools import models as tools_db
-from app.modules.users import models as users_db
+from app.modules.maintenance import endpoints as maintenance
+from app.modules.rentals import models as rentals_db  # noqa: F401
+from app.modules.reviews import models as reviews_db  # noqa: F401
+from app.modules.tools import models as tools_db  # noqa: F401
+from app.modules.users import models as users_db  # noqa: F401
 
 setup_logging()
 logger = logging.getLogger(__name__)
 
-try:
-    from debug_toolbar.middleware import DebugToolbarMiddleware
-except Exception:  # pragma: no cover - optional dev dependency
-    DebugToolbarMiddleware = None
-
 app = FastAPI(tags="RentElektro")
 app.debug = os.getenv("DEBUG", "true").lower() == "true"
-debug_toolbar_enabled = os.getenv("DEBUG_TOOLBAR", "false").lower() == "true"
-auto_create_schema = os.getenv("AUTO_CREATE_SCHEMA", "true").lower() == "true"
-
-if debug_toolbar_enabled and DebugToolbarMiddleware is not None:
-    app.add_middleware(
-        DebugToolbarMiddleware,
-        panels=["debug_toolbar.panels.sqlalchemy.SQLAlchemyPanel"],
-    )
+auto_create_schema = os.getenv("AUTO_CREATE_SCHEMA", "false").lower() == "true"
 
 instrumentator = Instrumentator()
 instrumentator.instrument(app)
 
 if auto_create_schema:
-    users_db.Base.metadata.create_all(bind=engine)
-    tools_db.Base.metadata.create_all(bind=engine)
-    rentals_db.Base.metadata.create_all(bind=engine)
-    reviews_db.Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
 
 
 @app.middleware("http")
@@ -68,6 +55,7 @@ async def log_requests(request: Request, call_next):
     )
     return response
 
+
 origins = [
     "http://localhost",
     "http://localhost:8081",
@@ -90,4 +78,5 @@ def read_root():
     return {"Hello": "World"}
 
 
-app.include_router(api_router)
+app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(maintenance.router)
