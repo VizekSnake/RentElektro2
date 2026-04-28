@@ -1,12 +1,12 @@
-from typing import Optional
+from typing import Annotated, Optional
 
-from pydantic import BaseModel, ConfigDict, confloat
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ReviewBase(BaseModel):
     tool_id: int
     user_id: int
-    rating: confloat(ge=1.0, le=5.0)
+    rating: Annotated[float, Field(ge=1.0, le=5.0)]
     comment: Optional[str] = None
 
 

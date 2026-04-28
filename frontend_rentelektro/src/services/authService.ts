@@ -91,7 +91,7 @@ export async function logoutSession(): Promise<void> {
 
 export async function registerUser(payload: SignUpPayload): Promise<void> {
   try {
-    const response = await apiClient.POST('/users/register', { body: payload });
+    const response = await apiClient.POST('/users', { body: payload });
     assertApiResponse(response, 'Rejestracja nie powiodła się.');
   } catch (error) {
     logger.warn('register_failed', { detail: error instanceof Error ? error.message : undefined });

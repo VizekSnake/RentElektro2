@@ -21,17 +21,17 @@ export async function getCurrentUserId(): Promise<number | null> {
 }
 
 export async function createRental(payload: RentalCreatePayload): Promise<Rental> {
-  const response = await apiClient.POST('/rental/add', { body: payload });
+  const response = await apiClient.POST('/rentals', { body: payload });
   return unwrapApiResponse(response, 'Nie udało się utworzyć wynajmu.');
 }
 
 export async function fetchOwnerRentalInbox(): Promise<RentalInboxItem[]> {
-  const response = await apiClient.GET('/rental/inbox');
+  const response = await apiClient.GET('/rentals/inbox');
   return unwrapApiResponse(response, 'Nie udało się pobrać skrzynki wynajmów.');
 }
 
 export async function fetchMyRentalRequests(): Promise<RentalInboxItem[]> {
-  const response = await apiClient.GET('/rental/my');
+  const response = await apiClient.GET('/rentals/my');
   return unwrapApiResponse(response, 'Nie udało się pobrać Twoich próśb o wynajem.');
 }
 
@@ -39,7 +39,7 @@ export async function decideRental(
   rentalId: number,
   payload: RentalDecisionPayload,
 ): Promise<Rental> {
-  const response = await apiClient.PATCH('/rental/{rental_id}/decision', {
+  const response = await apiClient.PATCH('/rentals/{rental_id}/decision', {
     params: {
       path: {
         rental_id: rentalId,
@@ -54,7 +54,7 @@ export async function payRental(
   rentalId: number,
   payload: RentalPaymentPayload,
 ): Promise<Rental> {
-  const response = await apiClient.PATCH('/rental/{rental_id}/pay', {
+  const response = await apiClient.PATCH('/rentals/{rental_id}/pay', {
     params: {
       path: {
         rental_id: rentalId,
@@ -69,7 +69,7 @@ export async function updateOwnerRentalStatus(
   rentalId: number,
   payload: RentalOwnerStatusPayload,
 ): Promise<Rental> {
-  const response = await apiClient.PATCH('/rental/{rental_id}/owner-status', {
+  const response = await apiClient.PATCH('/rentals/{rental_id}/owner-status', {
     params: {
       path: {
         rental_id: rentalId,
@@ -83,7 +83,7 @@ export async function updateOwnerRentalStatus(
 export async function markRentalNotificationsRead(
   payload: RentalNotificationsReadPayload,
 ): Promise<RentalNotificationsReadResult> {
-  const response = await apiClient.PATCH('/rental/notifications/read', {
+  const response = await apiClient.PATCH('/rentals/notifications/read', {
     body: payload,
   });
   return unwrapApiResponse(response, 'Nie udało się oznaczyć powiadomień jako odczytane.');

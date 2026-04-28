@@ -117,7 +117,7 @@ export interface paths {
       };
     };
   };
-  '/users/register': {
+  '/users': {
     post: {
       requestBody: {
         content: {
@@ -154,7 +154,7 @@ export interface paths {
       };
     };
   };
-  '/users/user/{user_id}': {
+  '/users/{user_id}': {
     patch: {
       parameters: {
         path: {
@@ -218,7 +218,7 @@ export interface paths {
       };
     };
   };
-  '/tool/all': {
+  '/tools': {
     get: {
       parameters?: {
         query?: {
@@ -239,56 +239,6 @@ export interface paths {
         };
       };
     };
-  };
-  '/tool/{tool_id}': {
-    get: {
-      parameters: {
-        path: {
-          tool_id: number;
-        };
-      };
-      responses: {
-        200: {
-          content: {
-            'application/json': Tool;
-          };
-        };
-        404: {
-          content: {
-            'application/json': ApiErrorPayload;
-          };
-        };
-      };
-    };
-  };
-  '/tool/category/all': {
-    get: {
-      responses: {
-        200: {
-          content: {
-            'application/json': ToolCategory[] | null;
-          };
-        };
-      };
-    };
-  };
-  '/tool/mine': {
-    get: {
-      responses: {
-        200: {
-          content: {
-            'application/json': Tool[];
-          };
-        };
-        401: {
-          content: {
-            'application/json': ApiErrorPayload;
-          };
-        };
-      };
-    };
-  };
-  '/tool/add': {
     post: {
       requestBody: {
         content: {
@@ -314,7 +264,26 @@ export interface paths {
       };
     };
   };
-  '/tool/update/{tool_id}': {
+  '/tools/{tool_id}': {
+    get: {
+      parameters: {
+        path: {
+          tool_id: number;
+        };
+      };
+      responses: {
+        200: {
+          content: {
+            'application/json': Tool;
+          };
+        };
+        404: {
+          content: {
+            'application/json': ApiErrorPayload;
+          };
+        };
+      };
+    };
     patch: {
       parameters: {
         path: {
@@ -345,7 +314,34 @@ export interface paths {
       };
     };
   };
-  '/rental/add': {
+  '/tools/categories': {
+    get: {
+      responses: {
+        200: {
+          content: {
+            'application/json': ToolCategory[] | null;
+          };
+        };
+      };
+    };
+  };
+  '/tools/mine': {
+    get: {
+      responses: {
+        200: {
+          content: {
+            'application/json': Tool[];
+          };
+        };
+        401: {
+          content: {
+            'application/json': ApiErrorPayload;
+          };
+        };
+      };
+    };
+  };
+  '/rentals': {
     post: {
       requestBody: {
         content: {
@@ -366,7 +362,7 @@ export interface paths {
       };
     };
   };
-  '/rental/inbox': {
+  '/rentals/inbox': {
     get: {
       responses: {
         200: {
@@ -382,7 +378,7 @@ export interface paths {
       };
     };
   };
-  '/rental/my': {
+  '/rentals/my': {
     get: {
       responses: {
         200: {
@@ -398,7 +394,7 @@ export interface paths {
       };
     };
   };
-  '/rental/notifications/read': {
+  '/rentals/notifications/read': {
     patch: {
       requestBody: {
         content: {
@@ -419,7 +415,7 @@ export interface paths {
       };
     };
   };
-  '/rental/{rental_id}/decision': {
+  '/rentals/{rental_id}/decision': {
     patch: {
       parameters: {
         path: {
@@ -445,7 +441,7 @@ export interface paths {
       };
     };
   };
-  '/rental/{rental_id}/pay': {
+  '/rentals/{rental_id}/pay': {
     patch: {
       parameters: {
         path: {
@@ -471,7 +467,7 @@ export interface paths {
       };
     };
   };
-  '/rental/{rental_id}/owner-status': {
+  '/rentals/{rental_id}/owner-status': {
     patch: {
       parameters: {
         path: {

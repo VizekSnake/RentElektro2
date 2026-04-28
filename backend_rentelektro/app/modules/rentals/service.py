@@ -5,6 +5,7 @@ from sqlalchemy import and_, exists
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.model_utils import apply_update
 from app.modules.rentals import repository
 from app.modules.rentals.models import Rental as RentalModel
 from app.modules.rentals.schemas import (
@@ -133,9 +134,7 @@ def get_renter_rental_or_404(db: Session, rental_id: int, renter_id: int) -> Ren
 
 def update_rental(db: Session, rental_id: int, rental_update: RentalUpdate) -> RentalModel:
     db_rental = get_rental_or_404(db, rental_id)
-    update_data = rental_update.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(db_rental, key, value)
+    apply_update(db_rental, rental_update)
     try:
         db.commit()
         db.refresh(db_rental)

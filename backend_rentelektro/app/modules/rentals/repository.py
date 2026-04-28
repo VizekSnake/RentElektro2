@@ -1,8 +1,12 @@
+from typing import cast
+
 from sqlalchemy.orm import Session, aliased
 
 from app.modules.rentals.models import Rental as RentalModel
 from app.modules.tools.models import Tool as ToolModel
 from app.modules.users.models import User as UserModel
+
+RentalFeedRow = tuple[RentalModel, ToolModel, UserModel, UserModel]
 
 
 def get_by_id(db: Session, rental_id: int) -> RentalModel | None:
@@ -30,10 +34,10 @@ def get_by_id_for_renter(db: Session, rental_id: int, renter_id: int) -> RentalM
     )
 
 
-def list_for_owner(db: Session, owner_id: int) -> list[tuple[RentalModel, ToolModel, UserModel]]:
+def list_for_owner(db: Session, owner_id: int) -> list[RentalFeedRow]:
     owner = aliased(UserModel)
     requester = aliased(UserModel)
-    return (
+    rows = (
         db.query(RentalModel, ToolModel, requester, owner)
         .join(ToolModel, ToolModel.id == RentalModel.tool_id)
         .join(requester, requester.id == RentalModel.user_id)
@@ -42,14 +46,13 @@ def list_for_owner(db: Session, owner_id: int) -> list[tuple[RentalModel, ToolMo
         .order_by(RentalModel.id.desc())
         .all()
     )
+    return cast(list[RentalFeedRow], rows)
 
 
-def list_for_renter(
-    db: Session, renter_id: int
-) -> list[tuple[RentalModel, ToolModel, UserModel, UserModel]]:
+def list_for_renter(db: Session, renter_id: int) -> list[RentalFeedRow]:
     owner = aliased(UserModel)
     requester = aliased(UserModel)
-    return (
+    rows = (
         db.query(RentalModel, ToolModel, requester, owner)
         .join(ToolModel, ToolModel.id == RentalModel.tool_id)
         .join(requester, requester.id == RentalModel.user_id)
@@ -58,3 +61,4 @@ def list_for_renter(
         .order_by(RentalModel.id.desc())
         .all()
     )
+    return cast(list[RentalFeedRow], rows)

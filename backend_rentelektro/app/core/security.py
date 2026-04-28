@@ -1,6 +1,5 @@
 import warnings
 from datetime import datetime, timedelta, timezone
-from os import environ
 from typing import Optional
 
 from fastapi import Depends, HTTPException, status
@@ -10,16 +9,17 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 
+from app.core.config import settings
 from app.core.dependencies import get_db
 from app.modules.users.models import User as UserModel
 
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="passlib.utils")
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/users/token", auto_error=False)
-SECRET_KEY = environ.get("SECRET_KEY")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 10
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+REFRESH_TOKEN_EXPIRE_DAYS = settings.REFRESH_TOKEN_EXPIRE_DAYS
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):

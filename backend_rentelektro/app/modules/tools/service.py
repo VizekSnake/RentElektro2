@@ -4,11 +4,13 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.model_utils import apply_update
 from app.modules.tools import repository
 from app.modules.tools.models import Category as CategoryModel, Tool as ToolModel
 from app.modules.tools.schemas import (
     CategoryAdd,
     PaginatedTools,
+    Tool,
     ToolAdd,
     ToolListFilters,
     ToolUpdate,
@@ -78,7 +80,7 @@ def list_tools_or_404(db: Session, filters: ToolListFilters) -> PaginatedTools:
         raise HTTPException(status_code=404, detail="Tools not found")
     total_pages = max(1, (total + filters.page_size - 1) // filters.page_size)
     return PaginatedTools(
-        items=tools,
+        items=[Tool.model_validate(tool, from_attributes=True) for tool in tools],
         total=total,
         page=filters.page,
         page_size=filters.page_size,
@@ -100,9 +102,7 @@ def list_owner_tools(db: Session, owner_id: int) -> list[ToolModel]:
 def update_tool(db: Session, tool_id: int, tool_update: ToolUpdate, owner_id: int) -> ToolModel:
     logger.info("update_tool_attempt tool_id=%s owner_id=%s", tool_id, owner_id)
     db_tool = get_owned_tool_or_404(db, tool_id, owner_id)
-    update_data = tool_update.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(db_tool, field, value)
+    apply_update(db_tool, tool_update)
     try:
         db.commit()
         db.refresh(db_tool)

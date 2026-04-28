@@ -18,7 +18,6 @@ class ToolBase(BaseModel):
     Age: Optional[float] = None
     RatePerDay: Optional[float] = None
     ImageURL: Optional[str] = None
-    owner_id: Optional[int] = None
 
 
 class ToolUpdate(BaseModel):

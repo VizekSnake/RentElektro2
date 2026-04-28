@@ -5,6 +5,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.model_utils import apply_update
 from app.core.security import get_password_hash, verify_password
 from app.modules.users import repository
 from app.modules.users.models import User as UserModel
@@ -68,9 +69,7 @@ def list_users_or_404(db: Session) -> list[UserModel]:
 
 def update_user(db: Session, user_id: int, user_update: UserUpdate) -> UserModel:
     db_user = get_user_or_404(db, user_id)
-    update_data = user_update.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(db_user, field, value)
+    apply_update(db_user, user_update)
     try:
         db.commit()
         db.refresh(db_user)
@@ -149,7 +148,7 @@ def anonymize_user(db: Session, user_id: int, payload: AccountAnonymizeRequest) 
         ) from exc
 
 
-def authenticate_user(username: str, password: str, db: Session) -> UserModel | bool:
+def authenticate_user(username: str, password: str, db: Session) -> UserModel | None:
     logger.info(
         "authenticate_user_attempt username=%s password_bytes=%s",
         username,
@@ -158,9 +157,9 @@ def authenticate_user(username: str, password: str, db: Session) -> UserModel | 
     user = repository.get_by_username(db, username)
     if not user:
         logger.warning("authenticate_user_not_found username=%s", username)
-        return False
+        return None
     if not verify_password(password, user.hashed_password):
         logger.warning("authenticate_user_invalid_password username=%s", username)
-        return False
+        return None
     logger.info("authenticate_user_success user_id=%s username=%s", user.id, user.username)
     return user

@@ -17,17 +17,17 @@ from app.modules.tools.schemas import (
 )
 from app.modules.users.schemas import User
 
-router = APIRouter(prefix="/tool", tags=["tools"])
+router = APIRouter(prefix="/tools", tags=["tools"])
 
 
-@router.post("/add", response_model=Tool)
+@router.post("", response_model=Tool)
 async def add_tool(
     tool: ToolAdd, user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
     return tools_service.create_tool(db=db, tool=tool, user_id=user.id)
 
 
-@router.post("/category/add", response_model=Category)
+@router.post("/categories", response_model=Category)
 async def add_category(
     category: CategoryAdd, user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
@@ -41,7 +41,7 @@ async def delete_tool(
     tools_service.delete_tool(db=db, tool_id=tool_id, owner_id=user.id)
 
 
-@router.patch("/update/{tool_id}", response_model=Tool)
+@router.patch("/{tool_id}", response_model=Tool)
 async def update_tool(
     tool_id: int,
     tool: ToolUpdate,
@@ -51,7 +51,7 @@ async def update_tool(
     return tools_service.update_tool(db=db, tool_id=tool_id, tool_update=tool, owner_id=user.id)
 
 
-@router.get("/all", response_model=PaginatedTools)
+@router.get("", response_model=PaginatedTools)
 async def get_all(
     search: str | None = Query(default=None),
     power_source: str | None = Query(default=None),
@@ -74,7 +74,7 @@ async def get_all(
     return tools_service.list_tools_or_404(db, filters)
 
 
-@router.get("/category/all", response_model=List[Category] | None)
+@router.get("/categories", response_model=List[Category] | None)
 async def get_all_category(db: Session = Depends(get_db)):
     return tools_service.list_categories_or_404(db)
 

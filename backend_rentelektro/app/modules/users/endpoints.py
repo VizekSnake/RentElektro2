@@ -1,12 +1,11 @@
-import os
 from datetime import timedelta
-from typing import List
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response, status
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.dependencies import get_db
 from app.core.security import (
     ACCESS_TOKEN_EXPIRE_MINUTES as EXPIRE_DELTA,
@@ -16,18 +15,18 @@ from app.core.security import (
     verify_token,
 )
 from app.modules.users import service as users_service
+from app.modules.users.models import User as UserModel
 from app.modules.users.schemas import (
     AccountAnonymizeRequest,
     PasswordChangeRequest,
     RefreshTokenRequest,
     Token,
-    User,
+    User as UserResponse,
     UserCreate,
     UserUpdate,
 )
 
 router = APIRouter(prefix="/users", tags=["users"])
-COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() == "true"
 
 
 def set_auth_cookies(response: Response, access_token: str, refresh_token: str) -> None:
@@ -35,7 +34,7 @@ def set_auth_cookies(response: Response, access_token: str, refresh_token: str) 
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=COOKIE_SECURE,
+        secure=settings.COOKIE_SECURE,
         samesite="lax",
         max_age=EXPIRE_DELTA * 60,
         path="/",
@@ -44,9 +43,9 @@ def set_auth_cookies(response: Response, access_token: str, refresh_token: str) 
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=COOKIE_SECURE,
+        secure=settings.COOKIE_SECURE,
         samesite="lax",
-        max_age=7 * 24 * 60 * 60,
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
         path="/",
     )
 
@@ -56,8 +55,19 @@ def clear_auth_cookies(response: Response) -> None:
     response.delete_cookie(key="refresh_token", path="/")
 
 
-@router.post("/register", response_model=User)
-async def register_user(user: UserCreate, db: Session = Depends(get_db)) -> User:
+def create_login_response(user: UserModel) -> JSONResponse:
+    access_token = create_access_token(
+        {"username": user.username, "id": user.id},
+        expires_delta=timedelta(minutes=EXPIRE_DELTA),
+    )
+    refresh_token = create_refresh_token({"username": user.username, "id": user.id})
+    response = JSONResponse(content={"token_type": "bearer", "authenticated": True})
+    set_auth_cookies(response, access_token, refresh_token)
+    return response
+
+
+@router.post("", response_model=UserResponse)
+async def register_user(user: UserCreate, db: Session = Depends(get_db)) -> UserModel:
     return users_service.create_user(db=db, user=user)
 
 
@@ -72,13 +82,7 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token = create_access_token(
-        {"username": user.username, "id": user.id}, expires_delta=timedelta(minutes=EXPIRE_DELTA)
-    )
-    refresh_token = create_refresh_token({"username": user.username, "id": user.id})
-    response = JSONResponse(content={"token_type": "bearer", "authenticated": True})
-    set_auth_cookies(response, access_token, refresh_token)
-    return response
+    return create_login_response(user)
 
 
 @router.post("/login", response_model=dict)
@@ -86,16 +90,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
     user = users_service.authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-
-    access_token = create_access_token(
-        {"username": user.username, "id": user.id}, expires_delta=timedelta(minutes=EXPIRE_DELTA)
-    )
-
-    response = JSONResponse(content={"token_type": "bearer", "authenticated": True})
-    set_auth_cookies(
-        response, access_token, create_refresh_token({"username": user.username, "id": user.id})
-    )
-    return response
+    return create_login_response(user)
 
 
 @router.get("/me")
@@ -129,19 +124,9 @@ def read_current_user_data(
     return response
 
 
-@router.get("/user/{user_id}", response_model=User)
-async def get_user(user_id: int, db: Session = Depends(get_db)):
-    return users_service.get_user_or_404(db, user_id=user_id)
-
-
-@router.get("/all", response_model=List[User] | None)
-async def get_all_users(db: Session = Depends(get_db)):
+@router.get("", response_model=list[UserResponse] | None)
+async def get_all_users(db: Session = Depends(get_db)) -> list[UserModel]:
     return users_service.list_users_or_404(db)
-
-
-@router.patch("/user/{user_id}", response_model=User)
-async def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
-    return users_service.update_user(db=db, user_id=user_id, user_update=user)
 
 
 @router.post("/me/password", status_code=status.HTTP_204_NO_CONTENT)
@@ -164,11 +149,6 @@ async def anonymize_current_user(
     current_user = read_users_me(access_token)
     users_service.anonymize_user(db=db, user_id=current_user["id"], payload=payload)
     clear_auth_cookies(response)
-
-
-@router.delete("/delete/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: int, db: Session = Depends(get_db)):
-    users_service.delete_user(db=db, user_id=user_id)
 
 
 @router.post("/refresh", response_model=Token)
@@ -200,3 +180,18 @@ def refresh_access_token(
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 def logout(response: Response):
     clear_auth_cookies(response)
+
+
+@router.get("/{user_id}", response_model=UserResponse)
+async def get_user(user_id: int, db: Session = Depends(get_db)) -> UserModel:
+    return users_service.get_user_or_404(db, user_id=user_id)
+
+
+@router.patch("/{user_id}", response_model=UserResponse)
+async def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)) -> UserModel:
+    return users_service.update_user(db=db, user_id=user_id, user_update=user)
+
+
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(user_id: int, db: Session = Depends(get_db)):
+    users_service.delete_user(db=db, user_id=user_id)

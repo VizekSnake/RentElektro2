@@ -49,7 +49,7 @@ def test_rental_crud_flow(auth_client, db_session, test_user):
     tool = _create_tool(db_session, owner_id=owner.id)
 
     create_response = auth_client.post(
-        "/api/v1/rental/add",
+        "/api/v1/rentals",
         json={
             "tool_id": tool.id,
             "user_id": test_user.id,
@@ -63,22 +63,22 @@ def test_rental_crud_flow(auth_client, db_session, test_user):
     rental_id = create_response.json()["id"]
     assert create_response.json()["status"] == "not_viewed"
 
-    read_response = auth_client.get(f"/api/v1/rental/read/{rental_id}")
+    read_response = auth_client.get(f"/api/v1/rentals/{rental_id}")
     assert read_response.status_code == 200
     assert read_response.json()["tool_id"] == tool.id
 
     update_response = auth_client.patch(
-        f"/api/v1/rental/update/{rental_id}",
+        f"/api/v1/rentals/{rental_id}",
         json={"comment": "Updated comment"},
     )
     assert update_response.status_code == 200
     assert update_response.json()["comment"] == "Updated comment"
 
-    all_response = auth_client.get("/api/v1/rental/all")
+    all_response = auth_client.get("/api/v1/rentals")
     assert all_response.status_code == 200
     assert len(all_response.json()) == 1
 
-    delete_response = auth_client.delete(f"/api/v1/rental/delete/{rental_id}")
+    delete_response = auth_client.delete(f"/api/v1/rentals/{rental_id}")
     assert delete_response.status_code == 204
 
 
@@ -99,7 +99,7 @@ def test_owner_inbox_and_decision_flow(auth_client, client, db_session, test_use
     tool = _create_tool(db_session, owner_id=owner.id)
 
     create_response = client.post(
-        "/api/v1/rental/add",
+        "/api/v1/rentals",
         json={
             "tool_id": tool.id,
             "user_id": renter.id,
@@ -114,7 +114,7 @@ def test_owner_inbox_and_decision_flow(auth_client, client, db_session, test_use
     app.dependency_overrides[get_current_user] = lambda: renter
     try:
         create_response = auth_client.post(
-            "/api/v1/rental/add",
+            "/api/v1/rentals",
             json={
                 "tool_id": tool.id,
                 "user_id": renter.id,
@@ -128,7 +128,7 @@ def test_owner_inbox_and_decision_flow(auth_client, client, db_session, test_use
     finally:
         app.dependency_overrides[get_current_user] = lambda: owner
 
-    inbox_response = auth_client.get("/api/v1/rental/inbox")
+    inbox_response = auth_client.get("/api/v1/rentals/inbox")
     assert inbox_response.status_code == 200
     assert len(inbox_response.json()) == 1
     assert inbox_response.json()[0]["requester"]["username"] == "renter1"
@@ -136,28 +136,28 @@ def test_owner_inbox_and_decision_flow(auth_client, client, db_session, test_use
     assert inbox_response.json()[0]["tool"]["Brand"] == "Stanley"
 
     decision_response = auth_client.patch(
-        f"/api/v1/rental/{rental_id}/decision",
+        f"/api/v1/rentals/{rental_id}/decision",
         json={"status": "accepted", "owner_comment": "Możesz odebrać jutro po 17:00"},
     )
     assert decision_response.status_code == 200
     assert decision_response.json()["status"] == RentalStatus.accepted.value
 
     second_decision_response = auth_client.patch(
-        f"/api/v1/rental/{rental_id}/decision",
+        f"/api/v1/rentals/{rental_id}/decision",
         json={"status": "rejected_by_owner", "owner_comment": "Za późno"},
     )
     assert second_decision_response.status_code == 400
 
     app.dependency_overrides[get_current_user] = lambda: renter
     try:
-        my_rentals_response = auth_client.get("/api/v1/rental/my")
+        my_rentals_response = auth_client.get("/api/v1/rentals/my")
         assert my_rentals_response.status_code == 200
         assert len(my_rentals_response.json()) == 1
         assert my_rentals_response.json()[0]["owner"]["username"] == owner.username
         assert my_rentals_response.json()[0]["status"] == RentalStatus.accepted.value
 
         pay_response = auth_client.patch(
-            f"/api/v1/rental/{rental_id}/pay",
+            f"/api/v1/rentals/{rental_id}/pay",
             json={
                 "cardholder": "Jan Najemca",
                 "card_number": "4242424242424242",
@@ -171,14 +171,14 @@ def test_owner_inbox_and_decision_flow(auth_client, client, db_session, test_use
         app.dependency_overrides[get_current_user] = lambda: owner
 
     pickup_response = auth_client.patch(
-        f"/api/v1/rental/{rental_id}/owner-status",
+        f"/api/v1/rentals/{rental_id}/owner-status",
         json={"status": "paid_rented"},
     )
     assert pickup_response.status_code == 200
     assert pickup_response.json()["status"] == RentalStatus.paid_rented.value
 
     return_response = auth_client.patch(
-        f"/api/v1/rental/{rental_id}/owner-status",
+        f"/api/v1/rentals/{rental_id}/owner-status",
         json={"status": "fulfilled"},
     )
     assert return_response.status_code == 200

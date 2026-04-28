@@ -1,9 +1,9 @@
 import logging
-import os
 from time import perf_counter
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.router import api_router
@@ -19,18 +19,7 @@ from app.modules.users import models as users_db  # noqa: F401
 setup_logging()
 logger = logging.getLogger(__name__)
 
-app = FastAPI(tags="RentElektro")
-app.debug = os.getenv("DEBUG", "true").lower() == "true"
-auto_create_schema = os.getenv("AUTO_CREATE_SCHEMA", "false").lower() == "true"
 
-instrumentator = Instrumentator()
-instrumentator.instrument(app)
-
-if auto_create_schema:
-    Base.metadata.create_all(bind=engine)
-
-
-@app.middleware("http")
 async def log_requests(request: Request, call_next):
     started = perf_counter()
     try:
@@ -56,27 +45,47 @@ async def log_requests(request: Request, call_next):
     return response
 
 
-origins = [
-    "http://localhost",
-    "http://localhost:8081",
-    "http://localhost:8080",
-    "http://localhost:8000",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allow_headers=["*"],
-)
+def configure_middlewares(app: FastAPI) -> None:
+    app.middleware("http")(log_requests)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.BACKEND_CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+        allow_headers=["*"],
+    )
+    Instrumentator().instrument(app)
 
 
-@app.get("/")
+def configure_routes(app: FastAPI) -> None:
+    app.add_api_route("/", read_root, methods=["GET"], response_class=PlainTextResponse)
+    app.include_router(api_router, prefix=settings.API_V1_STR)
+    app.include_router(maintenance.router)
+
+
 def read_root():
     logger.info("root_endpoint_called")
-    return {"Hello": "World"}
+    return r"""
+ ____            _   _____ _           _             
+|  _ \ ___ _ __ | |_| ____| | ___  ___| |_ _ __ ___  
+| |_) / _ \ '_ \| __|  _| | |/ _ \/ __| __| '__/ _ \ 
+|  _ <  __/ | | | |_| |___| |  __/ (__| |_| | | (_) |
+|_| \_\___|_| |_|\__|_____|_|\___|\___|\__|_|  \___/ 
+
+API v1
+Go for swagger: host_url/docs 
+""".strip()
 
 
-app.include_router(api_router, prefix=settings.API_V1_STR)
-app.include_router(maintenance.router)
+def create_app() -> FastAPI:
+    app = FastAPI(title=settings.APP_NAME, debug=settings.DEBUG, tags=["RentElektro"])
+    configure_middlewares(app)
+    configure_routes(app)
+
+    if settings.AUTO_CREATE_SCHEMA:
+        Base.metadata.create_all(bind=engine)
+
+    return app
+
+
+app = create_app()

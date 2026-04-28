@@ -10,7 +10,7 @@ def test_add_tool_and_get_tool(auth_client, db_session, test_user):
     db_session.refresh(category)
 
     response = auth_client.post(
-        "/api/v1/tool/add",
+        "/api/v1/tools",
         json={
             "Type": "drill",
             "PowerSource": "electric",
@@ -30,7 +30,7 @@ def test_add_tool_and_get_tool(auth_client, db_session, test_user):
     tool_id = response.json()["id"]
     assert response.json()["owner_id"] == test_user.id
 
-    read_response = auth_client.get(f"/api/v1/tool/{tool_id}")
+    read_response = auth_client.get(f"/api/v1/tools/{tool_id}")
 
     assert read_response.status_code == 200
     assert read_response.json()["Brand"] == "Bosch"
@@ -45,7 +45,7 @@ def test_get_all_tools_returns_created_tools(auth_client, db_session, test_user)
     db_session.refresh(category)
 
     auth_client.post(
-        "/api/v1/tool/add",
+        "/api/v1/tools",
         json={
             "Type": "saw",
             "PowerSource": "gas",
@@ -61,7 +61,7 @@ def test_get_all_tools_returns_created_tools(auth_client, db_session, test_user)
         },
     )
 
-    response = auth_client.get("/api/v1/tool/all")
+    response = auth_client.get("/api/v1/tools")
 
     assert response.status_code == 200
     assert response.json()["total"] == 1
@@ -83,7 +83,7 @@ def test_get_all_tools_supports_filters_and_pagination(auth_client, db_session, 
     db_session.refresh(category_b)
 
     auth_client.post(
-        "/api/v1/tool/add",
+        "/api/v1/tools",
         json={
             "Type": "drill",
             "PowerSource": "electric",
@@ -99,7 +99,7 @@ def test_get_all_tools_supports_filters_and_pagination(auth_client, db_session, 
         },
     )
     auth_client.post(
-        "/api/v1/tool/add",
+        "/api/v1/tools",
         json={
             "Type": "saw",
             "PowerSource": "gas",
@@ -116,7 +116,7 @@ def test_get_all_tools_supports_filters_and_pagination(auth_client, db_session, 
     )
 
     response = auth_client.get(
-        f"/api/v1/tool/all?search=drill&power_source=electric&availability=true&category_id={category_a.id}&page=1&page_size=1"
+        f"/api/v1/tools?search=drill&power_source=electric&availability=true&category_id={category_a.id}&page=1&page_size=1"
     )
 
     assert response.status_code == 200

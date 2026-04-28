@@ -13,7 +13,7 @@ export async function fetchProfile(): Promise<UserProfile> {
 }
 
 export async function updateProfile(userId: number, payload: UserProfileUpdate): Promise<void> {
-  const response = await apiClient.PATCH('/users/user/{user_id}', {
+  const response = await apiClient.PATCH('/users/{user_id}', {
     params: {
       path: {
         user_id: userId,

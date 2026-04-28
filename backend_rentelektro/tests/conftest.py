@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 os.environ.setdefault("AUTO_CREATE_SCHEMA", "false")
+os.environ["DEBUG"] = "false"
 os.environ.setdefault("SECRET_KEY", "test-secret-key")
 os.environ.setdefault("DATABASE_URL", "sqlite://")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))

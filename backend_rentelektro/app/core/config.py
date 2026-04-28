@@ -8,11 +8,21 @@ from sqlalchemy.engine import URL
 class Settings(BaseSettings):
     APP_NAME: str = "RentElektroAPI"
     API_V1_STR: str = "/api/v1"
+    DEBUG: bool = True
+    AUTO_CREATE_SCHEMA: bool = False
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ALGORITHM: str = "HS256"
     SECRET_KEY: str
     SQLALCHEMY_DATABASE_URL: str
     ADMIN_EMAIL: EmailStr | None = os.environ.get("ADMIN_EMAIL")
+    COOKIE_SECURE: bool = False
+    BACKEND_CORS_ORIGINS: list[str] = [
+        "http://localhost",
+        "http://localhost:8081",
+        "http://localhost:8080",
+        "http://localhost:8000",
+    ]
 
     model_config = SettingsConfigDict(extra="ignore")
 
