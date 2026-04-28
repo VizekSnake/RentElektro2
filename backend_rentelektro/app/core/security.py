@@ -2,9 +2,10 @@ import warnings
 from datetime import datetime, timedelta, timezone
 from typing import Optional, TypedDict
 
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from jwt import InvalidTokenError
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette.requests import Request
@@ -58,7 +59,7 @@ def verify_token(token: str) -> TokenPayload:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
         return {"username": username, "id": user_id}
-    except JWTError:
+    except InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 
