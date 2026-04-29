@@ -1,5 +1,8 @@
 import warnings
 from datetime import datetime, timedelta, timezone
+from hashlib import sha256
+from hmac import new as hmac_new
+from secrets import token_urlsafe
 from typing import Optional, TypedDict
 
 import jwt
@@ -51,6 +54,14 @@ def create_refresh_token(data: dict):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+
+def generate_password_reset_token() -> str:
+    return token_urlsafe(48)
+
+
+def hash_password_reset_token(token: str) -> str:
+    return hmac_new(SECRET_KEY.encode("utf-8"), token.encode("utf-8"), sha256).hexdigest()
 
 
 def verify_token(token: str) -> TokenPayload:

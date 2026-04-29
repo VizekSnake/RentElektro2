@@ -19,7 +19,10 @@ from app.modules.users.models import User as UserModel
 from app.modules.users.schemas import (
     AccountAnonymizeRequest,
     LoginResult,
+    MessageResponse,
     PasswordChangeRequest,
+    PasswordResetConfirmRequest,
+    PasswordResetRequest,
     RefreshTokenRequest,
     Token,
     User as UserResponse,
@@ -114,6 +117,28 @@ def read_current_user_data(
 @router.get("", response_model=list[UserResponse] | None)
 async def get_all_users(db: Session = Depends(get_db)) -> list[UserModel]:
     return users_service.list_users_or_404(db)
+
+
+@router.post(
+    "/password-reset/request",
+    response_model=MessageResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+)
+async def request_password_reset(
+    payload: PasswordResetRequest, db: Session = Depends(get_db)
+) -> MessageResponse:
+    users_service.request_password_reset(db=db, payload=payload)
+    return MessageResponse(
+        message="Jesli konto z tym adresem istnieje, link do resetu hasla zostal wygenerowany."
+    )
+
+
+@router.post("/password-reset/confirm", response_model=MessageResponse)
+async def confirm_password_reset(
+    payload: PasswordResetConfirmRequest, db: Session = Depends(get_db)
+) -> MessageResponse:
+    users_service.confirm_password_reset(db=db, payload=payload)
+    return MessageResponse(message="Haslo zostalo zresetowane.")
 
 
 @router.post("/me/password", status_code=status.HTTP_204_NO_CONTENT)

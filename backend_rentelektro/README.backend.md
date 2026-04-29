@@ -51,6 +51,8 @@ Local Poetry commands load `envs/config.dev.env` and `envs/postgres.dev.env` aut
 
 Application settings follow the FastAPI pattern from the official docs: `Settings` lives in `app/core/config.py` and `get_settings()` caches a single instance with `@lru_cache`.
 
+Password reset is available through the backend even without a real mail server. In the default `EMAIL_DELIVERY_MODE=console`, the reset link is written to backend logs/terminal. The transport is already prepared for future SMTP delivery via `MAIL_FROM_EMAIL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_USE_TLS`, and `SMTP_USE_SSL`.
+
 Run tests:
 
 ```bash

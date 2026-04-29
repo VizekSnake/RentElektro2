@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import EmailStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -18,8 +19,19 @@ class Settings(BaseSettings):
     APP_DEBUG: bool = True
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    PASSWORD_RESET_TOKEN_EXPIRE_MINUTES: int = 30
+    PASSWORD_RESET_URL_BASE: str = "http://localhost/reset-password"
     ALGORITHM: str = "HS256"
     SECRET_KEY: str
+    EMAIL_DELIVERY_MODE: Literal["console", "smtp"] = "console"
+    MAIL_FROM_EMAIL: EmailStr | None = None
+    MAIL_FROM_NAME: str = "RentElektro"
+    SMTP_HOST: str | None = None
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str | None = None
+    SMTP_PASSWORD: str | None = None
+    SMTP_USE_TLS: bool = True
+    SMTP_USE_SSL: bool = False
     DATABASE_URL: str | None = None
     POSTGRES_USER: str | None = None
     POSTGRES_PASSWORD: str | None = None

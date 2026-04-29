@@ -73,7 +73,7 @@ class ReviewSeed(TypedDict):
 
 USER_SEEDS: Final[list[UserSeed]] = [
     {
-        "email": "admin@rentelektro.local",
+        "email": "admin@rentelektro.com",
         "username": "admin",
         "firstname": "Admin",
         "lastname": "RentElektro",
@@ -85,7 +85,7 @@ USER_SEEDS: Final[list[UserSeed]] = [
         "profile_picture": "https://images.unsplash.com/photo-1560250097-0b93528c311a",
     },
     {
-        "email": "anna@rentelektro.local",
+        "email": "anna@rentelektro.com",
         "username": "anna_tools",
         "firstname": "Anna",
         "lastname": "Kowalska",
@@ -97,7 +97,7 @@ USER_SEEDS: Final[list[UserSeed]] = [
         "profile_picture": "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
     },
     {
-        "email": "piotr@rentelektro.local",
+        "email": "piotr@rentelektro.com",
         "username": "piotr_rent",
         "firstname": "Piotr",
         "lastname": "Nowak",
@@ -109,7 +109,7 @@ USER_SEEDS: Final[list[UserSeed]] = [
         "profile_picture": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
     },
     {
-        "email": "marta@rentelektro.local",
+        "email": "marta@rentelektro.com",
         "username": "marta_buduje",
         "firstname": "Marta",
         "lastname": "Zielinska",
@@ -121,7 +121,7 @@ USER_SEEDS: Final[list[UserSeed]] = [
         "profile_picture": "https://images.unsplash.com/photo-1544005313-94ddf0286df2",
     },
     {
-        "email": "tomasz@rentelektro.local",
+        "email": "tomasz@rentelektro.com",
         "username": "tomasz_event",
         "firstname": "Tomasz",
         "lastname": "Wojcik",
@@ -567,7 +567,9 @@ REVIEW_SEEDS: Final[list[ReviewSeed]] = [
 def ensure_users(session: Session) -> dict[str, User]:
     users: dict[str, User] = {}
     for item in USER_SEEDS:
-        user = session.query(User).filter(User.email == item["email"]).first()
+        user = session.query(User).filter(User.username == item["username"]).first()
+        if user is None:
+            user = session.query(User).filter(User.email == item["email"]).first()
         if user is None:
             user = User(
                 email=item["email"],
@@ -583,6 +585,16 @@ def ensure_users(session: Session) -> dict[str, User]:
             )
             session.add(user)
             session.flush()
+        else:
+            user.email = item["email"]
+            user.firstname = item["firstname"]
+            user.lastname = item["lastname"]
+            user.phone = item["phone"]
+            user.company = item["company"]
+            user.role = item["role"]
+            user.is_active = item["is_active"]
+            user.profile_picture = item["profile_picture"]
+            user.hashed_password = item["hashed_password"]
         users[item["username"]] = user
     return users
 
