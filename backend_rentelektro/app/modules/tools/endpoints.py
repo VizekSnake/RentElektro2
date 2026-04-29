@@ -14,6 +14,7 @@ from app.modules.tools.schemas import (
     Tool,
     ToolAdd,
     ToolListFilters,
+    ToolSort,
     ToolUpdate,
 )
 from app.modules.users.schemas import User
@@ -58,7 +59,7 @@ async def get_all(
     power_source: str | None = Query(default=None),
     availability: bool | None = Query(default=None),
     category_id: UUID | None = Query(default=None),
-    sort: str = Query(default="newest"),
+    sort: ToolSort = Query(default="newest"),
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=9, ge=1, le=24),
     db: Session = Depends(get_db),

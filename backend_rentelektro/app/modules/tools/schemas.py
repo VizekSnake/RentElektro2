@@ -3,6 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
+ToolSort = Literal["newest", "price_asc", "price_desc", "name"]
+
 
 class ToolBase(BaseModel):
     Type: str
@@ -74,7 +76,7 @@ class ToolListFilters(BaseModel):
     power_source: str | None = None
     availability: bool | None = None
     category_id: UUID | None = None
-    sort: Literal["newest", "price_asc", "price_desc", "name"] = "newest"
+    sort: ToolSort = "newest"
     page: int = 1
     page_size: int = 9
 
