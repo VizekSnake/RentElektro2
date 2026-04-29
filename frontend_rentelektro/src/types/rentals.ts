@@ -1,7 +1,9 @@
+import type { UUID } from '@/types/identifiers';
+
 export type Rental = {
-  id: number;
-  tool_id: number;
-  user_id: number;
+  id: UUID;
+  tool_id: UUID;
+  user_id: UUID;
   start_date: string;
   end_date: string;
   comment: string | null;
@@ -25,8 +27,8 @@ export type Rental = {
 };
 
 export type RentalCreatePayload = {
-  tool_id: number;
-  user_id: number;
+  tool_id: UUID;
+  user_id: UUID;
   start_date: string;
   end_date: string;
   comment: string;
@@ -34,7 +36,7 @@ export type RentalCreatePayload = {
 
 export type RentalInboxItem = Rental & {
   tool: {
-    id: number;
+    id: UUID;
     Type: string;
     TypeLabel?: string | null;
     Brand: string;
@@ -43,7 +45,7 @@ export type RentalInboxItem = Rental & {
     RatePerDay: number | null;
   };
   requester: {
-    id: number;
+    id: UUID;
     username: string;
     firstname: string;
     lastname: string;
@@ -51,7 +53,7 @@ export type RentalInboxItem = Rental & {
     phone: string | null;
   };
   owner: {
-    id: number;
+    id: UUID;
     username: string;
     firstname: string;
     lastname: string;

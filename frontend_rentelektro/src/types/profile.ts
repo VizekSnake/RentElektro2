@@ -1,5 +1,7 @@
+import type { UUID } from '@/types/identifiers';
+
 export type UserProfile = {
-  id: number;
+  id: UUID;
   email: string;
   lastname: string;
   phone: string;

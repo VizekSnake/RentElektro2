@@ -74,7 +74,7 @@
             </div>
             <div class="app-product-inline-meta">
               <span>ID oferty</span>
-              <strong>#{{ toolData.id }}</strong>
+              <strong>{{ toolData.public_id || 'n/d' }}</strong>
             </div>
           </div>
 
@@ -172,6 +172,7 @@ import { useToolDetails } from '@/composables/useToolDetails';
 import { getSessionUser } from '@/services/authService';
 import { updateTool } from '@/services/toolService';
 import { useRoute } from 'vue-router';
+import type { UUID } from '@/types/identifiers';
 import AppButton from '@/shared/ui/atoms/AppButton.vue';
 import AppChip from '@/shared/ui/atoms/AppChip.vue';
 import AppTextField from '@/shared/ui/atoms/AppTextField.vue';
@@ -186,16 +187,18 @@ import { createLogger } from '@/shared/lib/logger';
 
 const route = useRoute();
 const logger = createLogger('tool-profile-view');
-const currentUserId = ref<number | null>(null);
+const currentUserId = ref<UUID | null>(null);
 const isSavingOwnerChanges = ref(false);
 const ownerSuccessMessage = ref('');
 const ownerErrorMessage = ref('');
 const fallbackTool = {
-  id: 0,
+  id: '' as UUID,
+  public_id: '',
   Type: '',
   TypeLabel: '',
   PowerSource: '',
   PowerSourceLabel: '',
+  CategoryName: '',
   Brand: '',
   Description: '',
   category_id: null,
@@ -205,7 +208,7 @@ const fallbackTool = {
   Age: null,
   RatePerDay: 0,
   ImageURL: '',
-  owner_id: 0,
+  owner_id: '' as UUID,
 };
 const ownerForm = reactive({
   Type: '',

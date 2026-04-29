@@ -1,5 +1,6 @@
 import apiClient from '@/shared/api/apiClient';
 import { unwrapApiResponse } from '@/shared/api/apiErrors';
+import type { UUID } from '@/types/identifiers';
 import type {
   Rental,
   RentalCreatePayload,
@@ -11,7 +12,7 @@ import type {
   RentalPaymentPayload,
 } from '@/types/rentals';
 
-export async function getCurrentUserId(): Promise<number | null> {
+export async function getCurrentUserId(): Promise<UUID | null> {
   try {
     const response = await apiClient.GET('/users/me');
     return unwrapApiResponse(response, 'Nie udało się pobrać bieżącego użytkownika.').id;
@@ -36,7 +37,7 @@ export async function fetchMyRentalRequests(): Promise<RentalInboxItem[]> {
 }
 
 export async function decideRental(
-  rentalId: number,
+  rentalId: UUID,
   payload: RentalDecisionPayload,
 ): Promise<Rental> {
   const response = await apiClient.PATCH('/rentals/{rental_id}/decision', {
@@ -51,7 +52,7 @@ export async function decideRental(
 }
 
 export async function payRental(
-  rentalId: number,
+  rentalId: UUID,
   payload: RentalPaymentPayload,
 ): Promise<Rental> {
   const response = await apiClient.PATCH('/rentals/{rental_id}/pay', {
@@ -66,7 +67,7 @@ export async function payRental(
 }
 
 export async function updateOwnerRentalStatus(
-  rentalId: number,
+  rentalId: UUID,
   payload: RentalOwnerStatusPayload,
 ): Promise<Rental> {
   const response = await apiClient.PATCH('/rentals/{rental_id}/owner-status', {

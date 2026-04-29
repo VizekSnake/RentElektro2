@@ -1,35 +1,39 @@
+import type { UUID } from '@/types/identifiers';
+
 export type Tool = {
-  id: number;
+  id: UUID;
+  public_id: string;
   Type: string;
   TypeLabel?: string | null;
   PowerSource: string;
   PowerSourceLabel?: string | null;
+  CategoryName?: string | null;
   Brand: string;
   Description: string;
-  category_id?: number | null;
-  CategoryID?: number | null;
+  category_id?: UUID | null;
+  CategoryID?: UUID | null;
   Availability: boolean;
   Insurance: boolean;
   Power: number | null;
   Age: number | null;
   RatePerDay: number | null;
   ImageURL: string;
-  owner_id?: number;
+  owner_id?: UUID;
 };
 
 export type ToolCategory = {
-  id: number;
+  id: UUID;
   name: string;
   description: string;
   active: boolean;
-  creator_id: number;
+  creator_id: UUID;
 };
 
 export type ToolListFilters = {
   search?: string;
   power_source?: string;
   availability?: boolean;
-  category_id?: number;
+  category_id?: UUID;
   sort?: 'newest' | 'price_asc' | 'price_desc' | 'name';
   page?: number;
   page_size?: number;
@@ -48,7 +52,7 @@ export type ToolFormPayload = {
   PowerSource: string;
   Brand: string;
   Description: string;
-  category_id: number | null;
+  category_id: UUID | null;
   Availability: boolean;
   Insurance: boolean;
   Power: number | null;
@@ -59,5 +63,5 @@ export type ToolFormPayload = {
 
 export type ToolUpdatePayload = Partial<ToolFormPayload>;
 
-export const getToolCategoryId = (tool: Partial<Tool>): number | null =>
+export const getToolCategoryId = (tool: Partial<Tool>): UUID | null =>
   tool.category_id ?? tool.CategoryID ?? null;

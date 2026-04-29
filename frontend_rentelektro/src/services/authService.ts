@@ -1,11 +1,12 @@
 import apiClient from '@/shared/api/apiClient';
 import { assertApiResponse, unwrapApiResponse } from '@/shared/api/apiErrors';
 import { createLogger } from '@/shared/lib/logger';
+import type { UUID } from '@/types/identifiers';
 
 const logger = createLogger('auth-service');
 
 export type SessionUser = {
-  id: number;
+  id: UUID;
   username: string;
 };
 

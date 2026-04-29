@@ -1,24 +1,36 @@
 from uuid import UUID
 
 from sqlalchemy import func, or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.modules.tools.models import Category as CategoryModel, Tool as ToolModel
 from app.modules.tools.schemas import ToolListFilters
 
 
 def get_tool_by_id(db: Session, tool_id: UUID) -> ToolModel | None:
-    return db.query(ToolModel).filter(ToolModel.id == tool_id).first()
+    return (
+        db.query(ToolModel)
+        .options(joinedload(ToolModel.category))
+        .filter(ToolModel.id == tool_id)
+        .first()
+    )
 
 
 def get_tool_by_id_for_owner(db: Session, tool_id: UUID, owner_id: UUID) -> ToolModel | None:
     return (
-        db.query(ToolModel).filter(ToolModel.id == tool_id, ToolModel.owner_id == owner_id).first()
+        db.query(ToolModel)
+        .options(joinedload(ToolModel.category))
+        .filter(ToolModel.id == tool_id, ToolModel.owner_id == owner_id)
+        .first()
     )
 
 
 def list_tools(db: Session, filters: ToolListFilters) -> tuple[list[ToolModel], int]:
-    query = db.query(ToolModel).filter(ToolModel.Availability.is_(True))
+    query = (
+        db.query(ToolModel)
+        .options(joinedload(ToolModel.category))
+        .filter(ToolModel.Availability.is_(True))
+    )
 
     if filters.search:
         search_value = f"%{filters.search.strip()}%"
@@ -74,6 +86,7 @@ def list_categories(db: Session) -> list[CategoryModel]:
 def list_tools_for_owner(db: Session, owner_id: UUID) -> list[ToolModel]:
     return (
         db.query(ToolModel)
+        .options(joinedload(ToolModel.category))
         .filter(ToolModel.owner_id == owner_id)
         .order_by(ToolModel.created_at.desc(), ToolModel.id.desc())
         .all()

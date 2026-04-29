@@ -10,6 +10,7 @@ import type {
   RentalPaymentPayload,
 } from '@/types/rentals';
 import type { AccountAnonymizePayload, PasswordChangePayload } from '@/types/profile';
+import type { UUID } from '@/types/identifiers';
 import type { PaginatedTools, Tool, ToolCategory, ToolFormPayload, ToolUpdatePayload } from '@/types/tools';
 
 type ApiErrorPayload = {
@@ -17,7 +18,7 @@ type ApiErrorPayload = {
 };
 
 type SessionUser = {
-  id: number;
+  id: UUID;
   username: string;
 };
 
@@ -218,7 +219,7 @@ export interface paths {
     patch: {
       parameters: {
         path: {
-          user_id: number;
+          user_id: UUID;
         };
       };
       requestBody: {
@@ -285,7 +286,7 @@ export interface paths {
           search?: string;
           power_source?: string;
           availability?: boolean;
-          category_id?: number;
+          category_id?: UUID;
           sort?: 'newest' | 'price_asc' | 'price_desc' | 'name';
           page?: number;
           page_size?: number;
@@ -328,7 +329,7 @@ export interface paths {
     get: {
       parameters: {
         path: {
-          tool_id: number;
+          tool_id: UUID;
         };
       };
       responses: {
@@ -347,7 +348,7 @@ export interface paths {
     patch: {
       parameters: {
         path: {
-          tool_id: number;
+          tool_id: UUID;
         };
       };
       requestBody: {
@@ -479,7 +480,7 @@ export interface paths {
     patch: {
       parameters: {
         path: {
-          rental_id: number;
+          rental_id: UUID;
         };
       };
       requestBody: {
@@ -505,7 +506,7 @@ export interface paths {
     patch: {
       parameters: {
         path: {
-          rental_id: number;
+          rental_id: UUID;
         };
       };
       requestBody: {
@@ -531,7 +532,7 @@ export interface paths {
     patch: {
       parameters: {
         path: {
-          rental_id: number;
+          rental_id: UUID;
         };
       };
       requestBody: {

@@ -374,14 +374,15 @@
 import { computed, onMounted, reactive } from 'vue';
 
 import { useRentalInbox } from '@/composables/useRentalInbox';
+import type { UUID } from '@/types/identifiers';
 import AppButton from '@/shared/ui/atoms/AppButton.vue';
 import AppTextField from '@/shared/ui/atoms/AppTextField.vue';
 import AppTextarea from '@/shared/ui/atoms/AppTextarea.vue';
 import ResponseMessage from '@/shared/ui/molecules/ResponseMessage.vue';
 import type { Rental, RentalInboxItem, RentalPaymentPayload } from '@/types/rentals';
 
-const ownerComments = reactive<Record<number, string>>({});
-const paymentForms = reactive<Record<number, RentalPaymentPayload>>({});
+const ownerComments = reactive<Record<UUID, string>>({});
+const paymentForms = reactive<Record<UUID, RentalPaymentPayload>>({});
 const {
   ownerInboxItems,
   myRequestItems,
@@ -494,7 +495,7 @@ const returnLabel = (
 };
 
 const updatePaymentField = (
-  rentalId: number,
+  rentalId: UUID,
   field: keyof RentalPaymentPayload,
   value: string | number | null,
 ): void => {
@@ -511,7 +512,7 @@ const updatePaymentField = (
 };
 
 const submitDecision = async (
-  rentalId: number,
+  rentalId: UUID,
   status: 'accepted' | 'rejected_by_owner',
 ): Promise<void> => {
   await updateDecision(rentalId, {
@@ -520,7 +521,7 @@ const submitDecision = async (
   });
 };
 
-const submitPayment = async (rentalId: number): Promise<void> => {
+const submitPayment = async (rentalId: UUID): Promise<void> => {
   const form = paymentForms[rentalId];
   if (!form) {
     return;
@@ -530,7 +531,7 @@ const submitPayment = async (rentalId: number): Promise<void> => {
 };
 
 const advanceRentalStatus = async (
-  rentalId: number,
+  rentalId: UUID,
   status: 'paid_rented' | 'fulfilled',
 ): Promise<void> => {
   await advanceOwnerRentalStatus(rentalId, { status });

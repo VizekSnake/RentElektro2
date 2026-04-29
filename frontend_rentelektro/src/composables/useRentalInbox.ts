@@ -14,6 +14,7 @@ import type {
   RentalOwnerStatusPayload,
   RentalPaymentPayload,
 } from '@/types/rentals';
+import type { UUID } from '@/types/identifiers';
 import type { Tool } from '@/types/tools';
 
 export function useRentalInbox() {
@@ -46,7 +47,7 @@ export function useRentalInbox() {
   };
 
   const updateDecision = async (
-    rentalId: number,
+    rentalId: UUID,
     payload: RentalDecisionPayload,
   ): Promise<void> => {
     isSubmitting.value = true;
@@ -68,7 +69,7 @@ export function useRentalInbox() {
   };
 
   const submitPayment = async (
-    rentalId: number,
+    rentalId: UUID,
     payload: RentalPaymentPayload,
   ): Promise<void> => {
     isSubmitting.value = true;
@@ -87,7 +88,7 @@ export function useRentalInbox() {
   };
 
   const advanceOwnerRentalStatus = async (
-    rentalId: number,
+    rentalId: UUID,
     payload: RentalOwnerStatusPayload,
   ): Promise<void> => {
     isSubmitting.value = true;

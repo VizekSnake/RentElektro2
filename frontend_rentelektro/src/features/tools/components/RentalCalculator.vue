@@ -51,16 +51,17 @@ import RentalSummaryCard from '@/features/tools/components/RentalSummaryCard.vue
 import ResponseMessage from '@/shared/ui/molecules/ResponseMessage.vue';
 import { createRental, getCurrentUserId } from '@/services/rentalService';
 import { createLogger } from '@/shared/lib/logger';
+import type { UUID } from '@/types/identifiers';
 
 const props = defineProps<{
-  toolId: number;
+  toolId: UUID;
   ratePerDay: number;
 }>();
 
 const startDate = ref<string | null>(null);
 const endDate = ref<string | null>(null);
 const comment = ref('');
-const currentUserId = ref<number | null>(null);
+const currentUserId = ref<UUID | null>(null);
 const isSubmitting = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');

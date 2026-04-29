@@ -17,13 +17,12 @@ import { computed } from 'vue';
 import DetailGrid from '@/shared/ui/organisms/DetailGrid.vue';
 import TagGroup, { type TagGroupItem } from '@/shared/ui/molecules/TagGroup.vue';
 import type { Tool } from '@/types/tools';
-import { getToolCategoryId } from '@/types/tools';
 
 const props = defineProps<{
   tool: Tool;
 }>();
 
-const categoryId = computed(() => getToolCategoryId(props.tool));
+const categoryName = computed(() => props.tool.CategoryName || 'n/d');
 const statusTags = computed<TagGroupItem[]>(() => {
   const items: TagGroupItem[] = [
     {
@@ -53,7 +52,7 @@ const statusTags = computed<TagGroupItem[]>(() => {
 });
 
 const detailItems = computed(() => [
-  { label: 'Kategoria', value: `#${categoryId.value ?? 'n/a'}` },
+  { label: 'Kategoria', value: categoryName.value },
   { label: 'Moc', value: props.tool.Power ?? 'n/a' },
   { label: 'Wiek', value: props.tool.Age ?? 'n/a' },
   { label: 'Cena za dzień', value: `$${props.tool.RatePerDay ?? 0}`, valueClass: 'text-body-1 font-weight-bold' },

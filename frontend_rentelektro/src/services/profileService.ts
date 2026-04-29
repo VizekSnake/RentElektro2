@@ -1,5 +1,6 @@
 import apiClient from '@/shared/api/apiClient';
 import { assertApiResponse, unwrapApiResponse } from '@/shared/api/apiErrors';
+import type { UUID } from '@/types/identifiers';
 import type {
   AccountAnonymizePayload,
   PasswordChangePayload,
@@ -12,7 +13,7 @@ export async function fetchProfile(): Promise<UserProfile> {
   return unwrapApiResponse(response, 'Nie udało się pobrać profilu.');
 }
 
-export async function updateProfile(userId: number, payload: UserProfileUpdate): Promise<void> {
+export async function updateProfile(userId: UUID, payload: UserProfileUpdate): Promise<void> {
   const response = await apiClient.PATCH('/users/{user_id}', {
     params: {
       path: {

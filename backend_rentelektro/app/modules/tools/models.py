@@ -3,6 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 
+from nanoid import generate
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
@@ -37,11 +38,22 @@ POWER_SOURCE_LABELS: dict[str, str] = {
 }
 
 
+def generate_tool_public_id() -> str:
+    return f"OFR-{generate(alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789', size=6)}"
+
+
 class Tool(Base):
     __tablename__ = "tools"
 
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid, primary_key=True, default=uuid.uuid4, index=True, unique=True
+    )
+    public_id: Mapped[str] = mapped_column(
+        String(12),
+        unique=True,
+        index=True,
+        nullable=False,
+        default=generate_tool_public_id,
     )
     Type: Mapped[str] = mapped_column(String)
     PowerSource: Mapped[str] = mapped_column(String)
@@ -75,6 +87,10 @@ class Tool(Base):
     @property
     def PowerSourceLabel(self) -> str:
         return POWER_SOURCE_LABELS.get(self.PowerSource, self.PowerSource)
+
+    @property
+    def CategoryName(self) -> str | None:
+        return self.category.name if self.category is not None else None
 
 
 class Category(Base):

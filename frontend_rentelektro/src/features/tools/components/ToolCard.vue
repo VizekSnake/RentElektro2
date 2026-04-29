@@ -35,7 +35,7 @@
       <div class="app-tool-card-meta">
         <div class="app-tool-card-meta-item">
           <span>Kategoria</span>
-          <strong>#{{ categoryId ?? 'n/d' }}</strong>
+          <strong>{{ categoryName }}</strong>
         </div>
         <div class="app-tool-card-meta-item">
           <span>Moc</span>
@@ -62,7 +62,6 @@ import { computed } from 'vue';
 import AppButton from '@/shared/ui/atoms/AppButton.vue';
 import AppChip from '@/shared/ui/atoms/AppChip.vue';
 import type { Tool } from '@/types/tools';
-import { getToolCategoryId } from '@/types/tools';
 
 const props = defineProps<{
   tool: Tool;
@@ -84,7 +83,7 @@ const currencyFormatter = new Intl.NumberFormat('pl-PL', {
   maximumFractionDigits: 2,
 });
 const displayRate = computed(() => currencyFormatter.format(props.tool.RatePerDay ?? 0));
-const categoryId = computed(() => getToolCategoryId(props.tool));
+const categoryName = computed(() => props.tool.CategoryName || 'n/d');
 const powerLabel = computed(() => (props.tool.Power ? `${props.tool.Power} W` : 'n/d'));
 const ageLabel = computed(() => (props.tool.Age ? `${props.tool.Age} roku` : 'n/d'));
 </script>

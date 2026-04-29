@@ -18,21 +18,23 @@ class ToolWriteFields(BaseModel):
     ImageURL: Optional[str] = None
 
 
-class ToolBase(ToolWriteFields):
+class ToolReadFields(BaseModel):
     TypeLabel: Optional[str] = None
     PowerSourceLabel: Optional[str] = None
+    CategoryName: Optional[str] = None
 
 
 class ToolUpdate(ToolWriteFields):
     pass
 
 
-class ToolAdd(ToolBase):
+class ToolAdd(ToolWriteFields):
     owner_id: Optional[UUID] = None
 
 
-class Tool(ToolBase):
+class Tool(ToolWriteFields, ToolReadFields):
     id: UUID
+    public_id: str
     owner_id: UUID
 
     model_config = ConfigDict(from_attributes=True)

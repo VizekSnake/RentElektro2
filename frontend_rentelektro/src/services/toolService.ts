@@ -1,5 +1,6 @@
 import apiClient from '@/shared/api/apiClient';
 import { unwrapApiResponse } from '@/shared/api/apiErrors';
+import type { UUID } from '@/types/identifiers';
 import type {
   PaginatedTools,
   Tool,
@@ -26,11 +27,11 @@ export async function fetchTools(filters: ToolListFilters = {}): Promise<Paginat
   return unwrapApiResponse(response, 'Nie udało się pobrać listy narzędzi.');
 }
 
-export async function fetchToolById(id: string | number): Promise<Tool> {
+export async function fetchToolById(id: UUID): Promise<Tool> {
   const response = await apiClient.GET('/tools/{tool_id}', {
     params: {
       path: {
-        tool_id: Number(id),
+        tool_id: id,
       },
     },
   });
@@ -56,7 +57,7 @@ export async function createTool(payload: ToolFormPayload): Promise<Tool> {
   return unwrapApiResponse(response, 'Nie udało się dodać narzędzia.');
 }
 
-export async function updateTool(toolId: number, payload: ToolUpdatePayload): Promise<Tool> {
+export async function updateTool(toolId: UUID, payload: ToolUpdatePayload): Promise<Tool> {
   const response = await apiClient.PATCH('/tools/{tool_id}', {
     params: {
       path: {
