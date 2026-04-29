@@ -1,30 +1,6 @@
-import type { UUID } from '@/types/identifiers';
+import type { components } from '@/shared/api/generated/schema';
 
-export type UserProfile = {
-  id: UUID;
-  email: string;
-  lastname: string;
-  phone: string;
-  profile_picture: string;
-  is_active: boolean;
-  username: string;
-  firstname: string;
-  company: boolean;
-  role: string | null;
-};
-
-export type UserProfileUpdate = Partial<
-  Pick<
-    UserProfile,
-    'profile_picture' | 'username' | 'email' | 'phone' | 'firstname' | 'lastname' | 'company'
-  >
->;
-
-export type PasswordChangePayload = {
-  current_password: string;
-  new_password: string;
-};
-
-export type AccountAnonymizePayload = {
-  current_password: string;
-};
+export type UserProfile = components['schemas']['UserProfile'];
+export type UserProfileUpdate = components['schemas']['UserUpdate'];
+export type PasswordChangePayload = components['schemas']['PasswordChangeRequest'];
+export type AccountAnonymizePayload = components['schemas']['AccountAnonymizeRequest'];

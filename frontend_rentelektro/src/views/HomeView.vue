@@ -51,7 +51,7 @@
               :class="{ 'is-featured': index === 0 }"
             >
               <v-img
-                :src="item.ImageURL"
+                :src="item.ImageURL || ''"
                 :alt="`${item.Brand} ${item.Type}`"
                 cover
                 class="app-home-showcase-image"

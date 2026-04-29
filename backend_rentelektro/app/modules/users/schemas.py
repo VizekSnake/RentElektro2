@@ -87,6 +87,11 @@ class UserProfile(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class SessionUser(BaseModel):
+    id: UUID
+    username: str
+
+
 class UserLogin(BaseModel):
     username: str
     password: str

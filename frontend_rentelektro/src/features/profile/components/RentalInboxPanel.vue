@@ -433,7 +433,7 @@ const myHistoricalRequests = computed(() =>
   ),
 );
 
-const rateLabel = (value: number | null): string =>
+const rateLabel = (value: number | null | undefined): string =>
   value == null ? 'Brak stawki' : `${currencyFormatter.format(value)}/dzień`;
 
 const totalLabel = (item: RentalInboxItem): string => {

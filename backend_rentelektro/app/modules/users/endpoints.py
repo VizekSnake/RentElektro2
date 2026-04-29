@@ -25,6 +25,7 @@ from app.modules.users.schemas import (
     PasswordResetConfirmRequest,
     PasswordResetRequest,
     RefreshTokenRequest,
+    SessionUser,
     Token,
     User as UserResponse,
     UserCreate,
@@ -100,10 +101,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
     return create_login_response(user)
 
 
-@router.get("/me")
-def read_users_me(access_token: str = Depends(get_access_token)) -> dict:
+@router.get("/me", response_model=SessionUser)
+def read_users_me(access_token: str = Depends(get_access_token)) -> SessionUser:
     payload = verify_token(access_token)
-    return {"username": payload["username"], "id": payload["id"]}
+    return SessionUser(username=payload["username"], id=payload["id"])
 
 
 @router.get("/me/data", response_model=UserProfile)

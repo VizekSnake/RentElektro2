@@ -1,10 +1,30 @@
-from typing import Optional
+from typing import Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
 
-class ToolWriteFields(BaseModel):
+class ToolBase(BaseModel):
+    Type: str
+    PowerSource: str
+    Brand: str
+    Description: str
+    category_id: UUID | None = None
+    Availability: bool
+    Insurance: bool
+    Power: int | None = None
+    Age: float | None = None
+    RatePerDay: float | None = None
+    ImageURL: str | None = None
+
+
+class ToolReadFields(BaseModel):
+    TypeLabel: Optional[str] = None
+    PowerSourceLabel: Optional[str] = None
+    CategoryName: Optional[str] = None
+
+
+class ToolUpdate(BaseModel):
     Type: Optional[str] = None
     PowerSource: Optional[str] = None
     Brand: Optional[str] = None
@@ -18,21 +38,11 @@ class ToolWriteFields(BaseModel):
     ImageURL: Optional[str] = None
 
 
-class ToolReadFields(BaseModel):
-    TypeLabel: Optional[str] = None
-    PowerSourceLabel: Optional[str] = None
-    CategoryName: Optional[str] = None
-
-
-class ToolUpdate(ToolWriteFields):
-    pass
-
-
-class ToolAdd(ToolWriteFields):
+class ToolAdd(ToolBase):
     owner_id: Optional[UUID] = None
 
 
-class Tool(ToolWriteFields, ToolReadFields):
+class Tool(ToolBase, ToolReadFields):
     id: UUID
     public_id: str
     owner_id: UUID
@@ -64,7 +74,7 @@ class ToolListFilters(BaseModel):
     power_source: str | None = None
     availability: bool | None = None
     category_id: UUID | None = None
-    sort: str = "newest"
+    sort: Literal["newest", "price_asc", "price_desc", "name"] = "newest"
     page: int = 1
     page_size: int = 9
 

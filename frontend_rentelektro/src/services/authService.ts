@@ -1,43 +1,22 @@
 import apiClient from '@/shared/api/apiClient';
 import { assertApiResponse, unwrapApiResponse } from '@/shared/api/apiErrors';
+import type { components } from '@/shared/api/generated/schema';
 import { createLogger } from '@/shared/lib/logger';
-import type { UUID } from '@/types/identifiers';
 
 const logger = createLogger('auth-service');
 
-export type SessionUser = {
-  id: UUID;
-  username: string;
-};
-
-export type SignUpPayload = {
-  username: string;
-  email: string;
-  phone: string;
-  firstname: string;
-  lastname: string;
-  company: boolean;
-  password: string;
-};
-
-export type PasswordResetRequestPayload = {
-  email: string;
-};
-
-export type PasswordResetConfirmPayload = {
-  token: string;
-  new_password: string;
-};
-
-export type MessageResponse = {
-  message: string;
-};
+export type SessionUser = components['schemas']['SessionUser'];
+export type SignUpPayload = components['schemas']['UserCreate'];
+export type PasswordResetRequestPayload = components['schemas']['PasswordResetRequest'];
+export type PasswordResetConfirmPayload = components['schemas']['PasswordResetConfirmRequest'];
+export type MessageResponse = components['schemas']['MessageResponse'];
 
 export async function loginWithPassword(username: string, password: string): Promise<void> {
   logger.info('login_attempt', { username });
 
   const response = await apiClient.POST('/users/token', {
     body: {
+      scope: '',
       username,
       password,
     },
@@ -45,6 +24,7 @@ export async function loginWithPassword(username: string, password: string): Pro
       const formData = new URLSearchParams();
       formData.append('username', body.username);
       formData.append('password', body.password);
+      formData.append('scope', body.scope);
       return formData;
     },
     headers: {

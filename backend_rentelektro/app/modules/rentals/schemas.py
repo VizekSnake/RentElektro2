@@ -52,7 +52,7 @@ class RentalUpdate(BaseModel):
 
 
 class RentalDecisionUpdate(BaseModel):
-    status: AcceptedEnum
+    status: Literal["accepted", "rejected_by_owner"]
     owner_comment: Optional[str] = None
 
 
@@ -64,7 +64,7 @@ class RentalPaymentUpdate(BaseModel):
 
 
 class RentalOwnerStatusUpdate(BaseModel):
-    status: AcceptedEnum
+    status: Literal["paid_rented", "fulfilled"]
 
 
 class RentalInboxTool(BaseModel):

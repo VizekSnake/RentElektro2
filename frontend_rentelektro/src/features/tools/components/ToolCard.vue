@@ -1,7 +1,7 @@
 <template>
   <v-card class="app-tool-card h-100 d-flex flex-column" border="sm">
     <v-img
-      :src="tool.ImageURL"
+      :src="tool.ImageURL || ''"
       height="260"
       cover
       class="app-tool-image"

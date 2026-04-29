@@ -1,7 +1,7 @@
 <template>
   <div class="app-tool-detail-image-shell">
     <v-img
-      :src="imageUrl"
+      :src="imageUrl || ''"
       height="420"
       contain
       class="app-tool-detail-image"
@@ -18,6 +18,6 @@
 
 <script setup lang="ts">
 defineProps<{
-  imageUrl: string;
+  imageUrl?: string | null;
 }>();
 </script>

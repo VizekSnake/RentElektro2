@@ -49,7 +49,7 @@ export async function fetchMyTools(): Promise<Tool[]> {
 }
 
 export async function createTool(payload: ToolFormPayload): Promise<Tool> {
-  if (payload.ImageURL.startsWith('data:')) {
+  if (payload.ImageURL?.startsWith('data:')) {
     throw new Error('Do zapisu oferty podaj publiczny adres URL obrazka. Lokalny plik nie jest jeszcze wysyłany na serwer.');
   }
 
