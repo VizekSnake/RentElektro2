@@ -16,7 +16,7 @@ def test_add_tool_and_get_tool(auth_client, db_session, test_user):
             "PowerSource": "electric",
             "Brand": "Bosch",
             "Description": "Cordless drill",
-            "category_id": category.id,
+            "category_id": str(category.id),
             "Availability": True,
             "Insurance": False,
             "Power": 650,
@@ -28,7 +28,7 @@ def test_add_tool_and_get_tool(auth_client, db_session, test_user):
 
     assert response.status_code == 200
     tool_id = response.json()["id"]
-    assert response.json()["owner_id"] == test_user.id
+    assert response.json()["owner_id"] == str(test_user.id)
 
     read_response = auth_client.get(f"/api/v1/tools/{tool_id}")
 
@@ -51,7 +51,7 @@ def test_get_all_tools_returns_created_tools(auth_client, db_session, test_user)
             "PowerSource": "gas",
             "Brand": "Stihl",
             "Description": "Chainsaw",
-            "category_id": category.id,
+            "category_id": str(category.id),
             "Availability": True,
             "Insurance": True,
             "Power": 1200,
@@ -89,7 +89,7 @@ def test_get_all_tools_supports_filters_and_pagination(auth_client, db_session, 
             "PowerSource": "electric",
             "Brand": "Bosch",
             "Description": "Cordless drilling set",
-            "category_id": category_a.id,
+            "category_id": str(category_a.id),
             "Availability": True,
             "Insurance": False,
             "Power": 650,
@@ -105,7 +105,7 @@ def test_get_all_tools_supports_filters_and_pagination(auth_client, db_session, 
             "PowerSource": "gas",
             "Brand": "Stihl",
             "Description": "Garden cutting tool",
-            "category_id": category_b.id,
+            "category_id": str(category_b.id),
             "Availability": False,
             "Insurance": True,
             "Power": 1200,

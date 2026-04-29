@@ -1,9 +1,10 @@
+import uuid
 import warnings
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 from hmac import new as hmac_new
 from secrets import token_urlsafe
-from typing import Optional, TypedDict
+from typing import Any, Optional, TypedDict
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -34,11 +35,21 @@ REFRESH_TOKEN_EXPIRE_DAYS = settings.REFRESH_TOKEN_EXPIRE_DAYS
 
 class TokenPayload(TypedDict):
     username: str
-    id: int
+    id: uuid.UUID
+
+
+def _normalize_token_data(data: dict[str, Any]) -> dict[str, Any]:
+    normalized: dict[str, Any] = {}
+    for key, value in data.items():
+        if isinstance(value, uuid.UUID):
+            normalized[key] = str(value)
+        else:
+            normalized[key] = value
+    return normalized
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.copy()
+    to_encode = _normalize_token_data(data)
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
@@ -49,7 +60,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 
 def create_refresh_token(data: dict):
-    to_encode = data.copy()
+    to_encode = _normalize_token_data(data)
     expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -72,10 +83,17 @@ def verify_token(token: str) -> TokenPayload:
 
         username = payload.get("username")
         user_id = payload.get("id")
-        if not isinstance(username, str) or not isinstance(user_id, int):
+        if not isinstance(username, str) or not isinstance(user_id, str):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
-        return {"username": username, "id": user_id}
+        try:
+            parsed_user_id = uuid.UUID(user_id)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+            ) from exc
+
+        return {"username": username, "id": parsed_user_id}
     except InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 

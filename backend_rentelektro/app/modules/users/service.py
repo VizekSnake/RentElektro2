@@ -1,6 +1,7 @@
 import logging
 from datetime import UTC, datetime, timedelta
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+from uuid import UUID
 
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -112,7 +113,7 @@ def create_user(db: Session, user: UserCreate) -> UserModel:
         ) from exc
 
 
-def get_user_or_404(db: Session, user_id: int) -> UserModel:
+def get_user_or_404(db: Session, user_id: UUID) -> UserModel:
     user = repository.get_by_id(db, user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -126,7 +127,7 @@ def list_users_or_404(db: Session) -> list[UserModel]:
     return users
 
 
-def update_user(db: Session, user_id: int, user_update: UserUpdate) -> UserModel:
+def update_user(db: Session, user_id: UUID, user_update: UserUpdate) -> UserModel:
     db_user = get_user_or_404(db, user_id)
     apply_update(db_user, user_update)
     try:
@@ -141,7 +142,7 @@ def update_user(db: Session, user_id: int, user_update: UserUpdate) -> UserModel
         ) from exc
 
 
-def delete_user(db: Session, user_id: int) -> None:
+def delete_user(db: Session, user_id: UUID) -> None:
     db_user = get_user_or_404(db, user_id)
     try:
         db.delete(db_user)
@@ -154,7 +155,7 @@ def delete_user(db: Session, user_id: int) -> None:
         ) from exc
 
 
-def change_password(db: Session, user_id: int, payload: PasswordChangeRequest) -> None:
+def change_password(db: Session, user_id: UUID, payload: PasswordChangeRequest) -> None:
     user = get_user_or_404(db, user_id)
     if not verify_password(payload.current_password, user.hashed_password):
         raise HTTPException(
@@ -173,7 +174,7 @@ def change_password(db: Session, user_id: int, payload: PasswordChangeRequest) -
         ) from exc
 
 
-def anonymize_user(db: Session, user_id: int, payload: AccountAnonymizeRequest) -> None:
+def anonymize_user(db: Session, user_id: UUID, payload: AccountAnonymizeRequest) -> None:
     user = get_user_or_404(db, user_id)
     if not verify_password(payload.current_password, user.hashed_password):
         raise HTTPException(

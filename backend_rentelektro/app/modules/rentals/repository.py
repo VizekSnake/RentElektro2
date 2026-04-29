@@ -1,3 +1,4 @@
+import uuid
 from typing import cast
 
 from sqlalchemy.orm import Session, aliased
@@ -9,7 +10,7 @@ from app.modules.users.models import User as UserModel
 RentalFeedRow = tuple[RentalModel, ToolModel, UserModel, UserModel]
 
 
-def get_by_id(db: Session, rental_id: int) -> RentalModel | None:
+def get_by_id(db: Session, rental_id: uuid.UUID) -> RentalModel | None:
     return db.get(RentalModel, rental_id)
 
 
@@ -17,7 +18,9 @@ def list_all(db: Session) -> list[RentalModel]:
     return db.query(RentalModel).all()
 
 
-def get_by_id_for_owner(db: Session, rental_id: int, owner_id: int) -> RentalModel | None:
+def get_by_id_for_owner(
+    db: Session, rental_id: uuid.UUID, owner_id: uuid.UUID
+) -> RentalModel | None:
     return (
         db.query(RentalModel)
         .join(ToolModel, ToolModel.id == RentalModel.tool_id)
@@ -26,7 +29,9 @@ def get_by_id_for_owner(db: Session, rental_id: int, owner_id: int) -> RentalMod
     )
 
 
-def get_by_id_for_renter(db: Session, rental_id: int, renter_id: int) -> RentalModel | None:
+def get_by_id_for_renter(
+    db: Session, rental_id: uuid.UUID, renter_id: uuid.UUID
+) -> RentalModel | None:
     return (
         db.query(RentalModel)
         .filter(RentalModel.id == rental_id, RentalModel.user_id == renter_id)
@@ -34,7 +39,7 @@ def get_by_id_for_renter(db: Session, rental_id: int, renter_id: int) -> RentalM
     )
 
 
-def list_for_owner(db: Session, owner_id: int) -> list[RentalFeedRow]:
+def list_for_owner(db: Session, owner_id: uuid.UUID) -> list[RentalFeedRow]:
     owner = aliased(UserModel)
     requester = aliased(UserModel)
     rows = (
@@ -43,13 +48,13 @@ def list_for_owner(db: Session, owner_id: int) -> list[RentalFeedRow]:
         .join(requester, requester.id == RentalModel.user_id)
         .join(owner, owner.id == ToolModel.owner_id)
         .filter(owner.id == owner_id)
-        .order_by(RentalModel.id.desc())
+        .order_by(RentalModel.created_at.desc(), RentalModel.id.desc())
         .all()
     )
     return cast(list[RentalFeedRow], rows)
 
 
-def list_for_renter(db: Session, renter_id: int) -> list[RentalFeedRow]:
+def list_for_renter(db: Session, renter_id: uuid.UUID) -> list[RentalFeedRow]:
     owner = aliased(UserModel)
     requester = aliased(UserModel)
     rows = (
@@ -58,7 +63,7 @@ def list_for_renter(db: Session, renter_id: int) -> list[RentalFeedRow]:
         .join(requester, requester.id == RentalModel.user_id)
         .join(owner, owner.id == ToolModel.owner_id)
         .filter(requester.id == renter_id)
-        .order_by(RentalModel.id.desc())
+        .order_by(RentalModel.created_at.desc(), RentalModel.id.desc())
         .all()
     )
     return cast(list[RentalFeedRow], rows)

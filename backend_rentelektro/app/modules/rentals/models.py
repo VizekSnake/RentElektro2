@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime
+import uuid
+from datetime import UTC, datetime
 from enum import Enum as PyEnum
 
+from nanoid import generate
 from sqlalchemy import DateTime, Enum as SQLAlchemyEnum, ForeignKey, String, false
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.types import Uuid
 
 from app.core.database import Base
 
@@ -22,12 +25,30 @@ class AcceptedEnum(str, PyEnum):
     scam = "scam"
 
 
+def generate_offer_number() -> str:
+    return f"REN-{generate(alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789', size=6)}"
+
+
 class Rental(Base):
     __tablename__ = "rentals"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    tool_id: Mapped[int] = mapped_column(ForeignKey("tools.id"))
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4, index=True, unique=True
+    )
+    public_id: Mapped[str] = mapped_column(
+        String(12),
+        unique=True,
+        index=True,
+        nullable=False,
+        default=generate_offer_number,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"))
+    tool_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("tools.id"))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        index=True,
+    )
     start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     comment: Mapped[str | None] = mapped_column(String, nullable=True)

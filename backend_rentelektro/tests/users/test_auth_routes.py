@@ -41,6 +41,7 @@ def test_read_users_me(client, test_user):
     response = client.get("/api/v1/users/me")
     assert response.status_code == 200
     assert response.json()["username"] == "testuser"
+    assert response.json()["id"] == str(test_user.id)
 
 
 def test_read_current_user_data(client, test_user):
@@ -53,14 +54,14 @@ def test_read_current_user_data(client, test_user):
 
 
 def test_get_user(client, test_user):
-    response = client.get("/api/v1/users/1")
+    response = client.get(f"/api/v1/users/{test_user.id}")
     assert response.status_code == 200
     assert response.json()["username"] == "testuser"
 
 
 def test_update_user(client, test_user):
     response = client.patch(
-        "/api/v1/users/1",
+        f"/api/v1/users/{test_user.id}",
         json={
             "firstname": "Updated",
             "lastname": "User",
@@ -71,7 +72,7 @@ def test_update_user(client, test_user):
 
 
 def test_delete_user(client, test_user):
-    response = client.delete("/api/v1/users/1")
+    response = client.delete(f"/api/v1/users/{test_user.id}")
     assert response.status_code == 204  # User not found
 
 

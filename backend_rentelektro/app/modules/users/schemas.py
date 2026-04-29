@@ -1,4 +1,5 @@
 from typing import List, Optional, Union
+from uuid import UUID
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, EmailStr, Field
 
@@ -61,7 +62,7 @@ class UserUpdate(BaseModel):
 
 
 class User(UserBase):
-    id: int
+    id: UUID
     username: str
     firstname: str
     lastname: str
@@ -73,7 +74,7 @@ class User(UserBase):
 
 
 class UserProfile(UserBase):
-    id: int
+    id: UUID
     username: str
     firstname: str
     lastname: str

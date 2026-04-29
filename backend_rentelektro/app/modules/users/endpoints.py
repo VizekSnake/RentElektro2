@@ -1,4 +1,5 @@
 from datetime import timedelta
+from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response, status
 from fastapi.responses import JSONResponse
@@ -195,15 +196,15 @@ def logout(response: Response):
 
 
 @router.get("/{user_id}", response_model=UserResponse)
-async def get_user(user_id: int, db: Session = Depends(get_db)) -> UserModel:
+async def get_user(user_id: UUID, db: Session = Depends(get_db)) -> UserModel:
     return users_service.get_user_or_404(db, user_id=user_id)
 
 
 @router.patch("/{user_id}", response_model=UserResponse)
-async def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)) -> UserModel:
+async def update_user(user_id: UUID, user: UserUpdate, db: Session = Depends(get_db)) -> UserModel:
     return users_service.update_user(db=db, user_id=user_id, user_update=user)
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: int, db: Session = Depends(get_db)):
+async def delete_user(user_id: UUID, db: Session = Depends(get_db)):
     users_service.delete_user(db=db, user_id=user_id)

@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
@@ -5,11 +7,11 @@ from app.modules.tools.models import Category as CategoryModel, Tool as ToolMode
 from app.modules.tools.schemas import ToolListFilters
 
 
-def get_tool_by_id(db: Session, tool_id: int) -> ToolModel | None:
+def get_tool_by_id(db: Session, tool_id: UUID) -> ToolModel | None:
     return db.query(ToolModel).filter(ToolModel.id == tool_id).first()
 
 
-def get_tool_by_id_for_owner(db: Session, tool_id: int, owner_id: int) -> ToolModel | None:
+def get_tool_by_id_for_owner(db: Session, tool_id: UUID, owner_id: UUID) -> ToolModel | None:
     return (
         db.query(ToolModel).filter(ToolModel.id == tool_id, ToolModel.owner_id == owner_id).first()
     )
@@ -40,13 +42,25 @@ def list_tools(db: Session, filters: ToolListFilters) -> tuple[list[ToolModel], 
     total = query.with_entities(func.count(ToolModel.id)).scalar() or 0
 
     if filters.sort == "price_asc":
-        query = query.order_by(ToolModel.RatePerDay.asc(), ToolModel.id.desc())
+        query = query.order_by(
+            ToolModel.RatePerDay.asc(),
+            ToolModel.created_at.desc(),
+            ToolModel.id.desc(),
+        )
     elif filters.sort == "price_desc":
-        query = query.order_by(ToolModel.RatePerDay.desc(), ToolModel.id.desc())
+        query = query.order_by(
+            ToolModel.RatePerDay.desc(),
+            ToolModel.created_at.desc(),
+            ToolModel.id.desc(),
+        )
     elif filters.sort == "name":
-        query = query.order_by(ToolModel.Type.asc(), ToolModel.id.desc())
+        query = query.order_by(
+            ToolModel.Type.asc(),
+            ToolModel.created_at.desc(),
+            ToolModel.id.desc(),
+        )
     else:
-        query = query.order_by(ToolModel.id.desc())
+        query = query.order_by(ToolModel.created_at.desc(), ToolModel.id.desc())
 
     offset = (filters.page - 1) * filters.page_size
     items = query.offset(offset).limit(filters.page_size).all()
@@ -57,10 +71,10 @@ def list_categories(db: Session) -> list[CategoryModel]:
     return db.query(CategoryModel).all()
 
 
-def list_tools_for_owner(db: Session, owner_id: int) -> list[ToolModel]:
+def list_tools_for_owner(db: Session, owner_id: UUID) -> list[ToolModel]:
     return (
         db.query(ToolModel)
         .filter(ToolModel.owner_id == owner_id)
-        .order_by(ToolModel.id.desc())
+        .order_by(ToolModel.created_at.desc(), ToolModel.id.desc())
         .all()
     )

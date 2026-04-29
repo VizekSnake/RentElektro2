@@ -1,3 +1,4 @@
+import uuid
 from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
@@ -61,7 +62,7 @@ def _serialize_rental_feed_item(
     )
 
 
-def create_rental(db: Session, rental: RentalAdd, current_user_id: int) -> RentalModel:
+def create_rental(db: Session, rental: RentalAdd, current_user_id: uuid.UUID) -> RentalModel:
     if rental.user_id != current_user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -112,28 +113,30 @@ def create_rental(db: Session, rental: RentalAdd, current_user_id: int) -> Renta
         ) from exc
 
 
-def get_rental_or_404(db: Session, rental_id: int) -> RentalModel:
+def get_rental_or_404(db: Session, rental_id: uuid.UUID) -> RentalModel:
     rental = repository.get_by_id(db, rental_id)
     if rental is None:
         raise HTTPException(status_code=404, detail="Rental not found")
     return rental
 
 
-def get_owned_rental_or_404(db: Session, rental_id: int, owner_id: int) -> RentalModel:
+def get_owned_rental_or_404(db: Session, rental_id: uuid.UUID, owner_id: uuid.UUID) -> RentalModel:
     rental = repository.get_by_id_for_owner(db, rental_id, owner_id)
     if rental is None:
         raise HTTPException(status_code=404, detail="Rental not found")
     return rental
 
 
-def get_renter_rental_or_404(db: Session, rental_id: int, renter_id: int) -> RentalModel:
+def get_renter_rental_or_404(
+    db: Session, rental_id: uuid.UUID, renter_id: uuid.UUID
+) -> RentalModel:
     rental = repository.get_by_id_for_renter(db, rental_id, renter_id)
     if rental is None:
         raise HTTPException(status_code=404, detail="Rental not found")
     return rental
 
 
-def update_rental(db: Session, rental_id: int, rental_update: RentalUpdate) -> RentalModel:
+def update_rental(db: Session, rental_id: uuid.UUID, rental_update: RentalUpdate) -> RentalModel:
     db_rental = get_rental_or_404(db, rental_id)
     apply_update(db_rental, rental_update)
     try:
@@ -148,7 +151,7 @@ def update_rental(db: Session, rental_id: int, rental_update: RentalUpdate) -> R
         ) from exc
 
 
-def delete_rental(db: Session, rental_id: int) -> None:
+def delete_rental(db: Session, rental_id: uuid.UUID) -> None:
     db_rental = get_rental_or_404(db, rental_id)
     try:
         db.delete(db_rental)
@@ -165,7 +168,7 @@ def list_rentals(db: Session) -> list[RentalModel]:
     return repository.list_all(db)
 
 
-def list_owner_inbox(db: Session, owner_id: int) -> list[RentalInboxItem]:
+def list_owner_inbox(db: Session, owner_id: uuid.UUID) -> list[RentalInboxItem]:
     rows = repository.list_for_owner(db, owner_id)
     return [
         _serialize_rental_feed_item(rental, tool, requester, owner)
@@ -173,7 +176,7 @@ def list_owner_inbox(db: Session, owner_id: int) -> list[RentalInboxItem]:
     ]
 
 
-def list_renter_requests(db: Session, renter_id: int) -> list[RentalInboxItem]:
+def list_renter_requests(db: Session, renter_id: uuid.UUID) -> list[RentalInboxItem]:
     rows = repository.list_for_renter(db, renter_id)
     return [
         _serialize_rental_feed_item(rental, tool, requester, owner)
@@ -182,7 +185,10 @@ def list_renter_requests(db: Session, renter_id: int) -> list[RentalInboxItem]:
 
 
 def decide_rental(
-    db: Session, rental_id: int, owner_id: int, decision: RentalDecisionUpdate
+    db: Session,
+    rental_id: uuid.UUID,
+    owner_id: uuid.UUID,
+    decision: RentalDecisionUpdate,
 ) -> RentalModel:
     if decision.status not in {AcceptedEnum.accepted, AcceptedEnum.rejected_by_owner}:
         raise HTTPException(
@@ -219,8 +225,8 @@ def decide_rental(
 
 def pay_rental(
     db: Session,
-    rental_id: int,
-    renter_id: int,
+    rental_id: uuid.UUID,
+    renter_id: uuid.UUID,
     payment: RentalPaymentUpdate,
 ) -> RentalModel:
     if not all(
@@ -262,8 +268,8 @@ def pay_rental(
 
 def update_owner_rental_status(
     db: Session,
-    rental_id: int,
-    owner_id: int,
+    rental_id: uuid.UUID,
+    owner_id: uuid.UUID,
     status_update: RentalOwnerStatusUpdate,
 ) -> RentalModel:
     allowed_transitions = {
@@ -301,7 +307,7 @@ def update_owner_rental_status(
 
 def mark_notifications_read(
     db: Session,
-    user_id: int,
+    user_id: uuid.UUID,
     payload: RentalNotificationsReadUpdate,
 ) -> RentalNotificationsReadResult:
     updated_owner = 0

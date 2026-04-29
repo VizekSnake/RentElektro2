@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from uuid import UUID
 
 from sqlalchemy.orm import Session
 
@@ -8,7 +9,7 @@ from app.modules.users.models import (
 )
 
 
-def get_by_id(db: Session, user_id: int) -> UserModel | None:
+def get_by_id(db: Session, user_id: UUID) -> UserModel | None:
     return db.query(UserModel).filter(UserModel.id == user_id).first()
 
 
@@ -34,7 +35,7 @@ def get_password_reset_token_by_hash(
     )
 
 
-def delete_password_reset_tokens_for_user(db: Session, user_id: int) -> None:
+def delete_password_reset_tokens_for_user(db: Session, user_id: UUID) -> None:
     (
         db.query(PasswordResetTokenModel)
         .filter(PasswordResetTokenModel.user_id == user_id)

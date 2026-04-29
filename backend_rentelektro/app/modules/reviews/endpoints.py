@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
@@ -21,7 +23,7 @@ def add_review(
 
 @router.get("/{tool_id}", response_model=ReviewSummary)
 def read_reviews(
-    tool_id: int,
+    tool_id: uuid.UUID,
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=10, ge=1, le=100),
     db: Session = Depends(get_db),

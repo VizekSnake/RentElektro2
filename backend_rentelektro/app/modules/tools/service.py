@@ -1,4 +1,5 @@
 import logging
+from uuid import UUID
 
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -19,7 +20,7 @@ from app.modules.tools.schemas import (
 logger = logging.getLogger(__name__)
 
 
-def create_tool(db: Session, tool: ToolAdd, user_id: int) -> ToolModel:
+def create_tool(db: Session, tool: ToolAdd, user_id: UUID) -> ToolModel:
     logger.info("create_tool_attempt owner_id=%s type=%s brand=%s", user_id, tool.Type, tool.Brand)
     db_tool = ToolModel(
         **tool.model_dump(exclude={"owner_id", "TypeLabel", "PowerSourceLabel"}),
@@ -40,7 +41,7 @@ def create_tool(db: Session, tool: ToolAdd, user_id: int) -> ToolModel:
         ) from exc
 
 
-def create_category(db: Session, category: CategoryAdd, user_id: int) -> CategoryModel:
+def create_category(db: Session, category: CategoryAdd, user_id: UUID) -> CategoryModel:
     logger.info("create_category_attempt creator_id=%s name=%s", user_id, category.name)
     db_category = CategoryModel(**category.model_dump(), creator_id=user_id)
     db.add(db_category)
@@ -60,14 +61,14 @@ def create_category(db: Session, category: CategoryAdd, user_id: int) -> Categor
         ) from exc
 
 
-def get_tool_or_404(db: Session, tool_id: int) -> ToolModel:
+def get_tool_or_404(db: Session, tool_id: UUID) -> ToolModel:
     db_tool = repository.get_tool_by_id(db, tool_id)
     if db_tool is None:
         raise HTTPException(status_code=404, detail="Tool not found")
     return db_tool
 
 
-def get_owned_tool_or_404(db: Session, tool_id: int, owner_id: int) -> ToolModel:
+def get_owned_tool_or_404(db: Session, tool_id: UUID, owner_id: UUID) -> ToolModel:
     db_tool = repository.get_tool_by_id_for_owner(db, tool_id, owner_id)
     if db_tool is None:
         raise HTTPException(status_code=404, detail="Tool not found")
@@ -95,11 +96,11 @@ def list_categories_or_404(db: Session) -> list[CategoryModel]:
     return categories
 
 
-def list_owner_tools(db: Session, owner_id: int) -> list[ToolModel]:
+def list_owner_tools(db: Session, owner_id: UUID) -> list[ToolModel]:
     return repository.list_tools_for_owner(db, owner_id)
 
 
-def update_tool(db: Session, tool_id: int, tool_update: ToolUpdate, owner_id: int) -> ToolModel:
+def update_tool(db: Session, tool_id: UUID, tool_update: ToolUpdate, owner_id: UUID) -> ToolModel:
     logger.info("update_tool_attempt tool_id=%s owner_id=%s", tool_id, owner_id)
     db_tool = get_owned_tool_or_404(db, tool_id, owner_id)
     apply_update(db_tool, tool_update)
@@ -117,7 +118,7 @@ def update_tool(db: Session, tool_id: int, tool_update: ToolUpdate, owner_id: in
         ) from exc
 
 
-def delete_tool(db: Session, tool_id: int, owner_id: int) -> None:
+def delete_tool(db: Session, tool_id: UUID, owner_id: UUID) -> None:
     logger.info("delete_tool_attempt tool_id=%s owner_id=%s", tool_id, owner_id)
     db_tool = get_owned_tool_or_404(db, tool_id, owner_id)
     try:

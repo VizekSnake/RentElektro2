@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -9,13 +10,13 @@ class ReviewBase(BaseModel):
 
 
 class ReviewCreate(ReviewBase):
-    tool_id: int
+    tool_id: uuid.UUID
 
 
 class Review(ReviewBase):
-    id: int
-    tool_id: int
-    user_id: int
+    id: uuid.UUID
+    tool_id: uuid.UUID
+    user_id: uuid.UUID
 
     model_config = ConfigDict(from_attributes=True)
 

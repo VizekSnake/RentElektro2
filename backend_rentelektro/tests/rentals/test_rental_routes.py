@@ -1,3 +1,5 @@
+import uuid
+
 from app.core.security import get_current_user
 from app.modules.rentals.models import AcceptedEnum as RentalStatus
 from app.modules.tools.models import Category as CategoryModel, Tool as ToolModel
@@ -5,7 +7,7 @@ from app.modules.users.schemas import UserCreate
 from app.modules.users.service import create_user
 
 
-def _create_tool(db_session, owner_id: int) -> ToolModel:
+def _create_tool(db_session, owner_id: uuid.UUID) -> ToolModel:
     category = CategoryModel(
         name="Construction", description="Construction tools", active=True, creator_id=owner_id
     )
@@ -51,8 +53,8 @@ def test_rental_crud_flow(auth_client, db_session, test_user):
     create_response = auth_client.post(
         "/api/v1/rentals",
         json={
-            "tool_id": tool.id,
-            "user_id": test_user.id,
+            "tool_id": str(tool.id),
+            "user_id": str(test_user.id),
             "start_date": "23.03.2026",
             "end_date": "25.03.2026",
             "comment": "Need it for a renovation",
@@ -65,7 +67,7 @@ def test_rental_crud_flow(auth_client, db_session, test_user):
 
     read_response = auth_client.get(f"/api/v1/rentals/{rental_id}")
     assert read_response.status_code == 200
-    assert read_response.json()["tool_id"] == tool.id
+    assert read_response.json()["tool_id"] == str(tool.id)
 
     update_response = auth_client.patch(
         f"/api/v1/rentals/{rental_id}",
@@ -101,8 +103,8 @@ def test_owner_inbox_and_decision_flow(auth_client, client, db_session, test_use
     create_response = client.post(
         "/api/v1/rentals",
         json={
-            "tool_id": tool.id,
-            "user_id": renter.id,
+            "tool_id": str(tool.id),
+            "user_id": str(renter.id),
             "start_date": "23.03.2026",
             "end_date": "25.03.2026",
             "comment": "Potrzebuję na weekendowy remont",
@@ -116,8 +118,8 @@ def test_owner_inbox_and_decision_flow(auth_client, client, db_session, test_use
         create_response = auth_client.post(
             "/api/v1/rentals",
             json={
-                "tool_id": tool.id,
-                "user_id": renter.id,
+                "tool_id": str(tool.id),
+                "user_id": str(renter.id),
                 "start_date": "23.03.2026",
                 "end_date": "25.03.2026",
                 "comment": "Potrzebuję na weekendowy remont",

@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from typing import Literal, Optional
+from uuid import UUID
 
 from pydantic import (
     BaseModel,
@@ -11,9 +12,9 @@ from app.modules.rentals.models import AcceptedEnum
 
 
 class Rental(BaseModel):
-    id: int
-    tool_id: int
-    user_id: int
+    id: UUID
+    tool_id: UUID
+    user_id: UUID
     start_date: date
     end_date: date
     comment: Optional[str] = None
@@ -29,8 +30,8 @@ class Rental(BaseModel):
 
 
 class RentalAdd(BaseModel):
-    tool_id: int
-    user_id: int
+    tool_id: UUID
+    user_id: UUID
     start_date: date
     end_date: date
     comment: str
@@ -43,8 +44,8 @@ class RentalAdd(BaseModel):
 
 
 class RentalUpdate(BaseModel):
-    tool_id: Optional[int] = None
-    user_id: Optional[int] = None
+    tool_id: Optional[UUID] = None
+    user_id: Optional[UUID] = None
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     comment: Optional[str] = None
@@ -67,7 +68,7 @@ class RentalOwnerStatusUpdate(BaseModel):
 
 
 class RentalInboxTool(BaseModel):
-    id: int
+    id: UUID
     Type: str
     TypeLabel: Optional[str] = None
     Brand: str
@@ -79,7 +80,7 @@ class RentalInboxTool(BaseModel):
 
 
 class RentalParticipant(BaseModel):
-    id: int
+    id: UUID
     username: str
     firstname: str
     lastname: str
@@ -90,9 +91,9 @@ class RentalParticipant(BaseModel):
 
 
 class RentalInboxItem(BaseModel):
-    id: int
-    tool_id: int
-    user_id: int
+    id: UUID
+    tool_id: UUID
+    user_id: UUID
     start_date: date
     end_date: date
     comment: Optional[str] = None

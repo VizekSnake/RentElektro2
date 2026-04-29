@@ -1,4 +1,5 @@
 from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
@@ -8,7 +9,7 @@ class ToolWriteFields(BaseModel):
     PowerSource: Optional[str] = None
     Brand: Optional[str] = None
     Description: Optional[str] = None
-    category_id: Optional[int] = None
+    category_id: Optional[UUID] = None
     Availability: Optional[bool] = None
     Insurance: Optional[bool] = None
     Power: Optional[int] = None
@@ -27,12 +28,12 @@ class ToolUpdate(ToolWriteFields):
 
 
 class ToolAdd(ToolBase):
-    owner_id: Optional[int] = None
+    owner_id: Optional[UUID] = None
 
 
 class Tool(ToolBase):
-    id: int
-    owner_id: int
+    id: UUID
+    owner_id: UUID
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -46,8 +47,8 @@ class ToolCategory(BaseModel):
 
 
 class Category(ToolCategory):
-    creator_id: int
-    id: int
+    creator_id: UUID
+    id: UUID
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -60,7 +61,7 @@ class ToolListFilters(BaseModel):
     search: str | None = None
     power_source: str | None = None
     availability: bool | None = None
-    category_id: int | None = None
+    category_id: UUID | None = None
     sort: str = "newest"
     page: int = 1
     page_size: int = 9

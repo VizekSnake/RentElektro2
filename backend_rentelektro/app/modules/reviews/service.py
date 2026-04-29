@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -8,7 +10,7 @@ from app.modules.reviews.schemas import ReviewCreate, ReviewSummary
 from app.modules.tools.models import Tool as ToolModel
 
 
-def create_review(db: Session, review: ReviewCreate, user_id: int) -> ReviewModel:
+def create_review(db: Session, review: ReviewCreate, user_id: uuid.UUID) -> ReviewModel:
     tool = db.get(ToolModel, review.tool_id)
     if tool is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tool not found")
@@ -37,7 +39,9 @@ def create_review(db: Session, review: ReviewCreate, user_id: int) -> ReviewMode
         ) from exc
 
 
-def get_reviews_summary(db: Session, tool_id: int, skip: int = 0, limit: int = 10) -> ReviewSummary:
+def get_reviews_summary(
+    db: Session, tool_id: uuid.UUID, skip: int = 0, limit: int = 10
+) -> ReviewSummary:
     tool = db.get(ToolModel, tool_id)
     if tool is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tool not found")

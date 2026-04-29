@@ -1,4 +1,5 @@
 from typing import List
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
@@ -36,14 +37,14 @@ async def add_category(
 
 @router.delete("/{tool_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_tool(
-    tool_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)
+    tool_id: UUID, user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
     tools_service.delete_tool(db=db, tool_id=tool_id, owner_id=user.id)
 
 
 @router.patch("/{tool_id}", response_model=Tool)
 async def update_tool(
-    tool_id: int,
+    tool_id: UUID,
     tool: ToolUpdate,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -56,7 +57,7 @@ async def get_all(
     search: str | None = Query(default=None),
     power_source: str | None = Query(default=None),
     availability: bool | None = Query(default=None),
-    category_id: int | None = Query(default=None),
+    category_id: UUID | None = Query(default=None),
     sort: str = Query(default="newest"),
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=9, ge=1, le=24),
@@ -88,5 +89,5 @@ async def get_my_tools(
 
 
 @router.get("/{tool_id}", response_model=Tool)
-async def get_tool(tool_id: int, db: Session = Depends(get_db)):
+async def get_tool(tool_id: UUID, db: Session = Depends(get_db)):
     return tools_service.get_tool_or_404(db, tool_id=tool_id)

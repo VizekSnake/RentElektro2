@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
@@ -60,25 +62,25 @@ async def mark_rental_notifications_read(
 
 
 @router.get("/{rental_id}", response_model=Rental)
-async def read_rental(rental_id: int, db: Session = Depends(get_db)):
+async def read_rental(rental_id: uuid.UUID, db: Session = Depends(get_db)):
     return rentals_service.get_rental_or_404(db, rental_id)
 
 
 @router.patch("/{rental_id}", response_model=Rental)
 async def update_rental_endpoint(
-    rental_id: int, rental: RentalUpdate, db: Session = Depends(get_db)
+    rental_id: uuid.UUID, rental: RentalUpdate, db: Session = Depends(get_db)
 ):
     return rentals_service.update_rental(db, rental_id, rental)
 
 
 @router.delete("/{rental_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_rental_endpoint(rental_id: int, db: Session = Depends(get_db)):
+async def delete_rental_endpoint(rental_id: uuid.UUID, db: Session = Depends(get_db)):
     rentals_service.delete_rental(db, rental_id)
 
 
 @router.patch("/{rental_id}/decision", response_model=Rental)
 async def decide_rental_endpoint(
-    rental_id: int,
+    rental_id: uuid.UUID,
     decision: RentalDecisionUpdate,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -88,7 +90,7 @@ async def decide_rental_endpoint(
 
 @router.patch("/{rental_id}/pay", response_model=Rental)
 async def pay_rental_endpoint(
-    rental_id: int,
+    rental_id: uuid.UUID,
     payment: RentalPaymentUpdate,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -98,7 +100,7 @@ async def pay_rental_endpoint(
 
 @router.patch("/{rental_id}/owner-status", response_model=Rental)
 async def update_owner_rental_status_endpoint(
-    rental_id: int,
+    rental_id: uuid.UUID,
     status_update: RentalOwnerStatusUpdate,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
