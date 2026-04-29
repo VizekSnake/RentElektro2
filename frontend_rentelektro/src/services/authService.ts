@@ -19,6 +19,19 @@ export type SignUpPayload = {
   password: string;
 };
 
+export type PasswordResetRequestPayload = {
+  email: string;
+};
+
+export type PasswordResetConfirmPayload = {
+  token: string;
+  new_password: string;
+};
+
+export type MessageResponse = {
+  message: string;
+};
+
 export async function loginWithPassword(username: string, password: string): Promise<void> {
   logger.info('login_attempt', { username });
 
@@ -97,4 +110,20 @@ export async function registerUser(payload: SignUpPayload): Promise<void> {
     logger.warn('register_failed', { detail: error instanceof Error ? error.message : undefined });
     throw error;
   }
+}
+
+export async function requestPasswordReset(
+  payload: PasswordResetRequestPayload,
+): Promise<MessageResponse> {
+  logger.info('password_reset_request_attempt', { email: payload.email });
+  const response = await apiClient.POST('/users/password-reset/request', { body: payload });
+  return unwrapApiResponse(response, 'Nie udało się wygenerować linku resetu hasła.');
+}
+
+export async function confirmPasswordReset(
+  payload: PasswordResetConfirmPayload,
+): Promise<MessageResponse> {
+  logger.info('password_reset_confirm_attempt');
+  const response = await apiClient.POST('/users/password-reset/confirm', { body: payload });
+  return unwrapApiResponse(response, 'Nie udało się zresetować hasła.');
 }

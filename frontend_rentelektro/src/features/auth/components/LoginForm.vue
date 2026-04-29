@@ -35,6 +35,10 @@
     </v-form>
 
     <div class="text-body-2 text-medium-emphasis text-center">
+      <router-link class="app-inline-link" to="/forgot-password">Nie pamiętasz hasła?</router-link>
+    </div>
+
+    <div class="text-body-2 text-medium-emphasis text-center">
       Nie masz konta?
       <router-link class="app-inline-link" to="/signup">Zarejestruj się</router-link>
     </div>

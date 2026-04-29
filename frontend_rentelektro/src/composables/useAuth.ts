@@ -1,10 +1,17 @@
 import { computed, ref } from 'vue';
-import type { SignUpPayload, SessionUser } from '@/services/authService';
+import type {
+  PasswordResetConfirmPayload,
+  PasswordResetRequestPayload,
+  SignUpPayload,
+  SessionUser,
+} from '@/services/authService';
 import {
+  confirmPasswordReset,
   ensureAuthenticated,
   getSessionUser,
   loginWithPassword,
   logoutSession,
+  requestPasswordReset,
   registerUser,
 } from '@/services/authService';
 
@@ -47,6 +54,26 @@ export function useAuth() {
     }
   };
 
+  const requestReset = async (payload: PasswordResetRequestPayload): Promise<string> => {
+    isSubmitting.value = true;
+    try {
+      const result = await requestPasswordReset(payload);
+      return result.message;
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
+  const confirmReset = async (payload: PasswordResetConfirmPayload): Promise<string> => {
+    isSubmitting.value = true;
+    try {
+      const result = await confirmPasswordReset(payload);
+      return result.message;
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+
   return {
     sessionUser,
     isAuthenticated,
@@ -56,5 +83,7 @@ export function useAuth() {
     login,
     signup,
     logout,
+    requestReset,
+    confirmReset,
   };
 }

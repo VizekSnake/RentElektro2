@@ -46,6 +46,19 @@ type RefreshTokenResponse = {
   token_type: string;
 };
 
+type MessageResponse = {
+  message: string;
+};
+
+type PasswordResetRequestPayload = {
+  email: string;
+};
+
+type PasswordResetConfirmPayload = {
+  token: string;
+  new_password: string;
+};
+
 export interface paths {
   '/users/token': {
     post: {
@@ -113,6 +126,53 @@ export interface paths {
       responses: {
         204: {
           content: never;
+        };
+      };
+    };
+  };
+  '/users/password-reset/request': {
+    post: {
+      requestBody: {
+        content: {
+          'application/json': PasswordResetRequestPayload;
+        };
+      };
+      responses: {
+        202: {
+          content: {
+            'application/json': MessageResponse;
+          };
+        };
+        422: {
+          content: {
+            'application/json': ApiErrorPayload;
+          };
+        };
+      };
+    };
+  };
+  '/users/password-reset/confirm': {
+    post: {
+      requestBody: {
+        content: {
+          'application/json': PasswordResetConfirmPayload;
+        };
+      };
+      responses: {
+        200: {
+          content: {
+            'application/json': MessageResponse;
+          };
+        };
+        400: {
+          content: {
+            'application/json': ApiErrorPayload;
+          };
+        };
+        422: {
+          content: {
+            'application/json': ApiErrorPayload;
+          };
         };
       };
     };
