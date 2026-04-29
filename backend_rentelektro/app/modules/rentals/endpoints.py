@@ -1,9 +1,10 @@
 import uuid
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db
+from app.core.email import EmailSender, OutboundEmail, get_email_sender
 from app.core.security import get_current_user
 from app.modules.rentals import service as rentals_service
 from app.modules.rentals.schemas import (
@@ -106,3 +107,21 @@ async def update_owner_rental_status_endpoint(
     user: User = Depends(get_current_user),
 ):
     return rentals_service.update_owner_rental_status(db, rental_id, user.id, status_update)
+
+
+# TODO write test for this endpoint
+@router.post("/rentals/{rental_id}/notify-owner")
+def notify_owner(
+    rental_id: uuid.UUID,
+    background_tasks: BackgroundTasks,
+    email_sender: EmailSender = Depends(get_email_sender),
+):
+    message = OutboundEmail(
+        recipient="owner@example.com",
+        subject="Nowa rezerwacja",
+        text_body=f"Masz nową prośbę o wypożyczenie narzędzia {rental_id}.",
+    )
+
+    background_tasks.add_task(email_sender.send, message)
+
+    return {"message": "Email queued"}

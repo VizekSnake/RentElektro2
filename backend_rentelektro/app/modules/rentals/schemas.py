@@ -15,8 +15,8 @@ class Rental(BaseModel):
     id: UUID
     tool_id: UUID
     user_id: UUID
-    start_date: date
-    end_date: date
+    start_date: datetime
+    end_date: datetime
     comment: Optional[str] = None
     owner_comment: Optional[str] = ""
     status: AcceptedEnum = AcceptedEnum.not_viewed

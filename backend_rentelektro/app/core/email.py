@@ -51,6 +51,9 @@ class SMTPEmailSender:
         smtp = self._open_connection()
         try:
             smtp.send_message(email_message)
+        except Exception:
+            logger.exception("smtp_email_delivery_failed recipient=%s", message.recipient)
+            raise
         finally:
             smtp.quit()
 

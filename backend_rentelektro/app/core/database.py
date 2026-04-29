@@ -19,7 +19,7 @@ if make_url(settings.SQLALCHEMY_DATABASE_URL).get_backend_name() == "postgresql"
         "pool_timeout": 30,
         "pool_recycle": 3600,
     }
-
+# TODO make async SQLAlchemy -> postgresql+asyncpg://, create_async_engine , AsyncSession if load will grow
 engine = create_engine(settings.SQLALCHEMY_DATABASE_URL, **engine_options)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
